@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
@@ -10,19 +11,62 @@ namespace FileCabinetApp
         private const int DescriptionHelpIndex = 1;
         private const int ExplanationHelpIndex = 2;
 
+        private static FileCabinetService fileCabinetService = new FileCabinetService();
+
         private static bool isRunning = true;
 
         private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
+            new Tuple<string, Action<string>>("stat", Stat),
+            new Tuple<string, Action<string>>("create", Create),
+            new Tuple<string, Action<string>>("list", List),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
+            new string[] { "stat", "prints the number of records.", "The 'stat' command prints the number of records." },
+            new string[] { "create", "creates a new record.", "The 'create' command creates a new record." },
+            new string[] { "list", "prints the records.", "The 'list' prints the records." },
         };
+
+        private static void Stat(string parameters)
+        {
+            var recordsCount = Program.fileCabinetService.GetStat();
+            Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        private static void Create(string parameters)
+        {
+            Console.WriteLine("First Name: ");
+            string tempFirstName = Console.ReadLine();
+            Console.WriteLine("Last Name: ");
+            string tempLastName = Console.ReadLine();
+            Console.WriteLine("Date of Birth: ");
+            DateTime tempDateOfBirth = DateTime.ParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture);
+            Console.WriteLine("Favourite number: ");
+            short tmpFavouriteNumber = short.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            Console.WriteLine("Favourite character: ");
+            char tmpFavouriteCharacter = Console.ReadLine()[0];
+            Console.WriteLine("Favourite game: ");
+            string tmpFavouriteGame = Console.ReadLine();
+            Console.WriteLine("Donations: ");
+            decimal tmpDonations = decimal.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+            Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
+        }
+
+        private static void List(string parameters)
+        {
+            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
+            foreach (var record in tempList)
+            {
+                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
+            }
+        }
 
         public static void Main(string[] args)
         {

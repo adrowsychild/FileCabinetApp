@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FileCabinetApp
 {
@@ -19,6 +20,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
             new Tuple<string, Action<string>>("stat", Stat),
+            new Tuple<string, Action<string>>("create", Create),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -26,12 +28,25 @@ namespace FileCabinetApp
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
             new string[] { "stat", "prints the number of records.", "The 'stat' command prints the number of records." },
+            new string[] { "create", "creates a new record.", "The 'create' command creates a new record." },
         };
 
         private static void Stat(string parameters)
         {
             var recordsCount = Program.fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        private static void Create(string parameters)
+        {
+            Console.WriteLine("First Name: ");
+            string tempFirstName = Console.ReadLine();
+            Console.WriteLine("Last Name: ");
+            string tempLastName = Console.ReadLine();
+            Console.WriteLine("Date of Birth: ");
+            DateTime tempDateOfBirth = DateTime.ParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture);
+            fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth);
+            Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
         }
 
         public static void Main(string[] args)

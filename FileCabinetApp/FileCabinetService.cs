@@ -24,8 +24,9 @@
 
         public FileCabinetRecord[] GetRecords()
         {
-            // TODO: добавьте реализацию метода
-            return Array.Empty<FileCabinetRecord>();
+            FileCabinetRecord[] listCopied = new FileCabinetRecord[this.list.Count];
+            this.list.CopyTo(listCopied);
+            return listCopied;
         }
 
         public int GetStat()

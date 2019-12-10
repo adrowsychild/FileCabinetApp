@@ -47,7 +47,15 @@ namespace FileCabinetApp
             string tempLastName = Console.ReadLine();
             Console.WriteLine("Date of Birth: ");
             DateTime tempDateOfBirth = DateTime.ParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture);
-            fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth);
+            Console.WriteLine("Favourite number: ");
+            short tmpFavouriteNumber = short.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            Console.WriteLine("Favourite character: ");
+            char tmpFavouriteCharacter = Console.ReadLine()[0];
+            Console.WriteLine("Favourite game: ");
+            string tmpFavouriteGame = Console.ReadLine();
+            Console.WriteLine("Donations: ");
+            decimal tmpDonations = decimal.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
             Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
         }
 
@@ -56,7 +64,7 @@ namespace FileCabinetApp
             FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
             foreach (var record in tempList)
             {
-                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
             }
         }
 

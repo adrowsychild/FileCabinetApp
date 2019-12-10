@@ -1,0 +1,28 @@
+﻿namespace FileCabinetApp
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class FileCabinetService
+    {
+        private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+
+        public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth)
+        {
+            // TODO: добавьте реализацию метода
+            return 0;
+        }
+
+        public FileCabinetRecord[] GetRecords()
+        {
+            // TODO: добавьте реализацию метода
+            return new FileCabinetRecord[] { };
+        }
+
+        public int GetStat()
+        {
+            // TODO: добавьте реализацию метода
+            return 0;
+        }
+    }
+}

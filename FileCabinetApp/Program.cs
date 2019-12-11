@@ -41,22 +41,39 @@ namespace FileCabinetApp
 
         private static void Create(string parameters)
         {
+        tryinput:
             Console.WriteLine("First Name: ");
             string tempFirstName = Console.ReadLine();
             Console.WriteLine("Last Name: ");
             string tempLastName = Console.ReadLine();
             Console.WriteLine("Date of Birth: ");
-            DateTime tempDateOfBirth = DateTime.ParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture);
+            DateTime.TryParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime tempDateOfBirth);
             Console.WriteLine("Favourite number: ");
-            short tmpFavouriteNumber = short.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
+            short.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out short tmpFavouriteNumber);
             Console.WriteLine("Favourite character: ");
             char tmpFavouriteCharacter = Console.ReadLine()[0];
             Console.WriteLine("Favourite game: ");
             string tmpFavouriteGame = Console.ReadLine();
             Console.WriteLine("Donations: ");
-            decimal tmpDonations = decimal.Parse(Console.ReadLine(), CultureInfo.InvariantCulture);
-            fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
-            Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
+            decimal.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal tmpDonations);
+            try
+            {
+                fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message + " Please, try again.");
+                Console.WriteLine("Hint:");
+                string help = "First Name: from 2 to 60 symbols\n" +
+                              "Last Name:  from 2 to 60 symbols\n" +
+                              "Data of Birth: Month/Day/Year since 01-Jan-1950\n" +
+                              "Favourite number: integer, not negative\n" +
+                              "Favourite character: latin alphabet\n" +
+                              "Donations: not negative number\n";
+                Console.WriteLine(help);
+                goto tryinput;
+            }
         }
 
         private static void List(string parameters)

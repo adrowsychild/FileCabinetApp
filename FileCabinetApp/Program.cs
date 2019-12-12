@@ -22,15 +22,17 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("stat", Stat),
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
+            new Tuple<string, Action<string>>("edit", Edit),
         };
 
         private static string[][] helpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
-            new string[] { "stat", "prints the number of records.", "The 'stat' command prints the number of records." },
-            new string[] { "create", "creates a new record.", "The 'create' command creates a new record." },
-            new string[] { "list", "prints the records.", "The 'list' prints the records." },
+            new string[] { "stat", "prints the number of records", "The 'stat' command prints the number of records." },
+            new string[] { "create", "creates a new record", "The 'create' command creates a new record." },
+            new string[] { "edit", "edits the existing record", "The 'edit' command edits the existing record." },
+            new string[] { "list", "prints the records", "The 'list' prints the records." },
         };
 
         private static void Stat(string parameters)
@@ -40,6 +42,37 @@ namespace FileCabinetApp
         }
 
         private static void Create(string parameters)
+        {
+            CheckRecordInput("create", -1);
+            Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
+        }
+
+        private static void Edit(string parameters)
+        {
+            if (int.TryParse(parameters, out int id))
+            {
+                if (id < 1 || id > fileCabinetService.GetStat())
+                {
+                    Console.WriteLine("#" + id + " record is not found.");
+                    return;
+                }
+
+                id--;
+                CheckRecordInput("edit", id);
+                Console.WriteLine("Record #" + ++id + " is updated.");
+            }
+        }
+
+        private static void List(string parameters)
+        {
+            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
+            foreach (var record in tempList)
+            {
+                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
+            }
+        }
+
+        private static void CheckRecordInput(string action, int id)
         {
         tryinput:
             Console.WriteLine("First Name: ");
@@ -58,11 +91,24 @@ namespace FileCabinetApp
             decimal.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal tmpDonations);
             try
             {
-                fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
-                Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
+                switch (action)
+                {
+                    case "create":
+                        fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                        break;
+                    case "edit":
+                        fileCabinetService.EditRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                        break;
+                }
             }
             catch (ArgumentException ex)
             {
+                if (ex.Message == "id is invalid.")
+                {
+                    Console.WriteLine("#" + id + " record is not found.");
+                    return;
+                }
+
                 Console.WriteLine(ex.Message + " Please, try again.");
                 Console.WriteLine("Hint:");
                 string help = "First Name: from 2 to 60 symbols\n" +
@@ -73,15 +119,6 @@ namespace FileCabinetApp
                               "Donations: not negative number\n";
                 Console.WriteLine(help);
                 goto tryinput;
-            }
-        }
-
-        private static void List(string parameters)
-        {
-            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
-            foreach (var record in tempList)
-            {
-                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
             }
         }
 

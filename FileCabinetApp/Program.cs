@@ -93,6 +93,14 @@ namespace FileCabinetApp
                     }
 
                     break;
+                case "dateofbirth":
+                    foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
+                    foreach (var record in foundRecords)
+                    {
+                        ShowRecord(record);
+                    }
+
+                    break;
             }
         }
 

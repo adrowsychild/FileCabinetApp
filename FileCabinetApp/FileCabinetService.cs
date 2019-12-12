@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
 
     public class FileCabinetService
     {
@@ -68,6 +69,21 @@
             for (int i = 0; i < this.list.Count; i++)
             {
                 if (lastName.ToLower() == this.list[i].LastName.ToLower())
+                {
+                    foundRecords.Add(this.list[i]);
+                }
+            }
+
+            return foundRecords.ToArray();
+        }
+
+        public FileCabinetRecord[] FindByDateOfBirth(string dateOfBirth)
+        {
+            List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.list.Count; i++)
+            {
+                if (dateOfBirth.ToLower() == this.list[i].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower())
                 {
                     foundRecords.Add(this.list[i]);
                 }

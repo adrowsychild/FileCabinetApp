@@ -46,6 +46,21 @@
             this.list[id].Donations = donations;
         }
 
+        public FileCabinetRecord[] FindByFirstName(string firstName)
+        {
+            List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.list.Count; i++)
+            {
+                if (firstName.ToLower() == this.list[i].FirstName.ToLower())
+                {
+                    foundRecords.Add(this.list[i]);
+                }
+            }
+
+            return foundRecords.ToArray();
+        }
+
         public FileCabinetRecord[] GetRecords()
         {
             FileCabinetRecord[] listCopied = new FileCabinetRecord[this.list.Count];

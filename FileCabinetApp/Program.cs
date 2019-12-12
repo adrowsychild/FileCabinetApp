@@ -23,6 +23,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("create", Create),
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
+            new Tuple<string, Action<string>>("find", Find),
         };
 
         private static string[][] helpMessages = new string[][]
@@ -32,6 +33,7 @@ namespace FileCabinetApp
             new string[] { "stat", "prints the number of records", "The 'stat' command prints the number of records." },
             new string[] { "create", "creates a new record", "The 'create' command creates a new record." },
             new string[] { "edit", "edits the existing record", "The 'edit' command edits the existing record." },
+            new string[] { "find", "finds records by given criteria", "The 'find' command finds records by given criteria" },
             new string[] { "list", "prints the records", "The 'list' prints the records." },
         };
 
@@ -63,13 +65,41 @@ namespace FileCabinetApp
             }
         }
 
+        private static void Find(string parameters)
+        {
+            string[] args = parameters.Split();
+            if (args.Length > 2)
+            {
+                return;
+            }
+
+            FileCabinetRecord[] foundRecords;
+
+            switch (args[0].ToLower())
+            {
+                case "firstname":
+                    foundRecords = fileCabinetService.FindByFirstName(args[1]);
+                    foreach (var record in foundRecords)
+                    {
+                        ShowRecord(record);
+                    }
+
+                    break;
+            }
+        }
+
         private static void List(string parameters)
         {
             FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
             foreach (var record in tempList)
             {
-                Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
+                ShowRecord(record);
             }
+        }
+
+        private static void ShowRecord(FileCabinetRecord record)
+        {
+            Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
         }
 
         private static void CheckRecordInput(string action, int id)

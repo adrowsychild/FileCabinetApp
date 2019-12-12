@@ -85,6 +85,14 @@ namespace FileCabinetApp
                     }
 
                     break;
+                case "lastname":
+                    foundRecords = fileCabinetService.FindByLastName(args[1]);
+                    foreach (var record in foundRecords)
+                    {
+                        ShowRecord(record);
+                    }
+
+                    break;
             }
         }
 

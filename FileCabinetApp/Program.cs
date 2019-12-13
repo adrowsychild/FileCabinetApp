@@ -79,25 +79,34 @@ namespace FileCabinetApp
             {
                 case "firstname":
                     foundRecords = fileCabinetService.FindByFirstName(args[1]);
-                    foreach (var record in foundRecords)
+                    if (foundRecords != null)
                     {
-                        ShowRecord(record);
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
                     }
 
                     break;
                 case "lastname":
                     foundRecords = fileCabinetService.FindByLastName(args[1]);
-                    foreach (var record in foundRecords)
+                    if (foundRecords != null)
                     {
-                        ShowRecord(record);
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
                     }
 
                     break;
                 case "dateofbirth":
                     foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
-                    foreach (var record in foundRecords)
+                    if (foundRecords != null)
                     {
-                        ShowRecord(record);
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
                     }
 
                     break;

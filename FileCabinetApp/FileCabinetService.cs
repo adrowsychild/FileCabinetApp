@@ -8,6 +8,8 @@
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
         public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
         {
             this.CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
@@ -26,6 +28,19 @@
 
             this.list.Add(record);
 
+            string firstname = firstName.ToLower();
+
+            if (!this.firstNameDictionary.ContainsKey(firstname))
+            {
+                List<FileCabinetRecord> listOfFirstNames = new List<FileCabinetRecord>();
+                listOfFirstNames.Add(record);
+                this.firstNameDictionary.Add(firstname, listOfFirstNames);
+            }
+            else
+            {
+                this.firstNameDictionary[firstname].Add(record);
+            }
+
             return record.Id;
         }
 
@@ -38,6 +53,10 @@
 
             this.CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
 
+            string firstname = firstName.ToLower();
+
+            this.firstNameDictionary[this.list[id].FirstName.ToLower()].Remove(this.list[id]);
+
             this.list[id].FirstName = firstName;
             this.list[id].LastName = lastName;
             this.list[id].DateOfBirth = dateOfBirth;
@@ -45,19 +64,29 @@
             this.list[id].FavouriteCharacter = favouriteCharacter;
             this.list[id].FavouriteGame = favouriteGame;
             this.list[id].Donations = donations;
+
+            if (!this.firstNameDictionary.ContainsKey(firstname))
+            {
+                List<FileCabinetRecord> listOfFirstNames = new List<FileCabinetRecord>();
+                listOfFirstNames.Add(this.list[id]);
+                this.firstNameDictionary.Add(firstname, listOfFirstNames);
+            }
+            else
+            {
+                this.firstNameDictionary[firstname].Add(this.list[id]);
+            }
         }
 
         public FileCabinetRecord[] FindByFirstName(string firstName)
         {
             List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
 
-            for (int i = 0; i < this.list.Count; i++)
+            if (firstName == null)
             {
-                if (firstName.ToLower() == this.list[i].FirstName.ToLower())
-                {
-                    foundRecords.Add(this.list[i]);
-                }
+                throw new ArgumentException(nameof(firstName) + "is null.");
             }
+
+            foundRecords = this.firstNameDictionary[firstName.ToLower()];
 
             return foundRecords.ToArray();
         }

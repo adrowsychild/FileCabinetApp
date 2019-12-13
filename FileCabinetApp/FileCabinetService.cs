@@ -10,6 +10,8 @@
 
         private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
 
         public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
         {
@@ -31,6 +33,7 @@
 
             string firstname = firstName.ToLower();
             string lastname = lastName.ToLower();
+            string dateofbirth = dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower();
 
             // firstname dictionary update
             if (!this.firstNameDictionary.ContainsKey(firstname))
@@ -56,6 +59,18 @@
                 this.lastNameDictionary[lastname].Add(record);
             }
 
+            // dateofbirth dictionary update
+            if (!this.dateOfBirthDictionary.ContainsKey(dateofbirth))
+            {
+                List<FileCabinetRecord> listOfDatesOfBirth = new List<FileCabinetRecord>();
+                listOfDatesOfBirth.Add(record);
+                this.dateOfBirthDictionary.Add(dateofbirth, listOfDatesOfBirth);
+            }
+            else
+            {
+                this.dateOfBirthDictionary[dateofbirth].Add(record);
+            }
+
             return record.Id;
         }
 
@@ -70,8 +85,11 @@
 
             string firstname = firstName.ToLower();
             string lastname = lastName.ToLower();
+            string dateofbirth = dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower();
 
             this.firstNameDictionary[this.list[id].FirstName.ToLower()].Remove(this.list[id]);
+            this.lastNameDictionary[this.list[id].LastName.ToLower()].Remove(this.list[id]);
+            this.dateOfBirthDictionary[this.list[id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[id]);
 
             this.list[id].FirstName = firstName;
             this.list[id].LastName = lastName;
@@ -81,7 +99,7 @@
             this.list[id].FavouriteGame = favouriteGame;
             this.list[id].Donations = donations;
 
-            // firstname dictionary
+            // firstname dictionary update
             if (!this.firstNameDictionary.ContainsKey(firstname))
             {
                 List<FileCabinetRecord> listOfFirstNames = new List<FileCabinetRecord>();
@@ -93,7 +111,7 @@
                 this.firstNameDictionary[firstname].Add(this.list[id]);
             }
 
-            // lastname dictionary
+            // lastname dictionary update
             if (!this.lastNameDictionary.ContainsKey(lastname))
             {
                 List<FileCabinetRecord> listOfLastNames = new List<FileCabinetRecord>();
@@ -103,6 +121,18 @@
             else
             {
                 this.lastNameDictionary[lastname].Add(this.list[id]);
+            }
+
+            // dateofbirth dictionary update
+            if (!this.dateOfBirthDictionary.ContainsKey(dateofbirth))
+            {
+                List<FileCabinetRecord> listOfDatesOfBirth = new List<FileCabinetRecord>();
+                listOfDatesOfBirth.Add(this.list[id]);
+                this.dateOfBirthDictionary.Add(dateofbirth, listOfDatesOfBirth);
+            }
+            else
+            {
+                this.dateOfBirthDictionary[dateofbirth].Add(this.list[id]);
             }
         }
 
@@ -115,9 +145,15 @@
                 throw new ArgumentException(nameof(firstName) + "is null.");
             }
 
-            foundRecords = this.firstNameDictionary[firstName.ToLower()];
-
-            return foundRecords.ToArray();
+            if (this.firstNameDictionary.ContainsKey(firstName.ToLower()))
+            {
+                foundRecords = this.firstNameDictionary[firstName.ToLower()];
+                return foundRecords.ToArray();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public FileCabinetRecord[] FindByLastName(string lastName)
@@ -129,9 +165,15 @@
                 throw new ArgumentException(nameof(lastName) + "is null.");
             }
 
-            foundRecords = this.lastNameDictionary[lastName.ToLower()];
-
-            return foundRecords.ToArray();
+            if (this.lastNameDictionary.ContainsKey(lastName.ToLower()))
+            {
+                foundRecords = this.lastNameDictionary[lastName.ToLower()];
+                return foundRecords.ToArray();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public FileCabinetRecord[] FindByDateOfBirth(string dateOfBirth)
@@ -143,9 +185,15 @@
                 throw new ArgumentException(nameof(dateOfBirth) + "is null.");
             }
 
-            foundRecords = this.firstNameDictionary[dateOfBirth.ToLower()];
-
-            return foundRecords.ToArray();
+            if (this.dateOfBirthDictionary.ContainsKey(dateOfBirth.ToLower()))
+            {
+                foundRecords = this.dateOfBirthDictionary[dateOfBirth.ToLower()];
+                return foundRecords.ToArray();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public FileCabinetRecord[] GetRecords()

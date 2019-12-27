@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Class for handling user's commands.
+    /// </summary>
     public static class Program
     {
         private const string DEVELOPERNAME = "Dyl Aliaksandra";
@@ -37,9 +40,12 @@ namespace FileCabinetApp
 
         private static bool isRunning = true;
 
+        /// <summary>
+        /// Method for handling user's commands.
+        /// </summary>
         public static void Main()
         {
-            Console.WriteLine($"File Cabinet Application, developed by {Program.DEVELOPERNAME}");
+            Console.WriteLine($"File Cabinet Application, developed by {DEVELOPERNAME}");
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
 

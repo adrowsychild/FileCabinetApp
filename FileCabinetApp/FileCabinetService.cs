@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.Globalization;
 
+    /// <summary>
+    /// Class for working with list of users.
+    /// </summary>
     public class FileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
@@ -12,6 +15,17 @@
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
+        /// <summary>
+        /// Creates a new record.
+        /// </summary>
+        /// <param name="firstName">User's first name.</param>
+        /// <param name="lastName">User's last name.</param>
+        /// <param name="dateOfBirth">User's date of birth.</param>
+        /// <param name="favouriteNumber">User's favourite number.</param>
+        /// <param name="favouriteCharacter">User's favourite character.</param>
+        /// <param name="favouriteGame">User's favourite game.</param>
+        /// <param name="donations">User's donations.</param>
+        /// <returns>User's id in the users' list.</returns>
         public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
         {
             CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
@@ -39,11 +53,22 @@
             return record.Id;
         }
 
+        /// <summary>
+        /// Edits the new record by given id.
+        /// </summary>
+        /// <param name="id">User's id in the users' list.</param>
+        /// <param name="firstName">User's first name.</param>
+        /// <param name="lastName">User's last name.</param>
+        /// <param name="dateOfBirth">User's date of birth.</param>
+        /// <param name="favouriteNumber">User's favourite number.</param>
+        /// <param name="favouriteCharacter">User's favourite character.</param>
+        /// <param name="favouriteGame">User's favourite game.</param>
+        /// <param name="donations">User's donations.</param>
         public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
         {
             if (id < 0 || id > this.GetStat())
             {
-                throw new ArgumentException(nameof(id) + " is invalid.");
+                throw new ArgumentException(message: $"{id} is invalid", nameof(id));
             }
 
             CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
@@ -67,24 +92,43 @@
             UpdateDictionary(this.list[id], this.dateOfBirthDictionary, dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
 
+        /// <summary>
+        /// Searches the records by first name.
+        /// </summary>
+        /// <param name="firstName">Given first name.</param>
+        /// <returns>The array of records.</returns>
         public FileCabinetRecord[] FindByFirstName(string firstName)
         {
             FileCabinetRecord[] foundRecords = FindByKey(firstName, this.firstNameDictionary);
             return foundRecords;
         }
 
+        /// <summary>
+        /// Searches the records by last name.
+        /// </summary>
+        /// <param name="lastName">Given last name.</param>
+        /// <returns>The array of records.</returns>
         public FileCabinetRecord[] FindByLastName(string lastName)
         {
             FileCabinetRecord[] foundRecords = FindByKey(lastName, this.lastNameDictionary);
             return foundRecords;
         }
 
+        /// <summary>
+        /// Searches the records by date of birth.
+        /// </summary>
+        /// <param name="dateOfBirth">Given date of birth.</param>
+        /// <returns>The array of records.</returns>
         public FileCabinetRecord[] FindByDateOfBirth(string dateOfBirth)
         {
             FileCabinetRecord[] foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
             return foundRecords;
         }
 
+        /// <summary>
+        /// Gets all the records.
+        /// </summary>
+        /// <returns>The array of records.</returns>
         public FileCabinetRecord[] GetRecords()
         {
             FileCabinetRecord[] listCopied = new FileCabinetRecord[this.list.Count];
@@ -92,11 +136,21 @@
             return listCopied;
         }
 
+        /// <summary>
+        /// Returns the number of records in the list.
+        /// </summary>
+        /// <returns>The number of records.</returns>
         public int GetStat()
         {
             return this.list.Count;
         }
 
+        /// <summary>
+        /// Adds a new record to the dictionary by given key.
+        /// </summary>
+        /// <param name="record">The record to add.</param>
+        /// <param name="dictionary">The dictionary to add to.</param>
+        /// <param name="key">The key to add the record by.</param>
         private static void UpdateDictionary(FileCabinetRecord record, Dictionary<string, List<FileCabinetRecord>> dictionary, string key)
         {
             string keyLowered = key.ToLower();
@@ -115,11 +169,17 @@
             }
         }
 
+        /// <summary>
+        /// Searches for the records in the dictionary by given key.
+        /// </summary>
+        /// <param name="key">The key to search by.</param>
+        /// <param name="dictionary">The dictionary to search in.</param>
+        /// <returns>The array of records.</returns>
         private static FileCabinetRecord[] FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
         {
             if (string.IsNullOrEmpty(key))
             {
-                throw new ArgumentException("Argument to find by is invalid.");
+                throw new ArgumentException(message: $"{key} to find by is invalid", nameof(key));
             }
 
             if (dictionary.ContainsKey(key.ToLower()))
@@ -129,45 +189,55 @@
             }
             else
             {
-                throw new ArgumentException("Records not found.");
+                throw new ArgumentException(message: $"{key} not found", nameof(key));
             }
         }
 
+        /// <summary>
+        /// Validates the input fields of user's info.
+        /// </summary>
+        /// <param name="firstName">User's first name.</param>
+        /// <param name="lastName">User's last name.</param>
+        /// <param name="dateOfBirth">User's date of birth.</param>
+        /// <param name="favouriteNumber">User's favourite number.</param>
+        /// <param name="favouriteCharacter">User's favourite character.</param>
+        /// <param name="favouriteGame">User's favourite game.</param>
+        /// <param name="donations">User's donations.</param>
         private static void CheckFields(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
         {
             if (string.IsNullOrEmpty(firstName) || firstName.Length < 2 || firstName.Length > 60)
             {
-                throw new ArgumentException(nameof(firstName) + " is invalid.");
+                throw new ArgumentException(message: $"{firstName} is invalid.", nameof(firstName));
             }
 
             if (string.IsNullOrEmpty(lastName) || lastName.Length < 2 || lastName.Length > 60)
             {
-                throw new ArgumentException(nameof(lastName) + " is invalid.");
+                throw new ArgumentException(message: $"{lastName} is invalid.", nameof(lastName));
             }
 
             if (dateOfBirth < new DateTime(1950, 1, 1) || dateOfBirth > DateTime.Now)
             {
-                throw new ArgumentException(nameof(dateOfBirth) + " is invalid.");
+                throw new ArgumentException(message: $"{dateOfBirth} is invalid.", nameof(dateOfBirth));
             }
 
             if (favouriteNumber < 0)
             {
-                throw new ArgumentException(nameof(favouriteNumber) + " is invalid.");
+                throw new ArgumentException(message: $"{favouriteNumber} is invalid.", nameof(favouriteNumber));
             }
 
             if (favouriteCharacter < 65 || (favouriteCharacter > 90 && favouriteCharacter < 97) || favouriteCharacter > 122)
             {
-                throw new ArgumentException(nameof(favouriteCharacter) + " is invalid.");
+                throw new ArgumentException(message: $"{favouriteCharacter} is invalid.", nameof(favouriteCharacter));
             }
 
             if (string.IsNullOrEmpty(favouriteGame))
             {
-                throw new ArgumentException(nameof(favouriteGame) + " is invalid.");
+                throw new ArgumentException(message: $"{favouriteGame} is invalid.", nameof(favouriteGame));
             }
 
             if (donations < 0)
             {
-                throw new ArgumentException(nameof(donations) + " is invalid.");
+                throw new ArgumentException(message: $"{donations} is invalid.", nameof(donations));
             }
         }
     }

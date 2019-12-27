@@ -14,7 +14,7 @@ namespace FileCabinetApp
         private const int DESCRIPTIONHELPINDEX = 1;
         private const int EXPLANATIONHELPINDEX = 2;
 
-        private static readonly FileCabinetService FileCabinetService = new FileCabinetService();
+        private static readonly FileCabinetService FileCabinetService = new FileCabinetCustomService();
 
         private static readonly Tuple<string, Action<string>>[] Commands = new Tuple<string, Action<string>>[]
         {
@@ -215,6 +215,7 @@ namespace FileCabinetApp
 
                 Console.WriteLine($"{ex.Message} Please, try again.");
                 Console.WriteLine("Hint:");
+
                 string help = "First Name: from 2 to 60 symbols\n" +
                               "Last Name:  from 2 to 60 symbols\n" +
                               "Data of Birth: Month/Day/Year since 01-Jan-1950\n" +

@@ -5,9 +5,9 @@
     using System.Globalization;
 
     /// <summary>
-    /// Class for working with list of users.
+    /// Abstract class for working with list of users.
     /// </summary>
-    public class FileCabinetService
+    public abstract class FileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
@@ -27,7 +27,7 @@
                 throw new ArgumentNullException($"{record} object is invalid.");
             }
 
-            CheckFields(record);
+            this.ValidateParameters(record);
 
             record.Id = this.list.Count + 1;
 
@@ -58,7 +58,7 @@
                 throw new ArgumentException(message: $"{record.Id} is invalid", nameof(record));
             }
 
-            CheckFields(record);
+            this.ValidateParameters(record);
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
             this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
@@ -129,6 +129,12 @@
         }
 
         /// <summary>
+        /// Validates the input fields of user's info.
+        /// </summary>
+        /// <param name="record">Record to validate.</param>
+        protected abstract void ValidateParameters(FileCabinetRecord record);
+
+        /// <summary>
         /// Adds a new record to the dictionary by given key.
         /// </summary>
         /// <param name="record">The record to add.</param>
@@ -173,48 +179,6 @@
             else
             {
                 throw new ArgumentException(message: $"{key} not found", nameof(key));
-            }
-        }
-
-        /// <summary>
-        /// Validates the input fields of user's info.
-        /// </summary>
-        /// <param name="record">User's info.</param>
-        private static void CheckFields(FileCabinetRecord record)
-        {
-            if (string.IsNullOrEmpty(record.FirstName) || record.FirstName.Length < 2 || record.FirstName.Length > 60)
-            {
-                throw new ArgumentException(message: "First name is invalid.", nameof(record));
-            }
-
-            if (string.IsNullOrEmpty(record.LastName) || record.LastName.Length < 2 || record.LastName.Length > 60)
-            {
-                throw new ArgumentException(message: "Last name is invalid.", nameof(record));
-            }
-
-            if (record.DateOfBirth < new DateTime(1950, 1, 1) || record.DateOfBirth > DateTime.Now)
-            {
-                throw new ArgumentException(message: "Date of birth is invalid.", nameof(record));
-            }
-
-            if (record.FavouriteNumber < 0)
-            {
-                throw new ArgumentException(message: "Favourite number is invalid.", nameof(record));
-            }
-
-            if (record.FavouriteCharacter < 65 || (record.FavouriteCharacter > 90 && record.FavouriteCharacter < 97) || record.FavouriteCharacter > 122)
-            {
-                throw new ArgumentException(message: "FavouriteCharacter is invalid.", nameof(record));
-            }
-
-            if (string.IsNullOrEmpty(record.FavouriteGame))
-            {
-                throw new ArgumentException(message: "FavouriteGame is invalid.", nameof(record));
-            }
-
-            if (record.Donations < 0)
-            {
-                throw new ArgumentException(message: "Donations is invalid.", nameof(record));
             }
         }
     }

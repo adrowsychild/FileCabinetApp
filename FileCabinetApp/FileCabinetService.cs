@@ -18,78 +18,61 @@
         /// <summary>
         /// Creates a new record.
         /// </summary>
-        /// <param name="firstName">User's first name.</param>
-        /// <param name="lastName">User's last name.</param>
-        /// <param name="dateOfBirth">User's date of birth.</param>
-        /// <param name="favouriteNumber">User's favourite number.</param>
-        /// <param name="favouriteCharacter">User's favourite character.</param>
-        /// <param name="favouriteGame">User's favourite game.</param>
-        /// <param name="donations">User's donations.</param>
+        /// <param name="record">User's info.</param>
         /// <returns>User's id in the users' list.</returns>
-        public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        public int CreateRecord(FileCabinetRecord record)
         {
-            CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
-
-            var record = new FileCabinetRecord
+            if (record == null)
             {
-                Id = this.list.Count + 1,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                FavouriteNumber = favouriteNumber,
-                FavouriteCharacter = favouriteCharacter,
-                FavouriteGame = favouriteGame,
-                Donations = donations,
-            };
+                throw new ArgumentNullException($"{record} object is invalid.");
+            }
+
+            CheckFields(record);
+
+            record.Id = this.list.Count + 1;
 
             this.list.Add(record);
 
-            UpdateDictionary(record, this.firstNameDictionary, firstName);
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(record, this.lastNameDictionary, lastName);
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
-            UpdateDictionary(record, this.dateOfBirthDictionary, dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return record.Id;
         }
 
         /// <summary>
-        /// Edits the new record by given id.
+        /// Edits the existing record.
         /// </summary>
-        /// <param name="id">User's id in the users' list.</param>
-        /// <param name="firstName">User's first name.</param>
-        /// <param name="lastName">User's last name.</param>
-        /// <param name="dateOfBirth">User's date of birth.</param>
-        /// <param name="favouriteNumber">User's favourite number.</param>
-        /// <param name="favouriteCharacter">User's favourite character.</param>
-        /// <param name="favouriteGame">User's favourite game.</param>
-        /// <param name="donations">User's donations.</param>
-        public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        /// <param name="record">Record to edit.</param>
+        public void EditRecord(FileCabinetRecord record)
         {
-            if (id < 0 || id > this.GetStat())
+            if (record == null)
             {
-                throw new ArgumentException(message: $"{id} is invalid", nameof(id));
+                throw new ArgumentNullException($"{record} object is invalid.");
             }
 
-            CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
+            if (record.Id < 0 || record.Id > this.GetStat())
+            {
+                throw new ArgumentException(message: $"{record.Id} is invalid", nameof(record));
+            }
 
-            this.firstNameDictionary[this.list[id].FirstName.ToLower()].Remove(this.list[id]);
-            this.lastNameDictionary[this.list[id].LastName.ToLower()].Remove(this.list[id]);
-            this.dateOfBirthDictionary[this.list[id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[id]);
+            CheckFields(record);
 
-            this.list[id].FirstName = firstName;
-            this.list[id].LastName = lastName;
-            this.list[id].DateOfBirth = dateOfBirth;
-            this.list[id].FavouriteNumber = favouriteNumber;
-            this.list[id].FavouriteCharacter = favouriteCharacter;
-            this.list[id].FavouriteGame = favouriteGame;
-            this.list[id].Donations = donations;
+            this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
+            this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
+            this.dateOfBirthDictionary[this.list[record.Id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[record.Id]);
 
-            UpdateDictionary(this.list[id], this.firstNameDictionary, firstName);
+            this.list[record.Id] = record;
 
-            UpdateDictionary(this.list[id], this.lastNameDictionary, lastName);
+            UpdateDictionary(this.list[record.Id], this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(this.list[id], this.dateOfBirthDictionary, dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(this.list[record.Id], this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(this.list[record.Id], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.list[record.Id].Id++;
         }
 
         /// <summary>
@@ -196,48 +179,42 @@
         /// <summary>
         /// Validates the input fields of user's info.
         /// </summary>
-        /// <param name="firstName">User's first name.</param>
-        /// <param name="lastName">User's last name.</param>
-        /// <param name="dateOfBirth">User's date of birth.</param>
-        /// <param name="favouriteNumber">User's favourite number.</param>
-        /// <param name="favouriteCharacter">User's favourite character.</param>
-        /// <param name="favouriteGame">User's favourite game.</param>
-        /// <param name="donations">User's donations.</param>
-        private static void CheckFields(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        /// <param name="record">User's info.</param>
+        private static void CheckFields(FileCabinetRecord record)
         {
-            if (string.IsNullOrEmpty(firstName) || firstName.Length < 2 || firstName.Length > 60)
+            if (string.IsNullOrEmpty(record.FirstName) || record.FirstName.Length < 2 || record.FirstName.Length > 60)
             {
-                throw new ArgumentException(message: $"{firstName} is invalid.", nameof(firstName));
+                throw new ArgumentException(message: "First name is invalid.", nameof(record));
             }
 
-            if (string.IsNullOrEmpty(lastName) || lastName.Length < 2 || lastName.Length > 60)
+            if (string.IsNullOrEmpty(record.LastName) || record.LastName.Length < 2 || record.LastName.Length > 60)
             {
-                throw new ArgumentException(message: $"{lastName} is invalid.", nameof(lastName));
+                throw new ArgumentException(message: "Last name is invalid.", nameof(record));
             }
 
-            if (dateOfBirth < new DateTime(1950, 1, 1) || dateOfBirth > DateTime.Now)
+            if (record.DateOfBirth < new DateTime(1950, 1, 1) || record.DateOfBirth > DateTime.Now)
             {
-                throw new ArgumentException(message: $"{dateOfBirth} is invalid.", nameof(dateOfBirth));
+                throw new ArgumentException(message: "Date of birth is invalid.", nameof(record));
             }
 
-            if (favouriteNumber < 0)
+            if (record.FavouriteNumber < 0)
             {
-                throw new ArgumentException(message: $"{favouriteNumber} is invalid.", nameof(favouriteNumber));
+                throw new ArgumentException(message: "Favourite number is invalid.", nameof(record));
             }
 
-            if (favouriteCharacter < 65 || (favouriteCharacter > 90 && favouriteCharacter < 97) || favouriteCharacter > 122)
+            if (record.FavouriteCharacter < 65 || (record.FavouriteCharacter > 90 && record.FavouriteCharacter < 97) || record.FavouriteCharacter > 122)
             {
-                throw new ArgumentException(message: $"{favouriteCharacter} is invalid.", nameof(favouriteCharacter));
+                throw new ArgumentException(message: "FavouriteCharacter is invalid.", nameof(record));
             }
 
-            if (string.IsNullOrEmpty(favouriteGame))
+            if (string.IsNullOrEmpty(record.FavouriteGame))
             {
-                throw new ArgumentException(message: $"{favouriteGame} is invalid.", nameof(favouriteGame));
+                throw new ArgumentException(message: "FavouriteGame is invalid.", nameof(record));
             }
 
-            if (donations < 0)
+            if (record.Donations < 0)
             {
-                throw new ArgumentException(message: $"{donations} is invalid.", nameof(donations));
+                throw new ArgumentException(message: "Donations is invalid.", nameof(record));
             }
         }
     }

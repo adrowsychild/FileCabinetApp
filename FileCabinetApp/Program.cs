@@ -198,10 +198,10 @@ namespace FileCabinetApp
                 switch (action)
                 {
                     case "create":
-                        FileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                        FileCabinetService.CreateRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
                         break;
                     case "edit":
-                        FileCabinetService.EditRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                        FileCabinetService.EditRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
                         break;
                 }
             }

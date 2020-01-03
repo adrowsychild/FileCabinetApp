@@ -8,7 +8,7 @@
     /// <summary>
     /// Class for working with list of users.
     /// </summary>
-    public class FileCabinetService
+    public class FileCabinetService : IFileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
@@ -137,6 +137,17 @@
         public int GetStat()
         {
             return this.list.Count;
+        }
+
+        /// <summary>
+        /// Gets the validator type.
+        /// </summary>
+        /// <returns>The type of validator in string form.</returns>
+        public string GetValidatorType()
+        {
+            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
+            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
+            return validationType;
         }
 
         /// <summary>

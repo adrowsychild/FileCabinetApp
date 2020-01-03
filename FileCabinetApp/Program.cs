@@ -52,7 +52,7 @@ namespace FileCabinetApp
 
         private static bool isRunning = true;
 
-        private static FileCabinetService fileCabinetService;
+        private static IFileCabinetService fileCabinetService;
 
         private delegate void Settings(string args);
 
@@ -73,10 +73,7 @@ namespace FileCabinetApp
 
             Console.WriteLine(Program.INTRO);
 
-            int serviceIndex = fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture);
-            string validationRules = fileCabinetService.GetType().ToString()[26..serviceIndex].ToLower();
-
-            Console.WriteLine("Using " + validationRules + " validation rules.");
+            Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();

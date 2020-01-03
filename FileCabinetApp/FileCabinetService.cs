@@ -5,9 +5,9 @@
     using System.Globalization;
 
     /// <summary>
-    /// Abstract class for working with list of users.
+    /// Class for working with list of users.
     /// </summary>
-    public abstract class FileCabinetService
+    public class FileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
@@ -21,7 +21,7 @@
         /// Initializes a new instance of the <see cref="FileCabinetService"/> class.
         /// </summary>
         /// <param name="validator">Special validator.</param>
-        protected FileCabinetService(IRecordValidator validator)
+        public FileCabinetService(IRecordValidator validator)
         {
             this.validator = validator;
         }

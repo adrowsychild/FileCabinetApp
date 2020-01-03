@@ -191,8 +191,8 @@ namespace FileCabinetApp
         {
             fileCabinetService = validationRules switch
             {
-                "custom" => new FileCabinetCustomService(),
-                _ => new FileCabinetDefaultService(),
+                "custom" => new FileCabinetService(new CustomValidator()),
+                _ => new FileCabinetService(new DefaultValidator()),
             };
         }
 

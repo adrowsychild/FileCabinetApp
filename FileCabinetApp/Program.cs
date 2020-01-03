@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 namespace FileCabinetApp
@@ -232,7 +233,7 @@ namespace FileCabinetApp
                 return;
             }
 
-            FileCabinetRecord[] foundRecords;
+            IReadOnlyCollection<FileCabinetRecord> foundRecords;
 
             try
             {
@@ -275,7 +276,7 @@ namespace FileCabinetApp
 
         private static void List(string parameters)
         {
-            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
+            ReadOnlyCollection<FileCabinetRecord> tempList = fileCabinetService.GetRecords();
 
             foreach (var record in tempList)
             {

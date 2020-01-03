@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Globalization;
 
     /// <summary>
@@ -91,9 +92,9 @@
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            FileCabinetRecord[] foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
             return foundRecords;
         }
 
@@ -102,9 +103,9 @@
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
-            FileCabinetRecord[] foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
             return foundRecords;
         }
 
@@ -113,9 +114,9 @@
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public FileCabinetRecord[] FindByDateOfBirth(string dateOfBirth)
+        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            FileCabinetRecord[] foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
             return foundRecords;
         }
 
@@ -123,10 +124,9 @@
         /// Gets all the records.
         /// </summary>
         /// <returns>The array of records.</returns>
-        public FileCabinetRecord[] GetRecords()
+        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
-            FileCabinetRecord[] listCopied = new FileCabinetRecord[this.list.Count];
-            this.list.CopyTo(listCopied);
+            ReadOnlyCollection<FileCabinetRecord> listCopied = new ReadOnlyCollection<FileCabinetRecord>(this.list);
             return listCopied;
         }
 
@@ -169,7 +169,7 @@
         /// <param name="key">The key to search by.</param>
         /// <param name="dictionary">The dictionary to search in.</param>
         /// <returns>The array of records.</returns>
-        private static FileCabinetRecord[] FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
+        private static ReadOnlyCollection<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -178,8 +178,8 @@
 
             if (dictionary.ContainsKey(key.ToLower()))
             {
-                List<FileCabinetRecord> foundRecords = dictionary[key.ToLower()];
-                return foundRecords.ToArray();
+                ReadOnlyCollection<FileCabinetRecord> foundRecords = new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]);
+                return foundRecords;
             }
             else
             {

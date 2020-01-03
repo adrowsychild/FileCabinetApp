@@ -27,7 +27,7 @@
                 throw new ArgumentNullException($"{record} object is invalid.");
             }
 
-            this.ValidateParameters(record);
+            this.CreateValidator().ValidateParameters(record);
 
             record.Id = this.list.Count + 1;
 
@@ -58,7 +58,7 @@
                 throw new ArgumentException(message: $"{record.Id} is invalid", nameof(record));
             }
 
-            this.ValidateParameters(record);
+            this.CreateValidator().ValidateParameters(record);
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
             this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
@@ -129,10 +129,10 @@
         }
 
         /// <summary>
-        /// Validates the input fields of user's info.
+        /// Creates validator for user's input.
         /// </summary>
-        /// <param name="record">Record to validate.</param>
-        protected abstract void ValidateParameters(FileCabinetRecord record);
+        /// <returns>Special validator.</returns>
+        protected abstract IRecordValidator CreateValidator();
 
         /// <summary>
         /// Adds a new record to the dictionary by given key.

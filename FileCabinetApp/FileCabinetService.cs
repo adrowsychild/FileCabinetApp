@@ -15,6 +15,17 @@
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
+        private readonly IRecordValidator validator;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetService"/> class.
+        /// </summary>
+        /// <param name="validator">Special validator.</param>
+        protected FileCabinetService(IRecordValidator validator)
+        {
+            this.validator = validator;
+        }
+
         /// <summary>
         /// Creates a new record.
         /// </summary>
@@ -27,7 +38,7 @@
                 throw new ArgumentNullException($"{record} object is invalid.");
             }
 
-            this.CreateValidator().ValidateParameters(record);
+            this.validator.ValidateParameters(record);
 
             record.Id = this.list.Count + 1;
 
@@ -58,7 +69,7 @@
                 throw new ArgumentException(message: $"{record.Id} is invalid", nameof(record));
             }
 
-            this.CreateValidator().ValidateParameters(record);
+            this.validator.ValidateParameters(record);
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
             this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
@@ -127,12 +138,6 @@
         {
             return this.list.Count;
         }
-
-        /// <summary>
-        /// Creates validator for user's input.
-        /// </summary>
-        /// <returns>Special validator.</returns>
-        protected abstract IRecordValidator CreateValidator();
 
         /// <summary>
         /// Adds a new record to the dictionary by given key.

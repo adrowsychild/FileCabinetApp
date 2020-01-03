@@ -2,9 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Globalization;
 
-    public class FileCabinetService
+    /// <summary>
+    /// Class for working with list of users.
+    /// </summary>
+    public class FileCabinetService : IFileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
@@ -12,237 +16,205 @@
         private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
+        private readonly IRecordValidator validator;
 
-        public int CreateRecord(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetService"/> class.
+        /// </summary>
+        /// <param name="validator">Special validator.</param>
+        public FileCabinetService(IRecordValidator validator)
         {
-            this.CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
+            this.validator = validator;
+        }
 
-            var record = new FileCabinetRecord
+        /// <summary>
+        /// Creates a new record.
+        /// </summary>
+        /// <param name="record">User's info.</param>
+        /// <returns>User's id in the users' list.</returns>
+        public int CreateRecord(FileCabinetRecord record)
+        {
+            if (record == null)
             {
-                Id = this.list.Count + 1,
-                FirstName = firstName,
-                LastName = lastName,
-                DateOfBirth = dateOfBirth,
-                FavouriteNumber = favouriteNumber,
-                FavouriteCharacter = favouriteCharacter,
-                FavouriteGame = favouriteGame,
-                Donations = donations,
-            };
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                return -1;
+            }
+
+            record.Id = this.list.Count + 1;
 
             this.list.Add(record);
 
-            string firstname = firstName.ToLower();
-            string lastname = lastName.ToLower();
-            string dateofbirth = dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower();
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
 
-            // firstname dictionary update
-            if (!this.firstNameDictionary.ContainsKey(firstname))
-            {
-                List<FileCabinetRecord> listOfFirstNames = new List<FileCabinetRecord>();
-                listOfFirstNames.Add(record);
-                this.firstNameDictionary.Add(firstname, listOfFirstNames);
-            }
-            else
-            {
-                this.firstNameDictionary[firstname].Add(record);
-            }
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
-            // lastname dictionary update
-            if (!this.lastNameDictionary.ContainsKey(lastname))
-            {
-                List<FileCabinetRecord> listOfLastNames = new List<FileCabinetRecord>();
-                listOfLastNames.Add(record);
-                this.lastNameDictionary.Add(lastname, listOfLastNames);
-            }
-            else
-            {
-                this.lastNameDictionary[lastname].Add(record);
-            }
-
-            // dateofbirth dictionary update
-            if (!this.dateOfBirthDictionary.ContainsKey(dateofbirth))
-            {
-                List<FileCabinetRecord> listOfDatesOfBirth = new List<FileCabinetRecord>();
-                listOfDatesOfBirth.Add(record);
-                this.dateOfBirthDictionary.Add(dateofbirth, listOfDatesOfBirth);
-            }
-            else
-            {
-                this.dateOfBirthDictionary[dateofbirth].Add(record);
-            }
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return record.Id;
         }
 
-        public void EditRecord(int id, string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        /// <summary>
+        /// Edits the existing record.
+        /// </summary>
+        /// <param name="record">Record to edit.</param>
+        /// <returns>Whether operation succeeded.</returns>
+        public int EditRecord(FileCabinetRecord record)
         {
-            if (id < 0 || id > this.GetStat())
+            if (record == null)
             {
-                throw new ArgumentException(nameof(id) + " is invalid.");
+                throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            this.CheckFields(firstName, lastName, dateOfBirth, favouriteNumber, favouriteCharacter, favouriteGame, donations);
-
-            string firstname = firstName.ToLower();
-            string lastname = lastName.ToLower();
-            string dateofbirth = dateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower();
-
-            this.firstNameDictionary[this.list[id].FirstName.ToLower()].Remove(this.list[id]);
-            this.lastNameDictionary[this.list[id].LastName.ToLower()].Remove(this.list[id]);
-            this.dateOfBirthDictionary[this.list[id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[id]);
-
-            this.list[id].FirstName = firstName;
-            this.list[id].LastName = lastName;
-            this.list[id].DateOfBirth = dateOfBirth;
-            this.list[id].FavouriteNumber = favouriteNumber;
-            this.list[id].FavouriteCharacter = favouriteCharacter;
-            this.list[id].FavouriteGame = favouriteGame;
-            this.list[id].Donations = donations;
-
-            // firstname dictionary update
-            if (!this.firstNameDictionary.ContainsKey(firstname))
+            if (record.Id < 0 || record.Id > this.GetStat())
             {
-                List<FileCabinetRecord> listOfFirstNames = new List<FileCabinetRecord>();
-                listOfFirstNames.Add(this.list[id]);
-                this.firstNameDictionary.Add(firstname, listOfFirstNames);
-            }
-            else
-            {
-                this.firstNameDictionary[firstname].Add(this.list[id]);
+                return -1;
             }
 
-            // lastname dictionary update
-            if (!this.lastNameDictionary.ContainsKey(lastname))
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
             {
-                List<FileCabinetRecord> listOfLastNames = new List<FileCabinetRecord>();
-                listOfLastNames.Add(this.list[id]);
-                this.lastNameDictionary.Add(lastname, listOfLastNames);
-            }
-            else
-            {
-                this.lastNameDictionary[lastname].Add(this.list[id]);
+                throw new ArgumentException(validationException);
             }
 
-            // dateofbirth dictionary update
-            if (!this.dateOfBirthDictionary.ContainsKey(dateofbirth))
-            {
-                List<FileCabinetRecord> listOfDatesOfBirth = new List<FileCabinetRecord>();
-                listOfDatesOfBirth.Add(this.list[id]);
-                this.dateOfBirthDictionary.Add(dateofbirth, listOfDatesOfBirth);
-            }
-            else
-            {
-                this.dateOfBirthDictionary[dateofbirth].Add(this.list[id]);
-            }
+            this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
+            this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
+            this.dateOfBirthDictionary[this.list[record.Id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[record.Id]);
+
+            this.list[record.Id] = record;
+
+            UpdateDictionary(this.list[record.Id], this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(this.list[record.Id], this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(this.list[record.Id], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.list[record.Id].Id++;
+
+            return 0;
         }
 
-        public FileCabinetRecord[] FindByFirstName(string firstName)
+        /// <summary>
+        /// Searches the records by first name.
+        /// </summary>
+        /// <param name="firstName">Given first name.</param>
+        /// <returns>The array of records.</returns>
+        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
-
-            if (firstName == null)
-            {
-                throw new ArgumentException(nameof(firstName) + "is null.");
-            }
-
-            if (this.firstNameDictionary.ContainsKey(firstName.ToLower()))
-            {
-                foundRecords = this.firstNameDictionary[firstName.ToLower()];
-                return foundRecords.ToArray();
-            }
-            else
-            {
-                return null;
-            }
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            return foundRecords;
         }
 
-        public FileCabinetRecord[] FindByLastName(string lastName)
+        /// <summary>
+        /// Searches the records by last name.
+        /// </summary>
+        /// <param name="lastName">Given last name.</param>
+        /// <returns>The array of records.</returns>
+        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
-            List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
-
-            if (lastName == null)
-            {
-                throw new ArgumentException(nameof(lastName) + "is null.");
-            }
-
-            if (this.lastNameDictionary.ContainsKey(lastName.ToLower()))
-            {
-                foundRecords = this.lastNameDictionary[lastName.ToLower()];
-                return foundRecords.ToArray();
-            }
-            else
-            {
-                return null;
-            }
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            return foundRecords;
         }
 
-        public FileCabinetRecord[] FindByDateOfBirth(string dateOfBirth)
+        /// <summary>
+        /// Searches the records by date of birth.
+        /// </summary>
+        /// <param name="dateOfBirth">Given date of birth.</param>
+        /// <returns>The array of records.</returns>
+        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            List<FileCabinetRecord> foundRecords = new List<FileCabinetRecord>();
-
-            if (dateOfBirth == null)
-            {
-                throw new ArgumentException(nameof(dateOfBirth) + "is null.");
-            }
-
-            if (this.dateOfBirthDictionary.ContainsKey(dateOfBirth.ToLower()))
-            {
-                foundRecords = this.dateOfBirthDictionary[dateOfBirth.ToLower()];
-                return foundRecords.ToArray();
-            }
-            else
-            {
-                return null;
-            }
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            return foundRecords;
         }
 
-        public FileCabinetRecord[] GetRecords()
+        /// <summary>
+        /// Gets all the records.
+        /// </summary>
+        /// <returns>The array of records.</returns>
+        public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
-            FileCabinetRecord[] listCopied = new FileCabinetRecord[this.list.Count];
-            this.list.CopyTo(listCopied);
+            ReadOnlyCollection<FileCabinetRecord> listCopied = new ReadOnlyCollection<FileCabinetRecord>(this.list);
             return listCopied;
         }
 
+        /// <summary>
+        /// Returns the number of records in the list.
+        /// </summary>
+        /// <returns>The number of records.</returns>
         public int GetStat()
         {
             return this.list.Count;
         }
 
-        private void CheckFields(string firstName, string lastName, DateTime dateOfBirth, short favouriteNumber, char favouriteCharacter, string favouriteGame, decimal donations)
+        /// <summary>
+        /// Gets the validator type.
+        /// </summary>
+        /// <returns>The type of validator in string form.</returns>
+        public string GetValidatorType()
         {
-            if (string.IsNullOrEmpty(firstName) || firstName.Length < 2 || firstName.Length > 60)
+            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
+            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
+            return validationType;
+        }
+
+        /// <summary>
+        /// Gets the validator.
+        /// </summary>
+        /// <returns>Validator.</returns>
+        public IRecordValidator GetValidator()
+        {
+            return this.validator;
+        }
+
+        /// <summary>
+        /// Adds a new record to the dictionary by given key.
+        /// </summary>
+        /// <param name="record">The record to add.</param>
+        /// <param name="dictionary">The dictionary to add to.</param>
+        /// <param name="key">The key to add the record by.</param>
+        private static void UpdateDictionary(FileCabinetRecord record, Dictionary<string, List<FileCabinetRecord>> dictionary, string key)
+        {
+            string keyLowered = key.ToLower();
+            if (!dictionary.ContainsKey(keyLowered))
             {
-                throw new ArgumentException(nameof(firstName) + " is invalid.");
+                List<FileCabinetRecord> listOfProperties = new List<FileCabinetRecord>
+                {
+                    record,
+                };
+
+                dictionary.Add(keyLowered, listOfProperties);
+            }
+            else
+            {
+                dictionary[keyLowered].Add(record);
+            }
+        }
+
+        /// <summary>
+        /// Searches for the records in the dictionary by given key.
+        /// </summary>
+        /// <param name="key">The key to search by.</param>
+        /// <param name="dictionary">The dictionary to search in.</param>
+        /// <returns>The array of records.</returns>
+        private static ReadOnlyCollection<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                throw new ArgumentException("Key to find by is invalid");
             }
 
-            if (string.IsNullOrEmpty(lastName) || lastName.Length < 2 || lastName.Length > 60)
+            if (dictionary.ContainsKey(key.ToLower()))
             {
-                throw new ArgumentException(nameof(lastName) + " is invalid.");
+                ReadOnlyCollection<FileCabinetRecord> foundRecords = new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]);
+                return foundRecords;
             }
-
-            if (dateOfBirth < new DateTime(1950, 1, 1) || dateOfBirth > DateTime.Now)
+            else
             {
-                throw new ArgumentException(nameof(dateOfBirth) + " is invalid.");
-            }
-
-            if (favouriteNumber < 0)
-            {
-                throw new ArgumentException(nameof(favouriteNumber) + " is invalid.");
-            }
-
-            if (favouriteCharacter < 65 || (favouriteCharacter > 90 && favouriteCharacter < 97) || favouriteCharacter > 122)
-            {
-                throw new ArgumentException(nameof(favouriteCharacter) + " is invalid.");
-            }
-
-            if (string.IsNullOrEmpty(favouriteGame))
-            {
-                throw new ArgumentException(nameof(favouriteGame) + " is invalid.");
-            }
-
-            if (donations < 0)
-            {
-                throw new ArgumentException(nameof(donations) + " is invalid.");
+                throw new ArgumentException("No records found.");
             }
         }
     }

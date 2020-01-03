@@ -1,21 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Reflection;
 
 namespace FileCabinetApp
 {
+    /// <summary>
+    /// Class for handling user's commands.
+    /// </summary>
     public static class Program
     {
-        private const string DeveloperName = "Dyl Aliaksandra";
-        private const string HintMessage = "Enter your command, or enter 'help' to get help.";
-        private const int CommandHelpIndex = 0;
-        private const int DescriptionHelpIndex = 1;
-        private const int ExplanationHelpIndex = 2;
+        private const string DEVELOPERNAME = "Dyl Aliaksandra";
+        private const string HINTMESSAGE = "Enter your command, or enter 'help' to get help.";
+        private const string INTRO = "File Cabinet Application, developed by " + DEVELOPERNAME;
+        private const int COMMANDHELPINDEX = 0;
+        private const int DESCRIPTIONHELPINDEX = 1;
+        private const int EXPLANATIONHELPINDEX = 2;
 
-        private static FileCabinetService fileCabinetService = new FileCabinetService();
-
-        private static bool isRunning = true;
-
-        private static Tuple<string, Action<string>>[] commands = new Tuple<string, Action<string>>[]
+        private static readonly Tuple<string, Action<string>>[] Commands = new Tuple<string, Action<string>>[]
         {
             new Tuple<string, Action<string>>("help", PrintHelp),
             new Tuple<string, Action<string>>("exit", Exit),
@@ -26,7 +29,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("find", Find),
         };
 
-        private static string[][] helpMessages = new string[][]
+        private static readonly string[][] HelpMessages = new string[][]
         {
             new string[] { "help", "prints the help screen", "The 'help' command prints the help screen." },
             new string[] { "exit", "exits the application", "The 'exit' command exits the application." },
@@ -37,150 +40,43 @@ namespace FileCabinetApp
             new string[] { "list", "prints the records", "The 'list' prints the records." },
         };
 
-        private static void Stat(string parameters)
+        /// <summary>
+        /// Contains the name of operation and corresponding operation itself.
+        /// Then, if we need to add settings, we only need to add values to the dictionary.
+        /// Warning: Both forms of command should be added one after another.
+        /// </summary>
+        private static readonly Dictionary<string, Settings> ChangeSettings = new Dictionary<string, Settings>
         {
-            var recordsCount = Program.fileCabinetService.GetStat();
-            Console.WriteLine($"{recordsCount} record(s).");
-        }
+            ["-v"] = new Settings(SetValidationRules),
+            ["--validation-rules"] = new Settings(SetValidationRules),
+        };
 
-        private static void Create(string parameters)
-        {
-            CheckRecordInput("create", -1);
-            Console.WriteLine("Record #" + fileCabinetService.GetStat() + " is created.");
-        }
+        private static bool isRunning = true;
 
-        private static void Edit(string parameters)
-        {
-            if (int.TryParse(parameters, out int id))
-            {
-                if (id < 1 || id > fileCabinetService.GetStat())
-                {
-                    Console.WriteLine("#" + id + " record is not found.");
-                    return;
-                }
+        private static IFileCabinetService fileCabinetService;
 
-                id--;
-                CheckRecordInput("edit", id);
-                Console.WriteLine("Record #" + ++id + " is updated.");
-            }
-        }
+        private delegate void Settings(string args);
 
-        private static void Find(string parameters)
-        {
-            string[] args = parameters.Split();
-            if (args.Length > 2)
-            {
-                return;
-            }
-
-            FileCabinetRecord[] foundRecords;
-
-            switch (args[0].ToLower())
-            {
-                case "firstname":
-                    foundRecords = fileCabinetService.FindByFirstName(args[1]);
-                    if (foundRecords != null)
-                    {
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-                    }
-
-                    break;
-                case "lastname":
-                    foundRecords = fileCabinetService.FindByLastName(args[1]);
-                    if (foundRecords != null)
-                    {
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-                    }
-
-                    break;
-                case "dateofbirth":
-                    foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
-                    if (foundRecords != null)
-                    {
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-                    }
-
-                    break;
-            }
-        }
-
-        private static void List(string parameters)
-        {
-            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
-            foreach (var record in tempList)
-            {
-                ShowRecord(record);
-            }
-        }
-
-        private static void ShowRecord(FileCabinetRecord record)
-        {
-            Console.WriteLine("#" + record.Id + ", " + record.FirstName + ", " + record.LastName + ", " + record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture) + ", favourite number: " + record.FavouriteNumber + ", favourite character: " + record.FavouriteCharacter + ", favourite game: " + record.FavouriteGame + ", donations: " + record.Donations);
-        }
-
-        private static void CheckRecordInput(string action, int id)
-        {
-        tryinput:
-            Console.WriteLine("First Name: ");
-            string tempFirstName = Console.ReadLine();
-            Console.WriteLine("Last Name: ");
-            string tempLastName = Console.ReadLine();
-            Console.WriteLine("Date of Birth: ");
-            DateTime.TryParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime tempDateOfBirth);
-            Console.WriteLine("Favourite number: ");
-            short.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out short tmpFavouriteNumber);
-            Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = Console.ReadLine()[0];
-            Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = Console.ReadLine();
-            Console.WriteLine("Donations: ");
-            decimal.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal tmpDonations);
-            try
-            {
-                switch (action)
-                {
-                    case "create":
-                        fileCabinetService.CreateRecord(tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
-                        break;
-                    case "edit":
-                        fileCabinetService.EditRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
-                        break;
-                }
-            }
-            catch (ArgumentException ex)
-            {
-                if (ex.Message == "id is invalid.")
-                {
-                    Console.WriteLine("#" + id + " record is not found.");
-                    return;
-                }
-
-                Console.WriteLine(ex.Message + " Please, try again.");
-                Console.WriteLine("Hint:");
-                string help = "First Name: from 2 to 60 symbols\n" +
-                              "Last Name:  from 2 to 60 symbols\n" +
-                              "Data of Birth: Month/Day/Year since 01-Jan-1950\n" +
-                              "Favourite number: integer, not negative\n" +
-                              "Favourite character: latin alphabet\n" +
-                              "Donations: not negative number\n";
-                Console.WriteLine(help);
-                goto tryinput;
-            }
-        }
-
+        /// <summary>
+        /// Method for handling user's commands.
+        /// </summary>
+        /// <param name="args">Additional rule-changing arguments.</param>
         public static void Main(string[] args)
         {
-            Console.WriteLine($"File Cabinet Application, developed by {Program.DeveloperName}");
-            Console.WriteLine(Program.HintMessage);
+            if (args != null && args.Length > 0)
+            {
+                SettingsParser(args);
+            }
+            else
+            {
+                SetDefaultSettings();
+            }
+
+            Console.WriteLine(Program.INTRO);
+
+            Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
+
+            Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
 
             do
@@ -192,16 +88,16 @@ namespace FileCabinetApp
 
                 if (string.IsNullOrEmpty(command))
                 {
-                    Console.WriteLine(Program.HintMessage);
+                    Console.WriteLine(Program.HINTMESSAGE);
                     continue;
                 }
 
-                var index = Array.FindIndex(commands, 0, commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
+                var index = Array.FindIndex(Commands, 0, Commands.Length, i => i.Item1.Equals(command, StringComparison.InvariantCultureIgnoreCase));
                 if (index >= 0)
                 {
                     const int parametersIndex = 1;
                     var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
-                    commands[index].Item2(parameters);
+                    Commands[index].Item2(parameters);
                 }
                 else
                 {
@@ -211,20 +107,353 @@ namespace FileCabinetApp
             while (isRunning);
         }
 
+        /// <summary>
+        /// Parses the settings from application arguments
+        /// and searches for given operation in the dictionary.
+        /// </summary>
+        /// <param name="args">Arguments to parse.</param>
+        private static void SettingsParser(string[] args)
+        {
+            SetDefaultSettings();
+
+            string operation = string.Empty;
+            string parameter = string.Empty;
+            Settings makeChanges = null;
+
+            // --some-operation=paramater
+            if (args[0].StartsWith("--", StringComparison.InvariantCulture))
+            {
+                int index = args[0].IndexOf("=", StringComparison.InvariantCulture);
+                if (index != -1)
+                {
+                    operation = args[0].Substring(0, index);
+                    parameter = args[0].Substring(index + 1);
+                    if (ChangeSettings.ContainsKey(operation.ToLower()))
+                    {
+                        makeChanges = ChangeSettings[operation.ToLower()];
+                    }
+                }
+            }
+
+            // -o parameter
+            else if (args[0].StartsWith("-", StringComparison.InvariantCulture))
+            {
+                operation = args[0];
+                if (args[1] != null)
+                {
+                    parameter = args[1];
+                }
+
+                if (ChangeSettings.ContainsKey(operation.ToLower()))
+                {
+                    makeChanges = ChangeSettings[operation.ToLower()];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(operation) && !string.IsNullOrEmpty(parameter) && makeChanges != null)
+            {
+                makeChanges.Invoke(parameter.ToLower());
+            }
+        }
+
+        /// <summary>
+        /// Sets the default settings of the application.
+        /// </summary>
+        private static void SetDefaultSettings()
+        {
+            Settings setSettings = null;
+            int i = 0;
+
+            foreach (Settings op in ChangeSettings.Values)
+            {
+                // as there're two forms of writing commands and we only need one of them
+                if (i % 2 == 0)
+                {
+                    setSettings += op;
+                    i++;
+                }
+                else
+                {
+                    i++;
+                    continue;
+                }
+            }
+
+            setSettings.Invoke("default");
+        }
+
+        /// <summary>
+        /// Sets the validation rules based on the parameter.
+        /// </summary>
+        /// <param name="validationRules">Validation rules to set.</param>
+        private static void SetValidationRules(string validationRules)
+        {
+            fileCabinetService = validationRules switch
+            {
+                "custom" => new FileCabinetService(new CustomValidator()),
+                _ => new FileCabinetService(new DefaultValidator()),
+            };
+        }
+
+        /// <summary>
+        /// Shows the number of records to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void Stat(string parameters)
+        {
+            var recordsCount = fileCabinetService.GetStat();
+            Console.WriteLine($"{recordsCount} record(s).");
+        }
+
+        /// <summary>
+        /// Creates a new record.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void Create(string parameters)
+        {
+            int id = fileCabinetService.CreateRecord(CheckRecordInput());
+            Console.WriteLine($"Record # {id} is created.");
+        }
+
+        /// <summary>
+        /// Edits the existing record.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void Edit(string parameters)
+        {
+            if (int.TryParse(parameters, out int id))
+            {
+                if (id < 1 || id > fileCabinetService.GetStat())
+                {
+                    Console.WriteLine($"#{id} record is not found.");
+                    return;
+                }
+
+                id--;
+                fileCabinetService.EditRecord(CheckRecordInput(id));
+                Console.WriteLine($"Record #{++id} is updated.");
+            }
+        }
+
+        /// <summary>
+        /// Searches for the record by key.
+        /// </summary>
+        /// <param name="parameters">Parameters to search by.</param>
+        private static void Find(string parameters)
+        {
+            string[] args = parameters.Split();
+            if (args.Length > 2)
+            {
+                return;
+            }
+
+            IReadOnlyCollection<FileCabinetRecord> foundRecords;
+
+            try
+            {
+                switch (args[0].ToLower())
+                {
+                    case "firstname":
+                        foundRecords = fileCabinetService.FindByFirstName(args[1]);
+
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
+
+                        break;
+                    case "lastname":
+                        foundRecords = fileCabinetService.FindByLastName(args[1]);
+
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
+
+                        break;
+                    case "dateofbirth":
+                        foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
+
+                        foreach (var record in foundRecords)
+                        {
+                            ShowRecord(record);
+                        }
+
+                        break;
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        /// <summary>
+        /// Shows all the records to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void List(string parameters)
+        {
+            ReadOnlyCollection<FileCabinetRecord> tempList = fileCabinetService.GetRecords();
+
+            foreach (var record in tempList)
+            {
+                ShowRecord(record);
+            }
+        }
+
+        /// <summary>
+        /// Shows one record.
+        /// </summary>
+        /// <param name="record">Record to show.</param>
+        private static void ShowRecord(FileCabinetRecord record)
+        {
+            Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
+        }
+
+        /// <summary>
+        /// Requests and checks the user's input.
+        /// </summary>
+        /// <param name="id">Id to create the record with.</param>
+        /// <returns>Valid record.</returns>
+        private static FileCabinetRecord CheckRecordInput(int id = 0)
+        {
+            Console.WriteLine("First Name: ");
+            string tmpFirstName = ReadInput<string>(Converter<string>, Validator<string>, "FirstName");
+
+            Console.WriteLine("Last Name: ");
+            string tmpLastName = ReadInput(Converter<string>, Validator<string>, "LastName");
+
+            Console.WriteLine("Date of Birth: ");
+            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator<DateTime>, "DateOfBirth");
+
+            Console.WriteLine("Favourite number: ");
+            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator<short>, "FavouriteNumber");
+
+            Console.WriteLine("Favourite character: ");
+            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator<char>, "FavouriteCharacter");
+
+            Console.WriteLine("Favourite game: ");
+            string tmpFavouriteGame = ReadInput(Converter<string>, Validator<string>, "FavouriteGame");
+
+            Console.WriteLine("Donations: ");
+            decimal tmpDonations = ReadInput(Converter<decimal>, Validator<decimal>, "Donations");
+
+            FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+
+            return record;
+        }
+
+        /// <summary>
+        /// Parses and validates the user's input.
+        /// </summary>
+        /// <typeparam name="T">The type of input.</typeparam>
+        /// <param name="converter">Converter from string to specific type.</param>
+        /// <param name="validator">Validator for the converted input.</param>
+        /// <param name="field">Field to check.</param>
+        /// <returns>Converted and validated value.</returns>
+        private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<IRecordValidator, string, T, Tuple<bool, string>> validator, string field)
+        {
+            do
+            {
+                T value;
+
+                var input = Console.ReadLine();
+                var conversionResult = converter(input);
+
+                if (!conversionResult.Item1)
+                {
+                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                value = conversionResult.Item3;
+
+                var validationResult = validator(fileCabinetService.GetValidator(), field, value);
+                if (!validationResult.Item1)
+                {
+                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                return value;
+            }
+            while (true);
+        }
+
+        /// <summary>
+        /// Converts the value to specific type.
+        /// </summary>
+        /// <typeparam name="T">The type to convert to.</typeparam>
+        /// <param name="input">The input to convert.</param>
+        /// <returns>
+        /// Bool whether the conversion succeeded.
+        /// Type of conversion as string.
+        /// Converted value itself.
+        /// </returns>
+        private static Tuple<bool, string, T> Converter<T>(string input)
+        {
+            bool conversionSucceeded = false;
+            string conversionType = $"from string to {typeof(T)}";
+            T convertedValue = default;
+
+            try
+            {
+                convertedValue = (T)Convert.ChangeType(input, typeof(T), CultureInfo.InvariantCulture);
+                conversionSucceeded = true;
+            }
+            catch (FormatException)
+            {
+            }
+
+            return new Tuple<bool, string, T>(conversionSucceeded, conversionType, convertedValue);
+        }
+
+        /// <summary>
+        /// Validates the user's value.
+        /// </summary>
+        /// <typeparam name="T">The type of value to validate.</typeparam>
+        /// <param name="validator">The specific validator.</param>
+        /// <param name="field">The field to validate.</param>
+        /// <param name="input">The value to validate.</param>
+        /// <returns>
+        /// Bool whether the validation succeeded.
+        /// Type of conversion as string.
+        /// </returns>
+        private static Tuple<bool, string> Validator<T>(IRecordValidator validator, string field, T input)
+        {
+            bool validationSucceeded;
+            string validationType = field + " field";
+            Type validatorType = validator.GetType();
+            MethodInfo validateField = validatorType.GetMethod("Validate" + field);
+
+            validationSucceeded = (bool)validateField.Invoke(validator, new object[] { input });
+
+            return new Tuple<bool, string>(validationSucceeded, validationType);
+        }
+
+        /// <summary>
+        /// Notifies there's no such command.
+        /// </summary>
+        /// <param name="command">Incorrect command.</param>
         private static void PrintMissedCommandInfo(string command)
         {
             Console.WriteLine($"There is no '{command}' command.");
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Prints help message to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void PrintHelp(string parameters)
         {
             if (!string.IsNullOrEmpty(parameters))
             {
-                var index = Array.FindIndex(helpMessages, 0, helpMessages.Length, i => string.Equals(i[Program.CommandHelpIndex], parameters, StringComparison.InvariantCultureIgnoreCase));
+                var index = Array.FindIndex(HelpMessages, 0, HelpMessages.Length, i => string.Equals(i[Program.COMMANDHELPINDEX], parameters, StringComparison.InvariantCultureIgnoreCase));
                 if (index >= 0)
                 {
-                    Console.WriteLine(helpMessages[index][Program.ExplanationHelpIndex]);
+                    Console.WriteLine(HelpMessages[index][Program.EXPLANATIONHELPINDEX]);
                 }
                 else
                 {
@@ -235,15 +464,19 @@ namespace FileCabinetApp
             {
                 Console.WriteLine("Available commands:");
 
-                foreach (var helpMessage in helpMessages)
+                foreach (var helpMessage in HelpMessages)
                 {
-                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.CommandHelpIndex], helpMessage[Program.DescriptionHelpIndex]);
+                    Console.WriteLine("\t{0}\t- {1}", helpMessage[Program.COMMANDHELPINDEX], helpMessage[Program.DESCRIPTIONHELPINDEX]);
                 }
             }
 
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Exits the application.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");

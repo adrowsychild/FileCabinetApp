@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace FileCabinetApp
@@ -10,11 +11,10 @@ namespace FileCabinetApp
     {
         private const string DEVELOPERNAME = "Dyl Aliaksandra";
         private const string HINTMESSAGE = "Enter your command, or enter 'help' to get help.";
+        private const string INTRO = "File Cabinet Application, developed by " + DEVELOPERNAME;
         private const int COMMANDHELPINDEX = 0;
         private const int DESCRIPTIONHELPINDEX = 1;
         private const int EXPLANATIONHELPINDEX = 2;
-
-        private static readonly FileCabinetService FileCabinetService = new FileCabinetCustomService();
 
         private static readonly Tuple<string, Action<string>>[] Commands = new Tuple<string, Action<string>>[]
         {
@@ -38,14 +38,45 @@ namespace FileCabinetApp
             new string[] { "list", "prints the records", "The 'list' prints the records." },
         };
 
+        /// <summary>
+        /// Contains the name of operation and corresponding operation itself.
+        /// Then, if we need to add settings, we only need to add values to the dictionary.
+        /// Warning: Both forms of command should be added one after another.
+        /// </summary>
+        private static readonly Dictionary<string, Settings> ChangeSettings = new Dictionary<string, Settings>
+        {
+            ["-v"] = new Settings(SetValidationRules),
+            ["--validation-rules"] = new Settings(SetValidationRules),
+        };
+
         private static bool isRunning = true;
+
+        private static FileCabinetService fileCabinetService;
+
+        private delegate void Settings(string args);
 
         /// <summary>
         /// Method for handling user's commands.
         /// </summary>
-        public static void Main()
+        /// <param name="args">Additional rule-changing arguments.</param>
+        public static void Main(string[] args)
         {
-            Console.WriteLine($"File Cabinet Application, developed by {DEVELOPERNAME}");
+            if (args != null && args.Length > 0)
+            {
+                SettingsParser(args);
+            }
+            else
+            {
+                SetDefaultSettings();
+            }
+
+            Console.WriteLine(Program.INTRO);
+
+            int serviceIndex = fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture);
+            string validationRules = fileCabinetService.GetType().ToString()[26..serviceIndex].ToLower();
+
+            Console.WriteLine("Using " + validationRules + " validation rules.");
+
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
 
@@ -77,23 +108,111 @@ namespace FileCabinetApp
             while (isRunning);
         }
 
+        /// <summary>
+        /// Parses the settings from application arguments
+        /// and searches for given operation in the dictionary.
+        /// </summary>
+        /// <param name="args">Arguments to parse.</param>
+        private static void SettingsParser(string[] args)
+        {
+            SetDefaultSettings();
+
+            string operation = string.Empty;
+            string parameter = string.Empty;
+            Settings makeChanges = null;
+
+            // --some-operation=paramater
+            if (args[0].StartsWith("--", StringComparison.InvariantCulture))
+            {
+                int index = args[0].IndexOf("=", StringComparison.InvariantCulture);
+                if (index != -1)
+                {
+                    operation = args[0].Substring(0, index);
+                    parameter = args[0].Substring(index + 1);
+                    if (ChangeSettings.ContainsKey(operation.ToLower()))
+                    {
+                        makeChanges = ChangeSettings[operation.ToLower()];
+                    }
+                }
+            }
+
+            // -o parameter
+            else if (args[0].StartsWith("-", StringComparison.InvariantCulture))
+            {
+                operation = args[0];
+                if (args[1] != null)
+                {
+                    parameter = args[1];
+                }
+
+                if (ChangeSettings.ContainsKey(operation.ToLower()))
+                {
+                    makeChanges = ChangeSettings[operation.ToLower()];
+                }
+            }
+
+            if (!string.IsNullOrEmpty(operation) && !string.IsNullOrEmpty(parameter) && makeChanges != null)
+            {
+                makeChanges.Invoke(parameter.ToLower());
+            }
+        }
+
+        /// <summary>
+        /// Sets the default settings of the application.
+        /// </summary>
+        private static void SetDefaultSettings()
+        {
+            Settings setSettings = null;
+            int i = 0;
+
+            foreach (Settings op in ChangeSettings.Values)
+            {
+                // as there're two forms of writing commands and we only need one of them
+                if (i % 2 == 0)
+                {
+                    setSettings += op;
+                    i++;
+                }
+                else
+                {
+                    i++;
+                    continue;
+                }
+            }
+
+            setSettings.Invoke("default");
+        }
+
+        /// <summary>
+        /// Sets the validation rules based on the parameter.
+        /// </summary>
+        /// <param name="validationRules">Validation rules to set.</param>
+        private static void SetValidationRules(string validationRules)
+        {
+            fileCabinetService = validationRules switch
+            {
+                "custom" => new FileCabinetCustomService(),
+                _ => new FileCabinetDefaultService(),
+            };
+        }
+
         private static void Stat(string parameters)
         {
-            var recordsCount = FileCabinetService.GetStat();
+            var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
         }
 
         private static void Create(string parameters)
         {
             CheckRecordInput("create");
-            Console.WriteLine($"Record # {FileCabinetService.GetStat()} is created.");
+            Console.WriteLine($"Record # {fileCabinetService.GetStat()} is created.");
         }
 
         private static void Edit(string parameters)
         {
             if (int.TryParse(parameters, out int id))
             {
-                if (id < 1 || id > FileCabinetService.GetStat())
+                if (id < 1 || id > fileCabinetService.GetStat())
                 {
                     Console.WriteLine($"#{id} record is not found.");
                     return;
@@ -120,7 +239,7 @@ namespace FileCabinetApp
                 switch (args[0].ToLower())
                 {
                     case "firstname":
-                        foundRecords = FileCabinetService.FindByFirstName(args[1]);
+                        foundRecords = fileCabinetService.FindByFirstName(args[1]);
 
                         foreach (var record in foundRecords)
                         {
@@ -129,7 +248,7 @@ namespace FileCabinetApp
 
                         break;
                     case "lastname":
-                        foundRecords = FileCabinetService.FindByLastName(args[1]);
+                        foundRecords = fileCabinetService.FindByLastName(args[1]);
 
                         foreach (var record in foundRecords)
                         {
@@ -138,7 +257,7 @@ namespace FileCabinetApp
 
                         break;
                     case "dateofbirth":
-                        foundRecords = FileCabinetService.FindByDateOfBirth(args[1]);
+                        foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
 
                         foreach (var record in foundRecords)
                         {
@@ -156,7 +275,7 @@ namespace FileCabinetApp
 
         private static void List(string parameters)
         {
-            FileCabinetRecord[] tempList = FileCabinetService.GetRecords();
+            FileCabinetRecord[] tempList = fileCabinetService.GetRecords();
 
             foreach (var record in tempList)
             {
@@ -198,10 +317,10 @@ namespace FileCabinetApp
                 switch (action)
                 {
                     case "create":
-                        FileCabinetService.CreateRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
+                        fileCabinetService.CreateRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
                         break;
                     case "edit":
-                        FileCabinetService.EditRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
+                        fileCabinetService.EditRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
                         break;
                 }
             }

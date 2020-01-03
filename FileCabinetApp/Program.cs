@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Reflection;
 
 namespace FileCabinetApp
 {
@@ -194,18 +195,30 @@ namespace FileCabinetApp
             };
         }
 
+        /// <summary>
+        /// Shows the number of records to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void Stat(string parameters)
         {
             var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
         }
 
+        /// <summary>
+        /// Creates a new record.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void Create(string parameters)
         {
-            CheckRecordInput("create");
-            Console.WriteLine($"Record # {fileCabinetService.GetStat()} is created.");
+            int id = fileCabinetService.CreateRecord(CheckRecordInput());
+            Console.WriteLine($"Record # {id} is created.");
         }
 
+        /// <summary>
+        /// Edits the existing record.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void Edit(string parameters)
         {
             if (int.TryParse(parameters, out int id))
@@ -217,11 +230,15 @@ namespace FileCabinetApp
                 }
 
                 id--;
-                CheckRecordInput("edit", id);
+                fileCabinetService.EditRecord(CheckRecordInput(id));
                 Console.WriteLine($"Record #{++id} is updated.");
             }
         }
 
+        /// <summary>
+        /// Searches for the record by key.
+        /// </summary>
+        /// <param name="parameters">Parameters to search by.</param>
         private static void Find(string parameters)
         {
             string[] args = parameters.Split();
@@ -271,6 +288,10 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Shows all the records to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void List(string parameters)
         {
             ReadOnlyCollection<FileCabinetRecord> tempList = fileCabinetService.GetRecords();
@@ -281,75 +302,150 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Shows one record.
+        /// </summary>
+        /// <param name="record">Record to show.</param>
         private static void ShowRecord(FileCabinetRecord record)
         {
             Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
         }
 
-        private static void CheckRecordInput(string action, int id = 0)
+        /// <summary>
+        /// Requests and checks the user's input.
+        /// </summary>
+        /// <param name="id">Id to create the record with.</param>
+        /// <returns>Valid record.</returns>
+        private static FileCabinetRecord CheckRecordInput(int id = 0)
         {
-        tryinput:
             Console.WriteLine("First Name: ");
-            string tempFirstName = Console.ReadLine();
+            string tmpFirstName = ReadInput<string>(Converter<string>, Validator<string>, "FirstName");
 
             Console.WriteLine("Last Name: ");
-            string tempLastName = Console.ReadLine();
+            string tmpLastName = ReadInput(Converter<string>, Validator<string>, "LastName");
 
             Console.WriteLine("Date of Birth: ");
-            DateTime.TryParseExact(Console.ReadLine(), "M/d/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime tempDateOfBirth);
+            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator<DateTime>, "DateOfBirth");
 
             Console.WriteLine("Favourite number: ");
-            short.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out short tmpFavouriteNumber);
+            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator<short>, "FavouriteNumber");
 
             Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = Console.ReadLine()[0];
+            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator<char>, "FavouriteCharacter");
 
             Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = Console.ReadLine();
+            string tmpFavouriteGame = ReadInput(Converter<string>, Validator<string>, "FavouriteGame");
 
             Console.WriteLine("Donations: ");
-            decimal.TryParse(Console.ReadLine(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal tmpDonations);
+            decimal tmpDonations = ReadInput(Converter<decimal>, Validator<decimal>, "Donations");
+
+            FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+
+            return record;
+        }
+
+        /// <summary>
+        /// Parses and validates the user's input.
+        /// </summary>
+        /// <typeparam name="T">The type of input.</typeparam>
+        /// <param name="converter">Converter from string to specific type.</param>
+        /// <param name="validator">Validator for the converted input.</param>
+        /// <param name="field">Field to check.</param>
+        /// <returns>Converted and validated value.</returns>
+        private static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<IRecordValidator, string, T, Tuple<bool, string>> validator, string field)
+        {
+            do
+            {
+                T value;
+
+                var input = Console.ReadLine();
+                var conversionResult = converter(input);
+
+                if (!conversionResult.Item1)
+                {
+                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                value = conversionResult.Item3;
+
+                var validationResult = validator(fileCabinetService.GetValidator(), field, value);
+                if (!validationResult.Item1)
+                {
+                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                return value;
+            }
+            while (true);
+        }
+
+        /// <summary>
+        /// Converts the value to specific type.
+        /// </summary>
+        /// <typeparam name="T">The type to convert to.</typeparam>
+        /// <param name="input">The input to convert.</param>
+        /// <returns>
+        /// Bool whether the conversion succeeded.
+        /// Type of conversion as string.
+        /// Converted value itself.
+        /// </returns>
+        private static Tuple<bool, string, T> Converter<T>(string input)
+        {
+            bool conversionSucceeded = false;
+            string conversionType = $"from string to {typeof(T)}";
+            T convertedValue = default;
 
             try
             {
-                switch (action)
-                {
-                    case "create":
-                        fileCabinetService.CreateRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
-                        break;
-                    case "edit":
-                        fileCabinetService.EditRecord(new FileCabinetRecord(id, tempFirstName, tempLastName, tempDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations));
-                        break;
-                }
+                convertedValue = (T)Convert.ChangeType(input, typeof(T), CultureInfo.InvariantCulture);
+                conversionSucceeded = true;
             }
-            catch (ArgumentException ex)
+            catch (FormatException)
             {
-                if (ex.Message == "id is invalid.")
-                {
-                    Console.WriteLine($"#{id} record is not found.");
-                    return;
-                }
-
-                Console.WriteLine($"{ex.Message} Please, try again.");
-                Console.WriteLine("Hint:");
-
-                string help = "First Name: from 2 to 60 symbols\n" +
-                              "Last Name:  from 2 to 60 symbols\n" +
-                              "Data of Birth: Month/Day/Year since 01-Jan-1950\n" +
-                              "Favourite number: integer, not negative\n" +
-                              "Favourite character: latin alphabet\n" +
-                              "Donations: not negative number\n";
-                Console.WriteLine(help);
-                goto tryinput;
             }
+
+            return new Tuple<bool, string, T>(conversionSucceeded, conversionType, convertedValue);
         }
 
+        /// <summary>
+        /// Validates the user's value.
+        /// </summary>
+        /// <typeparam name="T">The type of value to validate.</typeparam>
+        /// <param name="validator">The specific validator.</param>
+        /// <param name="field">The field to validate.</param>
+        /// <param name="input">The value to validate.</param>
+        /// <returns>
+        /// Bool whether the validation succeeded.
+        /// Type of conversion as string.
+        /// </returns>
+        private static Tuple<bool, string> Validator<T>(IRecordValidator validator, string field, T input)
+        {
+            bool validationSucceeded;
+            string validationType = field + " field";
+            Type validatorType = validator.GetType();
+            MethodInfo validateField = validatorType.GetMethod("Validate" + field);
+
+            validationSucceeded = (bool)validateField.Invoke(validator, new object[] { input });
+
+            return new Tuple<bool, string>(validationSucceeded, validationType);
+        }
+
+        /// <summary>
+        /// Notifies there's no such command.
+        /// </summary>
+        /// <param name="command">Incorrect command.</param>
         private static void PrintMissedCommandInfo(string command)
         {
             Console.WriteLine($"There is no '{command}' command.");
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Prints help message to the user.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void PrintHelp(string parameters)
         {
             if (!string.IsNullOrEmpty(parameters))
@@ -377,6 +473,10 @@ namespace FileCabinetApp
             Console.WriteLine();
         }
 
+        /// <summary>
+        /// Exits the application.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");

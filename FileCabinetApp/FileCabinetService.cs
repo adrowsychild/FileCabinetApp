@@ -36,10 +36,14 @@
         {
             if (record == null)
             {
-                throw new ArgumentNullException($"{record} object is invalid.");
+                throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            this.validator.ValidateParameters(record);
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                return -1;
+            }
 
             record.Id = this.list.Count + 1;
 
@@ -58,19 +62,24 @@
         /// Edits the existing record.
         /// </summary>
         /// <param name="record">Record to edit.</param>
-        public void EditRecord(FileCabinetRecord record)
+        /// <returns>Whether operation succeeded.</returns>
+        public int EditRecord(FileCabinetRecord record)
         {
             if (record == null)
             {
-                throw new ArgumentNullException($"{record} object is invalid.");
+                throw new ArgumentNullException($"Record object is invalid.");
             }
 
             if (record.Id < 0 || record.Id > this.GetStat())
             {
-                throw new ArgumentException(message: $"{record.Id} is invalid", nameof(record));
+                return -1;
             }
 
-            this.validator.ValidateParameters(record);
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                throw new ArgumentException(validationException);
+            }
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
             this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
@@ -85,6 +94,8 @@
             UpdateDictionary(this.list[record.Id], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             this.list[record.Id].Id++;
+
+            return 0;
         }
 
         /// <summary>
@@ -151,6 +162,15 @@
         }
 
         /// <summary>
+        /// Gets the validator.
+        /// </summary>
+        /// <returns>Validator.</returns>
+        public IRecordValidator GetValidator()
+        {
+            return this.validator;
+        }
+
+        /// <summary>
         /// Adds a new record to the dictionary by given key.
         /// </summary>
         /// <param name="record">The record to add.</param>
@@ -184,7 +204,7 @@
         {
             if (string.IsNullOrEmpty(key))
             {
-                throw new ArgumentException(message: $"{key} to find by is invalid", nameof(key));
+                throw new ArgumentException("Key to find by is invalid");
             }
 
             if (dictionary.ContainsKey(key.ToLower()))
@@ -194,7 +214,7 @@
             }
             else
             {
-                throw new ArgumentException(message: $"{key} not found", nameof(key));
+                throw new ArgumentException("No records found.");
             }
         }
     }

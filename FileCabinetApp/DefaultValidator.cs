@@ -13,47 +13,155 @@ namespace FileCabinetApp
         /// Validates the user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        public void ValidateParameters(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string ValidateParameters(FileCabinetRecord record)
         {
             if (record == null)
             {
-                throw new ArgumentNullException($"{record} object is invalid.");
+                return $"{record} object is invalid.";
             }
 
-            if (string.IsNullOrEmpty(record.FirstName) || record.FirstName.Length < 2 || record.FirstName.Length > 60)
+            if (!this.ValidateFirstName(record.FirstName))
             {
-                throw new ArgumentException("First name is invalid.");
+                return "First name is invalid.";
             }
 
-            if (string.IsNullOrEmpty(record.LastName) || record.LastName.Length < 2 || record.LastName.Length > 60)
+            if (!this.ValidateLastName(record.LastName))
             {
-                throw new ArgumentException("Last name is invalid.");
+                return "Last name is invalid.";
             }
 
-            if (record.DateOfBirth < new DateTime(1950, 1, 1))
+            if (!this.ValidateDateOfBirth(record.DateOfBirth))
             {
-                throw new ArgumentException("Date of birth is invalid.");
+                return "Date of birth is invalid.";
             }
 
-            if (record.FavouriteNumber < 0)
+            if (!this.ValidateFavouriteNumber(record.FavouriteNumber))
             {
-                throw new ArgumentException("Favourite number is invalid.");
+                return "Favourite number is invalid.";
             }
 
-            if (record.FavouriteCharacter < 65 || (record.FavouriteCharacter > 90 && record.FavouriteCharacter < 97) || record.FavouriteCharacter > 122)
+            if (!this.ValidateFavouriteCharacter(record.FavouriteCharacter))
             {
-                throw new ArgumentException("FavouriteCharacter is invalid.");
+                return "Favourite character is invalid.";
             }
 
-            if (string.IsNullOrEmpty(record.FavouriteGame))
+            if (!this.ValidateFavouriteGame(record.FavouriteGame))
             {
-                throw new ArgumentException("FavouriteGame is invalid.");
+                return "Favourite game is invalid.";
             }
 
-            if (record.Donations < 0)
+            if (!this.ValidateDonations(record.Donations))
             {
-                throw new ArgumentException("Donations is invalid.");
+                return "Donations are invalid.";
             }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Validates first name of user's input.
+        /// </summary>
+        /// <param name="firstName">First name to validate.</param>
+        /// <returns>Whether first name is valid.</returns>
+        public bool ValidateFirstName(string firstName)
+        {
+            if (string.IsNullOrEmpty(firstName) || firstName.Length < 2 || firstName.Length > 60)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates last name of user's input.
+        /// </summary>
+        /// <param name="lastName">Last name to validate.</param>
+        /// <returns>Whether last name is valid.</returns>
+        public bool ValidateLastName(string lastName)
+        {
+            if (string.IsNullOrEmpty(lastName) || lastName.Length < 2 || lastName.Length > 60)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates date of birth of user's input.
+        /// </summary>
+        /// <param name="dateOfBirth">Date of birth to validate.</param>
+        /// <returns>Whether date of birth is valid.</returns>
+        public bool ValidateDateOfBirth(DateTime dateOfBirth)
+        {
+            if (dateOfBirth < new DateTime(1950, 1, 1) || dateOfBirth > DateTime.Now)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates favourite number of user's input.
+        /// </summary>
+        /// <param name="favouriteNumber">Favourite number to validate.</param>
+        /// <returns>Whether favourite number is valid.</returns>
+        public bool ValidateFavouriteNumber(short favouriteNumber)
+        {
+            if (favouriteNumber < 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates favourite character of user's input.
+        /// </summary>
+        /// <param name="favouriteCharacter">Favourite character to validate.</param>
+        /// <returns>Whether favourite character is valid.</returns>
+        public bool ValidateFavouriteCharacter(char favouriteCharacter)
+        {
+            if (favouriteCharacter < 65 || (favouriteCharacter > 90 && favouriteCharacter < 97) || favouriteCharacter > 122)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates favourite game of user's input.
+        /// </summary>
+        /// <param name="favouriteGame">Favourite game to validate.</param>
+        /// <returns>Whether favourite game is valid.</returns>
+        public bool ValidateFavouriteGame(string favouriteGame)
+        {
+            if (string.IsNullOrEmpty(favouriteGame))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Validates donations of user's input.
+        /// </summary>
+        /// <param name="donations">Donations to validate.</param>
+        /// <returns>Whether donations are valid.</returns>
+        public bool ValidateDonations(decimal donations)
+        {
+            if (donations < 0)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

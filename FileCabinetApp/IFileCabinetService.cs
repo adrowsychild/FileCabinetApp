@@ -21,7 +21,8 @@ namespace FileCabinetApp
         /// Edits the existing record.
         /// </summary>
         /// <param name="record">Record to edit.</param>
-        public void EditRecord(FileCabinetRecord record);
+        /// <returns>Whether operation succeeded.</returns>
+        public int EditRecord(FileCabinetRecord record);
 
         /// <summary>
         /// Searches the records by first name.
@@ -61,5 +62,11 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>The type of validator in string form.</returns>
         public string GetValidatorType();
+
+        /// <summary>
+        /// Gets the validator.
+        /// </summary>
+        /// <returns>Validator.</returns>
+        public IRecordValidator GetValidator();
     }
 }

@@ -4,6 +4,9 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.IO;
+    using System.Reflection;
+    using FileCabinetApp.Interfaces;
 
     /// <summary>
     /// Class for working with list of users.
@@ -142,6 +145,16 @@
         }
 
         /// <summary>
+        /// Makes a snapshot of records in the concrete moment.
+        /// </summary>
+        /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot()
+        {
+            ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(this.list);
+            return new FileCabinetServiceSnapshot(records);
+        }
+
+        /// <summary>
         /// Returns the number of records in the list.
         /// </summary>
         /// <returns>The number of records.</returns>
@@ -215,6 +228,96 @@
             else
             {
                 throw new ArgumentException("No records found.");
+            }
+        }
+
+        /// <summary>
+        /// Snapshot of records and methods saving them.
+        /// </summary>
+        internal class FileCabinetServiceSnapshot : IFileCabinetServiceSnapshot
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
+            /// </summary>
+            /// <param name="records">Records to snapshot.</param>
+            public FileCabinetServiceSnapshot(ReadOnlyCollection<FileCabinetRecord> records)
+            {
+                this.Records = records;
+            }
+
+            /// <summary>
+            /// Gets a snapshot of records.
+            /// </summary>
+            /// <value>A snapshot of records in the concrete moment.</value>
+            public ReadOnlyCollection<FileCabinetRecord> Records { get; }
+
+            /// <summary>
+            /// Saves the records to csv file.
+            /// </summary>
+            /// <param name="writer">Writer.</param>
+            /// <returns>Whether operation succeeded.</returns>
+            public bool SaveToCsv(StreamWriter writer)
+            {
+                FileCabinetRecordCsvWriter csvWriter = new FileCabinetRecordCsvWriter(writer);
+                foreach (var record in this.Records)
+                {
+                    csvWriter.Write(record);
+                }
+
+                return true;
+            }
+
+            /// <summary>
+            /// Saves information to csv file.
+            /// </summary>
+            internal class FileCabinetRecordCsvWriter : IFileCabinetRecordCsvWriter
+            {
+                private readonly TextWriter writer;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
+                /// </summary>
+                /// <param name="writer">Special writer.</param>
+                public FileCabinetRecordCsvWriter(TextWriter writer)
+                {
+                    this.writer = writer;
+                }
+
+                /// <summary>
+                /// Writes information to csv file.
+                /// </summary>
+                /// <param name="record">Record to write about.</param>
+                /// <returns>Whether operation succeeded.</returns>
+                public bool Write(FileCabinetRecord record)
+                {
+                    if (record == null)
+                    {
+                        return false;
+                    }
+
+                    PropertyInfo[] properties = record.GetType().GetProperties();
+
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        if (properties[i].PropertyType == typeof(DateTime))
+                        {
+                            DateTime date = (DateTime)properties[i].GetValue(record);
+                            this.writer.Write(date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                        }
+                        else
+                        {
+                            this.writer.Write(properties[i].GetValue(record));
+                        }
+
+                        if (i != properties.Length - 1)
+                        {
+                            this.writer.Write(',');
+                        }
+                    }
+
+                    this.writer.Write("\n");
+                    return true;
+                }
             }
         }
     }

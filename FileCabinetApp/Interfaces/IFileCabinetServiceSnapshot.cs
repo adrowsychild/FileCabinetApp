@@ -24,6 +24,11 @@ namespace FileCabinetApp.Interfaces
         /// <returns>Whether operation succeeded.</returns>
         public bool SaveToCsv(StreamWriter writer);
 
-        //public book SaveToXml(StreamWriter writer);
+        /// <summary>
+        /// Saves the records to xml file.
+        /// </summary>
+        /// <param name="writer">Writer.</param>
+        /// <returns>Whether operation succeeded.</returns>
+        public bool SaveToXml(StreamWriter writer);
     }
 }

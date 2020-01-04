@@ -323,7 +323,7 @@ namespace FileCabinetApp
                         isSucceed = snapshot.SaveToCsv(writer);
                         break;
                     case "xml":
-                        //isSucceed = snapshot.SaveToXml(writer);
+                        isSucceed = snapshot.SaveToXml(writer);
                         break;
                 }
 

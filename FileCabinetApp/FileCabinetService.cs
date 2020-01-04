@@ -6,6 +6,8 @@
     using System.Globalization;
     using System.IO;
     using System.Reflection;
+    using System.Xml;
+    using System.Xml.Linq;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -254,7 +256,7 @@
             /// <summary>
             /// Saves the records to csv file.
             /// </summary>
-            /// <param name="writer">Writer.</param>
+            /// <param name="writer">Csv writer.</param>
             /// <returns>Whether operation succeeded.</returns>
             public bool SaveToCsv(StreamWriter writer)
             {
@@ -263,6 +265,30 @@
                 {
                     csvWriter.Write(record);
                 }
+
+                return true;
+            }
+
+            /// <summary>
+            /// Saves the records to xml file.
+            /// </summary>
+            /// <param name="writer">Xml writer.</param>
+            /// <returns>Whether operation succeeded.</returns>
+            public bool SaveToXml(StreamWriter writer)
+            {
+                XmlWriter xmlWriter = XmlWriter.Create(writer);
+                FileCabinetXmlWriter fileXmlWriter = new FileCabinetXmlWriter(xmlWriter);
+
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement("records");
+
+                foreach (var record in this.Records)
+                {
+                    fileXmlWriter.Write(record);
+                }
+
+                xmlWriter.WriteEndDocument();
+                xmlWriter.Close();
 
                 return true;
             }
@@ -277,7 +303,7 @@
                 /// <summary>
                 /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
                 /// </summary>
-                /// <param name="writer">Special writer.</param>
+                /// <param name="writer">Csv writer.</param>
                 public FileCabinetRecordCsvWriter(TextWriter writer)
                 {
                     this.writer = writer;
@@ -316,6 +342,57 @@
                     }
 
                     this.writer.Write("\n");
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Saves information to xml file.
+            /// </summary>
+            internal class FileCabinetXmlWriter : IFileCabinetXmlWriter
+            {
+                private readonly XmlWriter writer;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetXmlWriter"/> class.
+                /// </summary>
+                /// <param name="writer">Xml writer.</param>
+                public FileCabinetXmlWriter(XmlWriter writer)
+                {
+                    this.writer = writer;
+                }
+
+                /// <summary>
+                /// Writes information to xml file.
+                /// </summary>
+                /// <param name="record">Record to write about.</param>
+                /// <returns>Whether operation succeeded.</returns>
+                public bool Write(FileCabinetRecord record)
+                {
+                    if (record == null)
+                    {
+                        return false;
+                    }
+
+                    this.writer.WriteStartElement("record");
+                    this.writer.WriteAttributeString("id", record.Id.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteStartElement("name");
+                    this.writer.WriteAttributeString("first", record.FirstName);
+                    this.writer.WriteAttributeString("last", record.LastName);
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("dateOfBirth");
+                    this.writer.WriteString(record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("favourite");
+                    this.writer.WriteAttributeString("number", record.FavouriteNumber.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteAttributeString("character", record.FavouriteCharacter.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteAttributeString("game", record.FavouriteGame);
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("donations");
+                    this.writer.WriteString(record.Donations.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteEndElement();
+                    this.writer.WriteEndElement();
+
                     return true;
                 }
             }

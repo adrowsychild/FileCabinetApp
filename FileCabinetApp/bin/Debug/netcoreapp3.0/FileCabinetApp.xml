@@ -186,6 +186,13 @@
             <param name="writer">Writer.</param>
             <returns>Whether operation succeeded.</returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetService.FileCabinetServiceSnapshot.SaveToXml(System.IO.StreamWriter)">
+            <summary>
+            Saves the records to xml file.
+            </summary>
+            <param name="writer">Writer.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
         <member name="T:FileCabinetApp.FileCabinetService.FileCabinetServiceSnapshot.FileCabinetRecordCsvWriter">
             <summary>
             Saves information to csv file.
@@ -200,6 +207,30 @@
         <member name="M:FileCabinetApp.FileCabinetService.FileCabinetServiceSnapshot.FileCabinetRecordCsvWriter.Write(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Writes information to csv file.
+            </summary>
+            <param name="record">Record to write about.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetService.FileCabinetServiceSnapshot.FileCabinetXmlWriter">
+            <summary>
+            Saves information to xml file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetService.FileCabinetServiceSnapshot.FileCabinetXmlWriter.Write(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Writes information to xml file.
+            </summary>
+            <param name="record">Record to write about.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="T:FileCabinetApp.IFileCabinetXmlWriter">
+            <summary>
+            Saves information to xml file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetXmlWriter.Write(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Writes information to xml file.
             </summary>
             <param name="record">Record to write about.</param>
             <returns>Whether operation succeeded.</returns>
@@ -230,6 +261,13 @@
         <member name="M:FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot.SaveToCsv(System.IO.StreamWriter)">
             <summary>
             Saves the records to csv file.
+            </summary>
+            <param name="writer">Writer.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot.SaveToXml(System.IO.StreamWriter)">
+            <summary>
+            Saves the records to xml file.
             </summary>
             <param name="writer">Writer.</param>
             <returns>Whether operation succeeded.</returns>

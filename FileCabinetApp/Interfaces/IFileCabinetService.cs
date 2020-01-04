@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
+using System.IO;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
 {
@@ -44,6 +45,12 @@ namespace FileCabinetApp
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth);
+
+        /// <summary>
+        /// Makes a snapshot of records in the concrete moment.
+        /// </summary>
+        /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot();
 
         /// <summary>
         /// Gets all the records.

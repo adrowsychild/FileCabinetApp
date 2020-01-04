@@ -4,6 +4,11 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
+    using System.IO;
+    using System.Reflection;
+    using System.Xml;
+    using System.Xml.Linq;
+    using FileCabinetApp.Interfaces;
 
     /// <summary>
     /// Class for working with list of users.
@@ -142,6 +147,16 @@
         }
 
         /// <summary>
+        /// Makes a snapshot of records in the concrete moment.
+        /// </summary>
+        /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot()
+        {
+            ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(this.list);
+            return new FileCabinetServiceSnapshot(records);
+        }
+
+        /// <summary>
         /// Returns the number of records in the list.
         /// </summary>
         /// <returns>The number of records.</returns>
@@ -215,6 +230,171 @@
             else
             {
                 throw new ArgumentException("No records found.");
+            }
+        }
+
+        /// <summary>
+        /// Snapshot of records and methods saving them.
+        /// </summary>
+        internal class FileCabinetServiceSnapshot : IFileCabinetServiceSnapshot
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
+            /// </summary>
+            /// <param name="records">Records to snapshot.</param>
+            public FileCabinetServiceSnapshot(ReadOnlyCollection<FileCabinetRecord> records)
+            {
+                this.Records = records;
+            }
+
+            /// <summary>
+            /// Gets a snapshot of records.
+            /// </summary>
+            /// <value>A snapshot of records in the concrete moment.</value>
+            public ReadOnlyCollection<FileCabinetRecord> Records { get; }
+
+            /// <summary>
+            /// Saves the records to csv file.
+            /// </summary>
+            /// <param name="writer">Csv writer.</param>
+            /// <returns>Whether operation succeeded.</returns>
+            public bool SaveToCsv(StreamWriter writer)
+            {
+                FileCabinetRecordCsvWriter csvWriter = new FileCabinetRecordCsvWriter(writer);
+                foreach (var record in this.Records)
+                {
+                    csvWriter.Write(record);
+                }
+
+                return true;
+            }
+
+            /// <summary>
+            /// Saves the records to xml file.
+            /// </summary>
+            /// <param name="writer">Xml writer.</param>
+            /// <returns>Whether operation succeeded.</returns>
+            public bool SaveToXml(StreamWriter writer)
+            {
+                XmlWriter xmlWriter = XmlWriter.Create(writer);
+                FileCabinetXmlWriter fileXmlWriter = new FileCabinetXmlWriter(xmlWriter);
+
+                xmlWriter.WriteStartDocument();
+                xmlWriter.WriteStartElement("records");
+
+                foreach (var record in this.Records)
+                {
+                    fileXmlWriter.Write(record);
+                }
+
+                xmlWriter.WriteEndDocument();
+                xmlWriter.Close();
+
+                return true;
+            }
+
+            /// <summary>
+            /// Saves information to csv file.
+            /// </summary>
+            internal class FileCabinetRecordCsvWriter : IFileCabinetRecordCsvWriter
+            {
+                private readonly TextWriter writer;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
+                /// </summary>
+                /// <param name="writer">Csv writer.</param>
+                public FileCabinetRecordCsvWriter(TextWriter writer)
+                {
+                    this.writer = writer;
+                }
+
+                /// <summary>
+                /// Writes information to csv file.
+                /// </summary>
+                /// <param name="record">Record to write about.</param>
+                /// <returns>Whether operation succeeded.</returns>
+                public bool Write(FileCabinetRecord record)
+                {
+                    if (record == null)
+                    {
+                        return false;
+                    }
+
+                    PropertyInfo[] properties = record.GetType().GetProperties();
+
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        if (properties[i].PropertyType == typeof(DateTime))
+                        {
+                            DateTime date = (DateTime)properties[i].GetValue(record);
+                            this.writer.Write(date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                        }
+                        else
+                        {
+                            this.writer.Write(properties[i].GetValue(record));
+                        }
+
+                        if (i != properties.Length - 1)
+                        {
+                            this.writer.Write(',');
+                        }
+                    }
+
+                    this.writer.Write("\n");
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Saves information to xml file.
+            /// </summary>
+            internal class FileCabinetXmlWriter : IFileCabinetXmlWriter
+            {
+                private readonly XmlWriter writer;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetXmlWriter"/> class.
+                /// </summary>
+                /// <param name="writer">Xml writer.</param>
+                public FileCabinetXmlWriter(XmlWriter writer)
+                {
+                    this.writer = writer;
+                }
+
+                /// <summary>
+                /// Writes information to xml file.
+                /// </summary>
+                /// <param name="record">Record to write about.</param>
+                /// <returns>Whether operation succeeded.</returns>
+                public bool Write(FileCabinetRecord record)
+                {
+                    if (record == null)
+                    {
+                        return false;
+                    }
+
+                    this.writer.WriteStartElement("record");
+                    this.writer.WriteAttributeString("id", record.Id.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteStartElement("name");
+                    this.writer.WriteAttributeString("first", record.FirstName);
+                    this.writer.WriteAttributeString("last", record.LastName);
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("dateOfBirth");
+                    this.writer.WriteString(record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("favourite");
+                    this.writer.WriteAttributeString("number", record.FavouriteNumber.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteAttributeString("character", record.FavouriteCharacter.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteAttributeString("game", record.FavouriteGame);
+                    this.writer.WriteEndElement();
+                    this.writer.WriteStartElement("donations");
+                    this.writer.WriteString(record.Donations.ToString(CultureInfo.InvariantCulture));
+                    this.writer.WriteEndElement();
+                    this.writer.WriteEndElement();
+
+                    return true;
+                }
             }
         }
     }

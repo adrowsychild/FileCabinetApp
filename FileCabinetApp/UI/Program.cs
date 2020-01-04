@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO;
 using System.Reflection;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
 {
@@ -27,6 +29,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("list", List),
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
+            new Tuple<string, Action<string>>("export", Export),
         };
 
         private static readonly string[][] HelpMessages = new string[][]
@@ -38,6 +41,7 @@ namespace FileCabinetApp
             new string[] { "edit", "edits the existing record", "The 'edit' command edits the existing record." },
             new string[] { "find", "finds records by given criteria", "The 'find' command finds records by given criteria" },
             new string[] { "list", "prints the records", "The 'list' prints the records." },
+            new string[] { "export", "exports the records to the file in xml or csv format.", "The 'export' command exports the records to the file in xml or csv format." },
         };
 
         /// <summary>
@@ -285,6 +289,52 @@ namespace FileCabinetApp
             catch (ArgumentException ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void Export(string parameters)
+        {
+            string[] args = parameters.Split();
+            if (args == null || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[1]))
+            {
+                Console.WriteLine("Incorrect parameters.");
+                return;
+            }
+
+            string format = args[0].ToLower();
+            string path = args[1];
+
+            if (File.Exists(path))
+            {
+                Console.WriteLine("File is exist - rewrite " + path + "? [Y/n]");
+                if (Console.ReadLine().ToLower() != "y")
+                {
+                    return;
+                }
+            }
+
+            using (StreamWriter writer = new StreamWriter(path))
+            {
+                IFileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot();
+                bool isSucceed = false;
+                switch (format)
+                {
+                    case "csv":
+                        isSucceed = snapshot.SaveToCsv(writer);
+                        break;
+                    case "xml":
+                        isSucceed = snapshot.SaveToXml(writer);
+                        break;
+                }
+
+                if (!isSucceed)
+                {
+                    Console.WriteLine("Export failed: can't open file " + path);
+                }
+                else
+                {
+                    Console.WriteLine("All records are exported to file " + path);
+                }
             }
         }
 

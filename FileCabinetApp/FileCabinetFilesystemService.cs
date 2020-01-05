@@ -124,7 +124,7 @@ namespace FileCabinetApp
         /// <returns>The number of records.</returns>
         public int GetStat()
         {
-            throw new NotImplementedException();
+            return this.count;
         }
 
         /// <summary>

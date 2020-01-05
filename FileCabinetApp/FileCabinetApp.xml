@@ -152,19 +152,17 @@
             Closes the stream.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.UpdateDictionary(FileCabinetApp.FileCabinetRecord,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{FileCabinetApp.FileCabinetRecord}},System.String)">
-            <summary>
-            Adds a new record to the dictionary by given key.
-            </summary>
-            <param name="record">The record to add.</param>
-            <param name="dictionary">The dictionary to add to.</param>
-            <param name="key">The key to add the record by.</param>
-        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
             <summary>
             Writes a record to the file.
             </summary>
             <param name="record">A record to write.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.ReadRecord(System.Int32)">
+            <summary>
+            Reads the record from the file.
+            </summary>
+            <param name="index">Index to read by.</param>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>

@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using FileCabinetApp.Interfaces;
 using static System.Decimal;
+using static System.String;
 
 namespace FileCabinetApp
 {
@@ -19,14 +20,9 @@ namespace FileCabinetApp
 
         private readonly FileStream fileStream;
 
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-
         private readonly IRecordValidator validator;
 
         private int count;
-        private int index = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -60,12 +56,6 @@ namespace FileCabinetApp
             record.Id = ++this.count;
 
             this.WriteRecord(record, this.count - 1);
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return record.Id;
         }
@@ -116,7 +106,16 @@ namespace FileCabinetApp
         /// <returns>The array of records.</returns>
         public ReadOnlyCollection<FileCabinetRecord> GetRecords()
         {
-            throw new NotImplementedException();
+            List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                storedRecords.Add(this.ReadRecord(i));
+            }
+
+            ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+
+            return records;
         }
 
         /// <summary>
@@ -177,6 +176,22 @@ namespace FileCabinetApp
             return bytes;
         }
 
+        private static string RemoveOffset(string value)
+        {
+            int i = 0;
+            int actualLength = 1;
+
+            while (i < value.Length && value[i] != 0x0)
+            {
+                actualLength++;
+                i++;
+            }
+
+            value = value.Substring(0, i);
+
+            return value;
+        }
+
         private static byte[] DecimalToBytes(decimal value)
         {
             byte[] bytes = new byte[16];
@@ -193,28 +208,19 @@ namespace FileCabinetApp
             return bytes;
         }
 
-        /// <summary>
-        /// Adds a new record to the dictionary by given key.
-        /// </summary>
-        /// <param name="record">The record to add.</param>
-        /// <param name="dictionary">The dictionary to add to.</param>
-        /// <param name="key">The key to add the record by.</param>
-        private static void UpdateDictionary(FileCabinetRecord record, Dictionary<string, List<FileCabinetRecord>> dictionary, string key)
+        private static decimal BytesToDecimal(byte[] bytes)
         {
-            string keyLowered = key.ToLower();
-            if (!dictionary.ContainsKey(keyLowered))
-            {
-                List<FileCabinetRecord> listOfProperties = new List<FileCabinetRecord>
-                {
-                    record,
-                };
+            decimal value;
 
-                dictionary.Add(keyLowered, listOfProperties);
-            }
-            else
+            using (MemoryStream stream = new MemoryStream(bytes))
             {
-                dictionary[keyLowered].Add(record);
+                using (BinaryReader reader = new BinaryReader(stream))
+                {
+                    value = reader.ReadDecimal();
+                }
             }
+
+            return value;
         }
 
         /// <summary>
@@ -235,6 +241,46 @@ namespace FileCabinetApp
             this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
             this.fileStream.Write(MakeStringOffset(record.FavouriteGame), 0, 120);
             this.fileStream.Write(DecimalToBytes(record.Donations), 0, sizeof(decimal));
+        }
+
+        /// <summary>
+        /// Reads the record from the file.
+        /// </summary>
+        /// <param name="index">Index to read by.</param>
+        private FileCabinetRecord ReadRecord(int index)
+        {
+            this.fileStream.Seek((index * RecordSize) + 2, SeekOrigin.Begin);
+            byte[] bytes = new byte[4];
+            this.fileStream.Read(bytes, 0, sizeof(int));
+            int tmpId = BitConverter.ToInt32(bytes);
+            bytes = new byte[120];
+            this.fileStream.Read(bytes, 0, 120);
+            string tmpFirstName = Encoding.ASCII.GetString(bytes);
+            tmpFirstName = RemoveOffset(tmpFirstName);
+            this.fileStream.Read(bytes, 0, 120);
+            string tmpLastName = Encoding.ASCII.GetString(bytes);
+            tmpLastName = RemoveOffset(tmpFirstName);
+            bytes = new byte[4];
+            this.fileStream.Read(bytes, 0, sizeof(int));
+            int tmpYear = BitConverter.ToInt32(bytes);
+            this.fileStream.Read(bytes, 0, sizeof(int));
+            int tmpMonth = BitConverter.ToInt32(bytes);
+            this.fileStream.Read(bytes, 0, sizeof(int));
+            int tmpDay = BitConverter.ToInt32(bytes);
+            bytes = new byte[2];
+            this.fileStream.Read(bytes, 0, sizeof(short));
+            short tmpFavNumber = BitConverter.ToInt16(bytes);
+            this.fileStream.Read(bytes, 0, sizeof(char));
+            char tmpFavCharacter = BitConverter.ToChar(bytes);
+            bytes = new byte[120];
+            this.fileStream.Read(bytes, 0, 120);
+            string tmpFavGame = Encoding.ASCII.GetString(bytes);
+            tmpFavGame = RemoveOffset(tmpFavGame);
+            bytes = new byte[16];
+            this.fileStream.Read(bytes, 0, sizeof(decimal));
+            decimal tmpDonations = BytesToDecimal(bytes);
+
+            return new FileCabinetRecord(tmpId, tmpFirstName, tmpLastName, new DateTime(tmpYear, tmpMonth, tmpDay), tmpFavNumber, tmpFavCharacter, tmpFavGame, tmpDonations);
         }
     }
 }

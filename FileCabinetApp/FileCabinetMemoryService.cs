@@ -7,13 +7,12 @@
     using System.IO;
     using System.Reflection;
     using System.Xml;
-    using System.Xml.Linq;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
     /// Class for working with list of users.
     /// </summary>
-    public class FileCabinetService : IFileCabinetService
+    public class FileCabinetMemoryService : IFileCabinetService
     {
         private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
@@ -24,10 +23,10 @@
         private readonly IRecordValidator validator;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FileCabinetService"/> class.
+        /// Initializes a new instance of the <see cref="FileCabinetMemoryService"/> class.
         /// </summary>
         /// <param name="validator">Special validator.</param>
-        public FileCabinetService(IRecordValidator validator)
+        public FileCabinetMemoryService(IRecordValidator validator)
         {
             this.validator = validator;
         }
@@ -42,12 +41,6 @@
             if (record == null)
             {
                 throw new ArgumentNullException($"Record object is invalid.");
-            }
-
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
-            {
-                return -1;
             }
 
             record.Id = this.list.Count + 1;
@@ -78,12 +71,6 @@
             if (record.Id < 0 || record.Id > this.GetStat())
             {
                 return -1;
-            }
-
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
-            {
-                throw new ArgumentException(validationException);
             }
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
@@ -183,6 +170,14 @@
         public IRecordValidator GetValidator()
         {
             return this.validator;
+        }
+
+        /// <summary>
+        /// Clears the list.
+        /// </summary>
+        public void Close()
+        {
+            this.list.Clear();
         }
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
@@ -75,5 +74,10 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>Validator.</returns>
         public IRecordValidator GetValidator();
+
+        /// <summary>
+        /// Does things when exiting, if needed.
+        /// </summary>
+        public void Close();
     }
 }

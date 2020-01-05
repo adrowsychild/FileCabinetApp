@@ -16,6 +16,7 @@ namespace FileCabinetApp
         private const string DEVELOPERNAME = "Dyl Aliaksandra";
         private const string HINTMESSAGE = "Enter your command, or enter 'help' to get help.";
         private const string INTRO = "File Cabinet Application, developed by " + DEVELOPERNAME;
+        private const string FILENAME = "cabinet-records.db";
         private const int COMMANDHELPINDEX = 0;
         private const int DESCRIPTIONHELPINDEX = 1;
         private const int EXPLANATIONHELPINDEX = 2;
@@ -51,6 +52,8 @@ namespace FileCabinetApp
         /// </summary>
         private static readonly Dictionary<string, Settings> ChangeSettings = new Dictionary<string, Settings>
         {
+            ["-s"] = new Settings(SetStorageRules),
+            ["--storage"] = new Settings(SetStorageRules),
             ["-v"] = new Settings(SetValidationRules),
             ["--validation-rules"] = new Settings(SetValidationRules),
         };
@@ -58,6 +61,8 @@ namespace FileCabinetApp
         private static bool isRunning = true;
 
         private static IFileCabinetService fileCabinetService;
+
+        private static IRecordValidator validator;
 
         private delegate void Settings(string args);
 
@@ -67,13 +72,18 @@ namespace FileCabinetApp
         /// <param name="args">Additional rule-changing arguments.</param>
         public static void Main(string[] args)
         {
+            string[] tempArgs = new string[2];
+
+            SetDefaultSettings();
+
             if (args != null && args.Length > 0)
             {
-                SettingsParser(args);
-            }
-            else
-            {
-                SetDefaultSettings();
+                for (int i = 1; i < args.Length; i += 2)
+                {
+                    tempArgs[0] = args[i - 1];
+                    tempArgs[1] = args[i];
+                    SettingsParser(tempArgs);
+                }
             }
 
             Console.WriteLine(Program.INTRO);
@@ -118,8 +128,6 @@ namespace FileCabinetApp
         /// <param name="args">Arguments to parse.</param>
         private static void SettingsParser(string[] args)
         {
-            SetDefaultSettings();
-
             string operation = string.Empty;
             string parameter = string.Empty;
             Settings makeChanges = null;
@@ -192,11 +200,30 @@ namespace FileCabinetApp
         /// <param name="validationRules">Validation rules to set.</param>
         private static void SetValidationRules(string validationRules)
         {
-            fileCabinetService = validationRules switch
+            validator = validationRules switch
             {
-                "custom" => new FileCabinetService(new CustomValidator()),
-                _ => new FileCabinetService(new DefaultValidator()),
+                "custom" => new CustomValidator(),
+                _ => new DefaultValidator(),
             };
+        }
+
+        /// <summary>
+        /// Sets the storage rules based on the parameter.
+        /// </summary>
+        /// <param name="storageRules">Storage rules to set.</param>
+        private static void SetStorageRules(string storageRules)
+        {
+            switch (storageRules)
+            {
+                case "file":
+                    FileStream fileStream = new FileStream(FILENAME, FileMode.Create);
+                    fileCabinetService = new FileCabinetFilesystemService(fileStream, validator);
+
+                    break;
+                default:
+                    fileCabinetService = new FileCabinetMemoryService(validator);
+                    break;
+            }
         }
 
         /// <summary>
@@ -216,7 +243,7 @@ namespace FileCabinetApp
         private static void Create(string parameters)
         {
             int id = fileCabinetService.CreateRecord(CheckRecordInput());
-            Console.WriteLine($"Record # {id} is created.");
+            Console.WriteLine($"Record #{id} is created.");
         }
 
         /// <summary>
@@ -292,6 +319,10 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Exports the records to csv or xml format.
+        /// </summary>
+        /// <param name="parameters">Format to write in and path to write to.</param>
         private static void Export(string parameters)
         {
             string[] args = parameters.Split();
@@ -369,25 +400,25 @@ namespace FileCabinetApp
         private static FileCabinetRecord CheckRecordInput(int id = 0)
         {
             Console.WriteLine("First Name: ");
-            string tmpFirstName = ReadInput<string>(Converter<string>, Validator<string>, "FirstName");
+            string tmpFirstName = ReadInput(Converter<string>, Validator, "FirstName");
 
             Console.WriteLine("Last Name: ");
-            string tmpLastName = ReadInput(Converter<string>, Validator<string>, "LastName");
+            string tmpLastName = ReadInput(Converter<string>, Validator, "LastName");
 
             Console.WriteLine("Date of Birth: ");
-            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator<DateTime>, "DateOfBirth");
+            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator, "DateOfBirth");
 
             Console.WriteLine("Favourite number: ");
-            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator<short>, "FavouriteNumber");
+            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator, "FavouriteNumber");
 
             Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator<char>, "FavouriteCharacter");
+            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator, "FavouriteCharacter");
 
             Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = ReadInput(Converter<string>, Validator<string>, "FavouriteGame");
+            string tmpFavouriteGame = ReadInput(Converter<string>, Validator, "FavouriteGame");
 
             Console.WriteLine("Donations: ");
-            decimal tmpDonations = ReadInput(Converter<decimal>, Validator<decimal>, "Donations");
+            decimal tmpDonations = ReadInput(Converter<decimal>, Validator, "Donations");
 
             FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
 
@@ -530,6 +561,7 @@ namespace FileCabinetApp
         private static void Exit(string parameters)
         {
             Console.WriteLine("Exiting an application...");
+            fileCabinetService.Close();
             isRunning = false;
         }
     }

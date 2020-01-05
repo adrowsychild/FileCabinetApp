@@ -70,6 +70,102 @@
             </summary>
             <value> Given donations. </value>
         </member>
+        <member name="T:FileCabinetApp.FileCabinetFilesystemService">
+            <summary>
+            Class for working with list of users.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.#ctor(System.IO.FileStream,FileCabinetApp.IRecordValidator)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetFilesystemService"/> class.
+            </summary>
+            <param name="fileStream">FileStream with opened binary file.</param>
+            <param name="validator">Specific validator.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.CreateRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Creates a new record.
+            </summary>
+            <param name="record">User's info.</param>
+            <returns>User's id in the users' list.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Edits the existing record.
+            </summary>
+            <param name="record">Record to edit.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFirstName(System.String)">
+            <summary>
+            Searches the records by first name.
+            </summary>
+            <param name="firstName">Given first name.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByLastName(System.String)">
+            <summary>
+            Searches the records by last name.
+            </summary>
+            <param name="lastName">Given last name.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByDateOfBirth(System.String)">
+            <summary>
+            Searches the records by date of birth.
+            </summary>
+            <param name="dateOfBirth">Given date of birth.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecords">
+            <summary>
+            Gets all the records.
+            </summary>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetStat">
+            <summary>
+            Returns the number of records in the list.
+            </summary>
+            <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetValidator">
+            <summary>
+            Gets the validator.
+            </summary>
+            <returns>Validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetValidatorType">
+            <summary>
+            Gets the validator type.
+            </summary>
+            <returns>The type of validator in string form.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeSnapshot">
+            <summary>
+            Makes a snapshot of records in the concrete moment.
+            </summary>
+            <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Close">
+            <summary>
+            Closes the stream.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.UpdateDictionary(FileCabinetApp.FileCabinetRecord,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{FileCabinetApp.FileCabinetRecord}},System.String)">
+            <summary>
+            Adds a new record to the dictionary by given key.
+            </summary>
+            <param name="record">The record to add.</param>
+            <param name="dictionary">The dictionary to add to.</param>
+            <param name="key">The key to add the record by.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
+            <summary>
+            Writes a record to the file.
+            </summary>
+            <param name="record">A record to write.</param>
+        </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>
             Class for working with list of users.
@@ -145,6 +241,11 @@
             Gets the validator.
             </summary>
             <returns>Validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.Close">
+            <summary>
+            Clears the list.
+            </summary>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.UpdateDictionary(FileCabinetApp.FileCabinetRecord,System.Collections.Generic.Dictionary{System.String,System.Collections.Generic.List{FileCabinetApp.FileCabinetRecord}},System.String)">
             <summary>
@@ -347,6 +448,11 @@
             Gets the validator.
             </summary>
             <returns>Validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.Close">
+            <summary>
+            Does things when exiting, if needed.
+            </summary>
         </member>
         <member name="T:FileCabinetApp.IRecordValidator">
             <summary>

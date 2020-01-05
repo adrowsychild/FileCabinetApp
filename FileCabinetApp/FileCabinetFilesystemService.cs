@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Text;
 using FileCabinetApp.Interfaces;
+using static System.Decimal;
 
 namespace FileCabinetApp
 {
@@ -11,9 +15,18 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetFilesystemService : IFileCabinetService
     {
+        private const int RecordSize = 400;
+
         private readonly FileStream fileStream;
 
+        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
         private readonly IRecordValidator validator;
+
+        private int count;
+        private int index = 1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -33,7 +46,28 @@ namespace FileCabinetApp
         /// <returns>User's id in the users' list.</returns>
         public int CreateRecord(FileCabinetRecord record)
         {
-            throw new NotImplementedException();
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                return -1;
+            }
+
+            record.Id = ++this.count;
+
+            this.WriteRecord(record, this.count - 1);
+
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            return record.Id;
         }
 
         /// <summary>
@@ -100,7 +134,7 @@ namespace FileCabinetApp
         /// <returns>Validator.</returns>
         public IRecordValidator GetValidator()
         {
-            throw new NotImplementedException();
+            return this.validator;
         }
 
         /// <summary>
@@ -109,7 +143,9 @@ namespace FileCabinetApp
         /// <returns>The type of validator in string form.</returns>
         public string GetValidatorType()
         {
-            throw new NotImplementedException();
+            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
+            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
+            return validationType;
         }
 
         /// <summary>
@@ -124,9 +160,81 @@ namespace FileCabinetApp
         /// <summary>
         /// Closes the stream.
         /// </summary>
-        public void CloseStream()
+        public void Close()
         {
             this.fileStream.Close();
+        }
+
+        private static byte[] MakeStringOffset(string value)
+        {
+            byte[] bytes = new byte[120];
+            byte[] somebytes = Encoding.ASCII.GetBytes(value);
+            for (int i = 0; i < somebytes.Length; i++)
+            {
+                bytes[i] = somebytes[i];
+            }
+
+            return bytes;
+        }
+
+        private static byte[] DecimalToBytes(decimal value)
+        {
+            byte[] bytes = new byte[16];
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (BinaryWriter writer = new BinaryWriter(stream))
+                {
+                    writer.Write(value);
+                    bytes = stream.ToArray();
+                }
+            }
+
+            return bytes;
+        }
+
+        /// <summary>
+        /// Adds a new record to the dictionary by given key.
+        /// </summary>
+        /// <param name="record">The record to add.</param>
+        /// <param name="dictionary">The dictionary to add to.</param>
+        /// <param name="key">The key to add the record by.</param>
+        private static void UpdateDictionary(FileCabinetRecord record, Dictionary<string, List<FileCabinetRecord>> dictionary, string key)
+        {
+            string keyLowered = key.ToLower();
+            if (!dictionary.ContainsKey(keyLowered))
+            {
+                List<FileCabinetRecord> listOfProperties = new List<FileCabinetRecord>
+                {
+                    record,
+                };
+
+                dictionary.Add(keyLowered, listOfProperties);
+            }
+            else
+            {
+                dictionary[keyLowered].Add(record);
+            }
+        }
+
+        /// <summary>
+        /// Writes a record to the file.
+        /// </summary>
+        /// <param name="record">A record to write.</param>
+        private void WriteRecord(FileCabinetRecord record, int index)
+        {
+            this.fileStream.Seek(index * RecordSize, SeekOrigin.Begin);
+            this.fileStream.Write(new byte[2], 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
+            this.fileStream.Write(MakeStringOffset(record.FirstName), 0, 120);
+            this.fileStream.Write(MakeStringOffset(record.LastName), 0, 120);
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
+            this.fileStream.Write(MakeStringOffset(record.FavouriteGame), 0, 120);
+            this.fileStream.Write(DecimalToBytes(record.Donations), 0, sizeof(decimal));
         }
     }
 }

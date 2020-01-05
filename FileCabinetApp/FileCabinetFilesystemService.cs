@@ -6,8 +6,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using FileCabinetApp.Interfaces;
-using static System.Decimal;
-using static System.String;
 
 namespace FileCabinetApp
 {
@@ -17,6 +15,17 @@ namespace FileCabinetApp
     public class FileCabinetFilesystemService : IFileCabinetService
     {
         private const int RecordSize = 400;
+
+        private const int IdOffset = 4;
+        private const int FirstNameOffset = 6;
+        private const int LastNameOffset = 126;
+        private const int YearOffset = 246;
+        private const int MonthOffset = 250;
+        private const int DayOffset = 254;
+        private const int FavNumOffset = 258;
+        private const int FavCarOffset = 262;
+        private const int FavGameOffset = 382;
+        private const int DonationsOffset = 398;
 
         private readonly FileStream fileStream;
 
@@ -91,7 +100,22 @@ namespace FileCabinetApp
         /// <returns>The array of records.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            throw new NotImplementedException();
+            List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
+                byte[] bytes = new byte[120];
+                this.fileStream.Read(bytes, 0, 120);
+                string tmpFirstName = Encoding.ASCII.GetString(bytes);
+                tmpFirstName = RemoveOffset(tmpFirstName);
+                if (tmpFirstName.ToLower() == firstName.ToLower())
+                {
+                    storedRecords.Add(this.ReadRecord(i));
+                }
+            }
+
+            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
         }
 
         /// <summary>
@@ -101,7 +125,22 @@ namespace FileCabinetApp
         /// <returns>The array of records.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
         {
-            throw new NotImplementedException();
+            List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
+                byte[] bytes = new byte[120];
+                this.fileStream.Read(bytes, 0, 120);
+                string tmpLastName = Encoding.ASCII.GetString(bytes);
+                tmpLastName = RemoveOffset(tmpLastName);
+                if (tmpLastName.ToLower() == lastName.ToLower())
+                {
+                    storedRecords.Add(this.ReadRecord(i));
+                }
+            }
+
+            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
         }
 
         /// <summary>
@@ -111,7 +150,26 @@ namespace FileCabinetApp
         /// <returns>The array of records.</returns>
         public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            throw new NotImplementedException();
+            List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                this.fileStream.Seek(YearOffset + (RecordSize * i), SeekOrigin.Begin);
+                byte[] bytes = new byte[4];
+                this.fileStream.Read(bytes, 0, sizeof(int));
+                int tmpYear = BitConverter.ToInt32(bytes);
+                this.fileStream.Read(bytes, 0, sizeof(int));
+                int tmpMonth = BitConverter.ToInt32(bytes);
+                this.fileStream.Read(bytes, 0, sizeof(int));
+                int tmpDay = BitConverter.ToInt32(bytes);
+                DateTime tmpDateOfBirth = new DateTime(tmpYear, tmpMonth, tmpDay);
+                if (tmpDateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower() == dateOfBirth.ToLower())
+                {
+                    storedRecords.Add(this.ReadRecord(i));
+                }
+            }
+
+            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
         }
 
         /// <summary>

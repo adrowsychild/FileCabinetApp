@@ -72,7 +72,7 @@
         {
             if (record == null)
             {
-                throw new ArgumentNullException($"Record object is invalid.");
+                throw new ArgumentNullException("Record object is invalid.");
             }
 
             if (record.Id < 0 || record.Id > this.GetStat())

@@ -67,7 +67,21 @@ namespace FileCabinetApp
         /// <returns>Whether operation succeeded.</returns>
         public int EditRecord(FileCabinetRecord record)
         {
-            throw new NotImplementedException();
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            if (record.Id < 0 || record.Id > this.count)
+            {
+                return -1;
+            }
+
+            record.Id++;
+
+            this.WriteRecord(record, record.Id - 1);
+
+            return record.Id;
         }
 
         /// <summary>

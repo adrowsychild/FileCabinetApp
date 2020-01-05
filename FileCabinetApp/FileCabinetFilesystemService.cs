@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using FileCabinetApp.Interfaces;
 
@@ -15,6 +14,7 @@ namespace FileCabinetApp
     public class FileCabinetFilesystemService : IFileCabinetService
     {
         private const int RecordSize = 400;
+        private const int StringSize = 120;
 
         private const int IdOffset = 4;
         private const int FirstNameOffset = 6;
@@ -105,8 +105,8 @@ namespace FileCabinetApp
             for (int i = 0; i < this.count; i++)
             {
                 this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[120];
-                this.fileStream.Read(bytes, 0, 120);
+                byte[] bytes = new byte[StringSize];
+                this.fileStream.Read(bytes, 0, StringSize);
                 string tmpFirstName = Encoding.ASCII.GetString(bytes);
                 tmpFirstName = RemoveOffset(tmpFirstName);
                 if (tmpFirstName.ToLower() == firstName.ToLower())
@@ -130,8 +130,8 @@ namespace FileCabinetApp
             for (int i = 0; i < this.count; i++)
             {
                 this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[120];
-                this.fileStream.Read(bytes, 0, 120);
+                byte[] bytes = new byte[StringSize];
+                this.fileStream.Read(bytes, 0, StringSize);
                 string tmpLastName = Encoding.ASCII.GetString(bytes);
                 tmpLastName = RemoveOffset(tmpLastName);
                 if (tmpLastName.ToLower() == lastName.ToLower())
@@ -236,9 +236,14 @@ namespace FileCabinetApp
             this.fileStream.Close();
         }
 
-        private static byte[] MakeStringOffset(string value)
+        /// <summary>
+        /// Makes an offset for the string.
+        /// </summary>
+        /// <param name="value">String to make offset to.</param>
+        /// <returns>String with offset in bytes.</returns>
+        private static byte[] MakeStringOffset(string value, int offset)
         {
-            byte[] bytes = new byte[120];
+            byte[] bytes = new byte[offset];
             byte[] somebytes = Encoding.ASCII.GetBytes(value);
             for (int i = 0; i < somebytes.Length; i++)
             {
@@ -248,6 +253,11 @@ namespace FileCabinetApp
             return bytes;
         }
 
+        /// <summary>
+        /// Removes the offset from the string.
+        /// </summary>
+        /// <param name="value">String to remove offset from.</param>
+        /// <returns>String without offset.</returns>
         private static string RemoveOffset(string value)
         {
             int i = 0;
@@ -264,9 +274,14 @@ namespace FileCabinetApp
             return value;
         }
 
+        /// <summary>
+        /// Converts decimal value to array of bytes.
+        /// </summary>
+        /// <param name="value">Value to convert.</param>
+        /// <returns>Array of bytes.</returns>
         private static byte[] DecimalToBytes(decimal value)
         {
-            byte[] bytes = new byte[16];
+            byte[] bytes = new byte[sizeof(decimal)];
 
             using (MemoryStream stream = new MemoryStream())
             {
@@ -280,6 +295,11 @@ namespace FileCabinetApp
             return bytes;
         }
 
+        /// <summary>
+        /// Converts array of bytes to decimal value.
+        /// </summary>
+        /// <param name="bytes">Bytes to convert.</param>
+        /// <returns>Decimal value.</returns>
         private static decimal BytesToDecimal(byte[] bytes)
         {
             decimal value;
@@ -304,14 +324,14 @@ namespace FileCabinetApp
             this.fileStream.Seek(index * RecordSize, SeekOrigin.Begin);
             this.fileStream.Write(new byte[2], 0, sizeof(short));
             this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
-            this.fileStream.Write(MakeStringOffset(record.FirstName), 0, 120);
-            this.fileStream.Write(MakeStringOffset(record.LastName), 0, 120);
+            this.fileStream.Write(MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
+            this.fileStream.Write(MakeStringOffset(record.LastName, StringSize), 0, StringSize);
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
             this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
-            this.fileStream.Write(MakeStringOffset(record.FavouriteGame), 0, 120);
+            this.fileStream.Write(MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
             this.fileStream.Write(DecimalToBytes(record.Donations), 0, sizeof(decimal));
         }
 
@@ -322,37 +342,35 @@ namespace FileCabinetApp
         private FileCabinetRecord ReadRecord(int index)
         {
             this.fileStream.Seek((index * RecordSize) + 2, SeekOrigin.Begin);
-            byte[] bytes = new byte[4];
+            byte[] bytes = new byte[sizeof(int)];
             this.fileStream.Read(bytes, 0, sizeof(int));
-            int tmpId = BitConverter.ToInt32(bytes);
-            bytes = new byte[120];
-            this.fileStream.Read(bytes, 0, 120);
-            string tmpFirstName = Encoding.ASCII.GetString(bytes);
-            tmpFirstName = RemoveOffset(tmpFirstName);
-            this.fileStream.Read(bytes, 0, 120);
-            string tmpLastName = Encoding.ASCII.GetString(bytes);
-            tmpLastName = RemoveOffset(tmpFirstName);
-            bytes = new byte[4];
+            int id = BitConverter.ToInt32(bytes);
+            bytes = new byte[StringSize];
+            this.fileStream.Read(bytes, 0, StringSize);
+            string firstName = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            this.fileStream.Read(bytes, 0, StringSize);
+            string lastName = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            bytes = new byte[sizeof(int)];
             this.fileStream.Read(bytes, 0, sizeof(int));
-            int tmpYear = BitConverter.ToInt32(bytes);
+            int year = BitConverter.ToInt32(bytes);
             this.fileStream.Read(bytes, 0, sizeof(int));
-            int tmpMonth = BitConverter.ToInt32(bytes);
+            int month = BitConverter.ToInt32(bytes);
             this.fileStream.Read(bytes, 0, sizeof(int));
-            int tmpDay = BitConverter.ToInt32(bytes);
-            bytes = new byte[2];
+            int day = BitConverter.ToInt32(bytes);
+            bytes = new byte[sizeof(short)];
             this.fileStream.Read(bytes, 0, sizeof(short));
-            short tmpFavNumber = BitConverter.ToInt16(bytes);
+            short favNumber = BitConverter.ToInt16(bytes);
+            bytes = new byte[sizeof(char)];
             this.fileStream.Read(bytes, 0, sizeof(char));
-            char tmpFavCharacter = BitConverter.ToChar(bytes);
-            bytes = new byte[120];
-            this.fileStream.Read(bytes, 0, 120);
-            string tmpFavGame = Encoding.ASCII.GetString(bytes);
-            tmpFavGame = RemoveOffset(tmpFavGame);
-            bytes = new byte[16];
+            char favCharacter = BitConverter.ToChar(bytes);
+            bytes = new byte[StringSize];
+            this.fileStream.Read(bytes, 0, StringSize);
+            string favGame = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            bytes = new byte[sizeof(decimal)];
             this.fileStream.Read(bytes, 0, sizeof(decimal));
-            decimal tmpDonations = BytesToDecimal(bytes);
+            decimal donations = BytesToDecimal(bytes);
 
-            return new FileCabinetRecord(tmpId, tmpFirstName, tmpLastName, new DateTime(tmpYear, tmpMonth, tmpDay), tmpFavNumber, tmpFavCharacter, tmpFavGame, tmpDonations);
+            return new FileCabinetRecord(id, firstName, lastName, new DateTime(year, month, day), favNumber, favCharacter, favGame, donations);
         }
     }
 }

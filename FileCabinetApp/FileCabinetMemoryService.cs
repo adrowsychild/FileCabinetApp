@@ -7,7 +7,6 @@
     using System.IO;
     using System.Reflection;
     using System.Xml;
-    using System.Xml.Linq;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -44,12 +43,6 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
-            {
-                return -1;
-            }
-
             record.Id = this.list.Count + 1;
 
             this.list.Add(record);
@@ -72,18 +65,12 @@
         {
             if (record == null)
             {
-                throw new ArgumentNullException("Record object is invalid.");
+                throw new ArgumentNullException($"Record object is invalid.");
             }
 
             if (record.Id < 0 || record.Id > this.GetStat())
             {
                 return -1;
-            }
-
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
-            {
-                throw new ArgumentException(validationException);
             }
 
             this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);

@@ -152,6 +152,34 @@
             Closes the stream.
             </summary>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeStringOffset(System.String,System.Int32)">
+            <summary>
+            Makes an offset for the string.
+            </summary>
+            <param name="value">String to make offset to.</param>
+            <returns>String with offset in bytes.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveOffset(System.String)">
+            <summary>
+            Removes the offset from the string.
+            </summary>
+            <param name="value">String to remove offset from.</param>
+            <returns>String without offset.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.DecimalToBytes(System.Decimal)">
+            <summary>
+            Converts decimal value to array of bytes.
+            </summary>
+            <param name="value">Value to convert.</param>
+            <returns>Array of bytes.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.BytesToDecimal(System.Byte[])">
+            <summary>
+            Converts array of bytes to decimal value.
+            </summary>
+            <param name="bytes">Bytes to convert.</param>
+            <returns>Decimal value.</returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
             <summary>
             Writes a record to the file.
@@ -549,6 +577,12 @@
             </summary>
             <param name="validationRules">Validation rules to set.</param>
         </member>
+        <member name="M:FileCabinetApp.Program.SetStorageRules(System.String)">
+            <summary>
+            Sets the storage rules based on the parameter.
+            </summary>
+            <param name="storageRules">Storage rules to set.</param>
+        </member>
         <member name="M:FileCabinetApp.Program.Stat(System.String)">
             <summary>
             Shows the number of records to the user.
@@ -572,6 +606,12 @@
             Searches for the record by key.
             </summary>
             <param name="parameters">Parameters to search by.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Export(System.String)">
+            <summary>
+            Exports the records to csv or xml format.
+            </summary>
+            <param name="parameters">Format to write in and path to write to.</param>
         </member>
         <member name="M:FileCabinetApp.Program.List(System.String)">
             <summary>

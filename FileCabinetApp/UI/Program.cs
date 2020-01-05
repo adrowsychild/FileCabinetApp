@@ -207,6 +207,10 @@ namespace FileCabinetApp
             };
         }
 
+        /// <summary>
+        /// Sets the storage rules based on the parameter.
+        /// </summary>
+        /// <param name="storageRules">Storage rules to set.</param>
         private static void SetStorageRules(string storageRules)
         {
             switch (storageRules)
@@ -239,7 +243,7 @@ namespace FileCabinetApp
         private static void Create(string parameters)
         {
             int id = fileCabinetService.CreateRecord(CheckRecordInput());
-            Console.WriteLine($"Record # {id} is created.");
+            Console.WriteLine($"Record #{id} is created.");
         }
 
         /// <summary>
@@ -315,6 +319,10 @@ namespace FileCabinetApp
             }
         }
 
+        /// <summary>
+        /// Exports the records to csv or xml format.
+        /// </summary>
+        /// <param name="parameters">Format to write in and path to write to.</param>
         private static void Export(string parameters)
         {
             string[] args = parameters.Split();
@@ -392,25 +400,25 @@ namespace FileCabinetApp
         private static FileCabinetRecord CheckRecordInput(int id = 0)
         {
             Console.WriteLine("First Name: ");
-            string tmpFirstName = ReadInput<string>(Converter<string>, Validator<string>, "FirstName");
+            string tmpFirstName = ReadInput(Converter<string>, Validator, "FirstName");
 
             Console.WriteLine("Last Name: ");
-            string tmpLastName = ReadInput(Converter<string>, Validator<string>, "LastName");
+            string tmpLastName = ReadInput(Converter<string>, Validator, "LastName");
 
             Console.WriteLine("Date of Birth: ");
-            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator<DateTime>, "DateOfBirth");
+            DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>, Validator, "DateOfBirth");
 
             Console.WriteLine("Favourite number: ");
-            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator<short>, "FavouriteNumber");
+            short tmpFavouriteNumber = ReadInput(Converter<short>, Validator, "FavouriteNumber");
 
             Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator<char>, "FavouriteCharacter");
+            char tmpFavouriteCharacter = ReadInput(Converter<char>, Validator, "FavouriteCharacter");
 
             Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = ReadInput(Converter<string>, Validator<string>, "FavouriteGame");
+            string tmpFavouriteGame = ReadInput(Converter<string>, Validator, "FavouriteGame");
 
             Console.WriteLine("Donations: ");
-            decimal tmpDonations = ReadInput(Converter<decimal>, Validator<decimal>, "Donations");
+            decimal tmpDonations = ReadInput(Converter<decimal>, Validator, "Donations");
 
             FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
 

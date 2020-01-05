@@ -186,6 +186,14 @@
         }
 
         /// <summary>
+        /// Clears the list.
+        /// </summary>
+        public void Close()
+        {
+            this.list.Clear();
+        }
+
+        /// <summary>
         /// Adds a new record to the dictionary by given key.
         /// </summary>
         /// <param name="record">The record to add.</param>

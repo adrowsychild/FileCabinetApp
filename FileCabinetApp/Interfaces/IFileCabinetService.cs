@@ -75,5 +75,10 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>Validator.</returns>
         public IRecordValidator GetValidator();
+
+        /// <summary>
+        /// Does things when exiting, if needed.
+        /// </summary>
+        public void Close();
     }
 }

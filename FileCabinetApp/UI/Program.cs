@@ -78,11 +78,27 @@ namespace FileCabinetApp
 
             if (args != null && args.Length > 0)
             {
-                for (int i = 1; i < args.Length; i += 2)
+                for (int i = 1; i <= args.Length;)
                 {
                     tempArgs[0] = args[i - 1];
-                    tempArgs[1] = args[i];
-                    SettingsParser(tempArgs);
+                    if (i != args.Length)
+                    {
+                        tempArgs[1] = args[i];
+                    }
+
+                    int parsedSetting = SettingsParser(tempArgs);
+                    if (parsedSetting == 0)
+                    {
+                        break;
+                    }
+                    else if (parsedSetting == 1)
+                    {
+                        i++;
+                    }
+                    else if (parsedSetting == 2)
+                    {
+                        i += 2;
+                    }
                 }
             }
 
@@ -126,11 +142,12 @@ namespace FileCabinetApp
         /// and searches for given operation in the dictionary.
         /// </summary>
         /// <param name="args">Arguments to parse.</param>
-        private static void SettingsParser(string[] args)
+        private static int SettingsParser(string[] args)
         {
             string operation = string.Empty;
             string parameter = string.Empty;
             Settings makeChanges = null;
+            int parsedSetting = 0;
 
             // --some-operation=paramater
             if (args[0].StartsWith("--", StringComparison.InvariantCulture))
@@ -143,6 +160,7 @@ namespace FileCabinetApp
                     if (ChangeSettings.ContainsKey(operation.ToLower()))
                     {
                         makeChanges = ChangeSettings[operation.ToLower()];
+                        parsedSetting = 1;
                     }
                 }
             }
@@ -159,6 +177,7 @@ namespace FileCabinetApp
                 if (ChangeSettings.ContainsKey(operation.ToLower()))
                 {
                     makeChanges = ChangeSettings[operation.ToLower()];
+                    parsedSetting = 2;
                 }
             }
 
@@ -166,6 +185,8 @@ namespace FileCabinetApp
             {
                 makeChanges.Invoke(parameter.ToLower());
             }
+
+            return parsedSetting;
         }
 
         /// <summary>

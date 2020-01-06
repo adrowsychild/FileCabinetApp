@@ -31,6 +31,14 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="FileCabinetRecord"/> class.
+        /// Unsafe constructor for using initializators.
+        /// </summary>
+        public FileCabinetRecord()
+        {
+        }
+
+        /// <summary>
         /// Gets or sets user's id in the users' list.
         /// </summary>
         /// <value> Given id. </value>

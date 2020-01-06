@@ -22,6 +22,12 @@
             <param name="favouriteGame">User's favourite game.</param>
             <param name="donations">User's donations.</param>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetRecord.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetRecord"/> class.
+            Unsafe constructor for using initializators.
+            </summary>
+        </member>
         <member name="P:FileCabinetApp.FileCabinetRecord.Id">
             <summary>
             Gets or sets user's id in the users' list.

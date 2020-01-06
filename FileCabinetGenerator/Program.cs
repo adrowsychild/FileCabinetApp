@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
@@ -64,14 +66,27 @@ namespace FileCabinetGenerator
                 }
             }
 
-            Console.WriteLine(OutputType);
-            Console.WriteLine(OutputFileName);
-            Console.WriteLine(RecordsAmount);
-            Console.WriteLine(StartId);
+            IRecordGenerator generator = new DefaultRecordGenerator();
+
+            List<FileCabinetRecord> records = generator.GenerateRecords(StartId, RecordsAmount);
+
+            foreach(var record in records)
+            {
+                ShowRecord(record);
+            }
 
             Console.WriteLine(RecordsAmount + " records were written to " + OutputFileName + ".");
 
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Shows one record.
+        /// </summary>
+        /// <param name="record">Record to show.</param>
+        private static void ShowRecord(FileCabinetRecord record)
+        {
+            Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
         }
 
         /// <summary>
@@ -126,6 +141,10 @@ namespace FileCabinetGenerator
             return parsedSetting;
         }
 
+        /// <summary>
+        /// Sets the output type.
+        /// </summary>
+        /// <param name="outputType">Output type to set.</param>
         private static void SetOutputType(string outputType)
         {
             if (outputType == "csv" || outputType == "xml")
@@ -138,9 +157,13 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Sets the fileName.
+        /// </summary>
+        /// <param name="fileName">fileName to set.</param>
         private static void SetOutput(string fileName)
         {
-            if (OutputFileName == null)
+            if (OutputType == null)
             {
                 Console.WriteLine("Set output type before output filename.");
                 return;
@@ -156,6 +179,10 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Sets the amount of records to write.
+        /// </summary>
+        /// <param name="recordsAmount">Amount of records.</param>
         private static void SetRecordsAmount(string recordsAmount)
         {
             if (int.TryParse(recordsAmount, out int amount))
@@ -175,6 +202,10 @@ namespace FileCabinetGenerator
             }
         }
 
+        /// <summary>
+        /// Sets the start-id.
+        /// </summary>
+        /// <param name="startId">Start-id</param>
         private static void SetStartId(string startId)
         {
             if (int.TryParse(startId, out int amount))

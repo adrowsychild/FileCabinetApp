@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 using FileCabinetApp;
 
 namespace FileCabinetGenerator
@@ -71,13 +74,14 @@ namespace FileCabinetGenerator
             IRecordGenerator generator = new DefaultRecordGenerator();
 
             List<FileCabinetRecord> records = generator.GenerateRecords(StartId, RecordsAmount);
-
+            /*
             foreach (var record in records)
             {
                 ShowRecord(record);
-            }
+            }*/
 
-            WriteToCsv(records, "file.csv");
+            //WriteToCsv(records, "file.csv");
+            WriteToXml(records, "file.xml");
 
             Console.WriteLine(RecordsAmount + " records were written to " + OutputFileName + ".");
 
@@ -118,6 +122,16 @@ namespace FileCabinetGenerator
 
                     writer.Write("\n");
                 }
+            }
+        }
+
+        private static void WriteToXml(List<FileCabinetRecord> records, string path)
+        {
+            using (XmlWriter writer = XmlWriter.Create(new StreamWriter(path)))
+            {
+                XmlSerializer ser = new XmlSerializer(typeof(List<FileCabinetRecord>));
+
+                ser.Serialize(writer, records);
             }
         }
 

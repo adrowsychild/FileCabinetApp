@@ -30,5 +30,12 @@ namespace FileCabinetApp.Interfaces
         /// <param name="writer">Writer.</param>
         /// <returns>Whether operation succeeded.</returns>
         public bool SaveToXml(StreamWriter writer);
+
+        /// <summary>
+        /// Loads the records from csv file.
+        /// </summary>
+        /// <param name="reader">Csv reader.</param>
+        /// <returns>Whether operation succeeded.</returns>
+        public IList<FileCabinetRecord> LoadFromCsv(StreamReader reader);
     }
 }

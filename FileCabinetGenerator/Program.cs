@@ -74,13 +74,8 @@ namespace FileCabinetGenerator
             IRecordGenerator generator = new DefaultRecordGenerator();
 
             List<FileCabinetRecord> records = generator.GenerateRecords(StartId, RecordsAmount);
-            /*
-            foreach (var record in records)
-            {
-                ShowRecord(record);
-            }*/
 
-            //WriteToCsv(records, "file.csv");
+            WriteToCsv(records, "file.csv");
             WriteToXml(records, "file.xml");
 
             Console.WriteLine(RecordsAmount + " records were written to " + OutputFileName + ".");
@@ -99,7 +94,6 @@ namespace FileCabinetGenerator
             {
                 foreach (var record in records)
                 {
-
                     PropertyInfo[] properties = record.GetType().GetProperties();
 
                     for (int i = 0; i < properties.Length; i++)
@@ -149,7 +143,7 @@ namespace FileCabinetGenerator
                 if (properties[i].PropertyType == typeof(DateTime))
                 {
                     DateTime date = (DateTime)properties[i].GetValue(record);
-                    output += properties[i].PropertyType + ": ";
+                    output += "Date of birth" + ": ";
                     output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
                 }
                 else

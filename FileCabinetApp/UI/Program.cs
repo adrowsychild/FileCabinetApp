@@ -31,6 +31,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
+            new Tuple<string, Action<string>>("import", Import),
         };
 
         private static readonly string[][] HelpMessages = new string[][]
@@ -43,6 +44,7 @@ namespace FileCabinetApp
             new string[] { "find", "finds records by given criteria", "The 'find' command finds records by given criteria" },
             new string[] { "list", "prints the records", "The 'list' prints the records." },
             new string[] { "export", "exports the records to the file in xml or csv format.", "The 'export' command exports the records to the file in xml or csv format." },
+            new string[] { "import", "imports the records from the xml or csv file.", "The 'import' command imports the records from the xml or csv file." },
         };
 
         /// <summary>
@@ -52,10 +54,10 @@ namespace FileCabinetApp
         /// </summary>
         private static readonly Dictionary<string, Settings> ChangeSettings = new Dictionary<string, Settings>
         {
-            ["-s"] = new Settings(SetStorageRules),
-            ["--storage"] = new Settings(SetStorageRules),
             ["-v"] = new Settings(SetValidationRules),
             ["--validation-rules"] = new Settings(SetValidationRules),
+            ["-s"] = new Settings(SetStorageRules),
+            ["--storage"] = new Settings(SetStorageRules),
         };
 
         private static bool isRunning = true;
@@ -281,9 +283,8 @@ namespace FileCabinetApp
                     return;
                 }
 
-                id--;
                 fileCabinetService.EditRecord(CheckRecordInput(id));
-                Console.WriteLine($"Record #{++id} is updated.");
+                Console.WriteLine($"Record #{id} is updated.");
             }
         }
 
@@ -391,6 +392,51 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Imports the records from csv or xml file.
+        /// </summary>
+        /// <param name="parameters">Format to write in and path to write to.</param>
+        private static void Import(string parameters)
+        {
+            string[] args = parameters.Split();
+            if (args == null || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[1]))
+            {
+                Console.WriteLine("Incorrect parameters.");
+                return;
+            }
+
+            string format = args[0].ToLower();
+            string path = args[1];
+
+            if (!File.Exists(path))
+            {
+                Console.WriteLine("Import error: " + path + " does not exist");
+                return;
+            }
+
+            IFileCabinetServiceSnapshot emptySnapshot = fileCabinetService.MakeEmptySnapshot();
+
+            using (StreamReader reader = new StreamReader(path))
+            {
+                bool isSucceed = false;
+                int importedRecords = 0;
+                switch (format)
+                {
+                    case "csv":
+                        isSucceed = true;
+                        IList<FileCabinetRecord> records = emptySnapshot.LoadFromCsv(reader);
+                        IFileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
+                        importedRecords = fileCabinetService.Restore(snapshot);
+                        break;
+                    case "xml":
+                        //isSucceed = snapshot.LoadFromXml(reader);
+                        break;
+                }
+
+                Console.WriteLine(importedRecords + "records were imported from " + path + ".");
+            }
+        }
+
+        /// <summary>
         /// Shows all the records to the user.
         /// </summary>
         /// <param name="parameters">Parameters.</param>
@@ -418,7 +464,7 @@ namespace FileCabinetApp
                 if (properties[i].PropertyType == typeof(DateTime))
                 {
                     DateTime date = (DateTime)properties[i].GetValue(record);
-                    output += properties[i].PropertyType + ": ";
+                    output += "Date of birth" + ": ";
                     output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
                 }
                 else
@@ -445,7 +491,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="id">Id to create the record with.</param>
         /// <returns>Valid record.</returns>
-        private static FileCabinetRecord CheckRecordInput(int id = 0)
+        private static FileCabinetRecord CheckRecordInput(int id = 1)
         {
             Console.WriteLine("First Name: ");
             string tmpFirstName = ReadInput(Converter<string>, Validator, "FirstName");

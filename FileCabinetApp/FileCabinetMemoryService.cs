@@ -14,13 +14,15 @@
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
-        private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-
         private readonly IRecordValidator validator;
+
+        private List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+
+        private Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
+        private List<int> ids = new List<int>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetMemoryService"/> class.
@@ -53,6 +55,8 @@
 
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
+            this.ids.Add(record.Id);
+
             return record.Id;
         }
 
@@ -68,24 +72,27 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            if (record.Id < 0 || record.Id > this.GetStat())
+            if (record.Id < 0 || !this.ids.Contains(record.Id))
             {
                 return -1;
             }
 
-            this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
-            this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
-            this.dateOfBirthDictionary[this.list[record.Id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[record.Id]);
+            int insideId = record.Id - 1;
 
-            this.list[record.Id] = record;
+            this.firstNameDictionary[this.list[insideId].FirstName.ToLower()].Remove(this.list[insideId]);
+            this.lastNameDictionary[this.list[insideId].LastName.ToLower()].Remove(this.list[insideId]);
+            this.dateOfBirthDictionary[this.list[insideId].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[insideId]);
+            this.ids.Remove(this.list[insideId].Id);
 
-            UpdateDictionary(this.list[record.Id], this.firstNameDictionary, record.FirstName);
+            this.list[insideId] = record;
 
-            UpdateDictionary(this.list[record.Id], this.lastNameDictionary, record.LastName);
+            UpdateDictionary(this.list[insideId], this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(this.list[record.Id], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(this.list[insideId], this.lastNameDictionary, record.LastName);
 
-            this.list[record.Id].Id++;
+            UpdateDictionary(this.list[insideId], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.ids.Add(record.Id);
 
             return 0;
         }
@@ -141,6 +148,57 @@
         {
             ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(this.list);
             return new FileCabinetServiceSnapshot(records);
+        }
+
+        /// <summary>
+        /// Makes a snapshot of records.
+        /// </summary>
+        /// <param name="recordsToSnapshot">Records to snapshot.</param>
+        /// <returns>Snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot(List<FileCabinetRecord> recordsToSnapshot)
+        {
+            ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(recordsToSnapshot);
+            return new FileCabinetServiceSnapshot(records);
+        }
+
+        /// <summary>
+        /// Makes an empty snapshot.
+        /// </summary>
+        /// <returns>Empty snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeEmptySnapshot()
+        {
+            return new FileCabinetServiceSnapshot();
+        }
+
+        /// <summary>
+        /// Restores the list of records by the snapshot.
+        /// </summary>
+        /// <param name="snapshot">Snapshot to restore by.</param>
+        public void Restore(IFileCabinetServiceSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                throw new ArgumentNullException($"Snapshot is invalid.");
+            }
+
+            int recordsImported = 0;
+
+            foreach (var record in snapshot.Records)
+            {
+                string exceptionMessage = this.validator.ValidateParameters(record);
+                if (exceptionMessage == null)
+                {
+                    if (this.ids.Contains(record.Id))
+                    {
+                        this.EditRecord(record);
+                        recordsImported++;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                }
+            }
         }
 
         /// <summary>
@@ -236,6 +294,13 @@
             /// <summary>
             /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
             /// </summary>
+            public FileCabinetServiceSnapshot()
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
+            /// </summary>
             /// <param name="records">Records to snapshot.</param>
             public FileCabinetServiceSnapshot(ReadOnlyCollection<FileCabinetRecord> records)
             {
@@ -289,6 +354,19 @@
             }
 
             /// <summary>
+            /// Loads the records from csv file.
+            /// </summary>
+            /// <param name="reader">Csv reader.</param>
+            /// <returns>Whether operation succeeded.</returns>
+            public IList<FileCabinetRecord> LoadFromCsv(StreamReader reader)
+            {
+                FileCabinetRecordCsvReader csvReader = new FileCabinetRecordCsvReader(reader);
+                IList<FileCabinetRecord> records = csvReader.ReadAll();
+
+                return records;
+            }
+
+            /// <summary>
             /// Saves information to csv file.
             /// </summary>
             internal class FileCabinetRecordCsvWriter : IFileCabinetRecordCsvWriter
@@ -338,6 +416,59 @@
 
                     this.writer.Write("\n");
                     return true;
+                }
+            }
+
+            /// <summary>
+            /// Loads information from csv file.
+            /// </summary>
+            internal class FileCabinetRecordCsvReader : IFileCabinetRecordCsvReader
+            {
+                private readonly TextReader reader;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetRecordCsvReader"/> class.
+                /// </summary>
+                /// <param name="reader">Csv reader.</param>
+                public FileCabinetRecordCsvReader(TextReader reader)
+                {
+                    this.reader = reader;
+                }
+
+                /// <summary>
+                /// Reads records from csv file.
+                /// </summary>
+                /// <returns>List of records.</returns>
+                public IList<FileCabinetRecord> ReadAll()
+                {
+                    IList<FileCabinetRecord> records = new List<FileCabinetRecord>();
+
+                    while (this.reader.Peek() > -1)
+                    {
+                        records.Add(this.Read());
+                    }
+
+                    return records;
+                }
+
+                /// <summary>
+                /// Reades a single record from csv file.
+                /// </summary>
+                /// <returns>Record.</returns>
+                public FileCabinetRecord Read()
+                {
+                    string record = this.reader.ReadLine();
+                    string[] values = record.Split(',');
+                    int id = int.Parse(values[0], CultureInfo.InvariantCulture);
+                    string firstName = values[1];
+                    string lastName = values[2];
+                    DateTime dateOfBirth = DateTime.ParseExact(values[3], "yyyy-MMM-d", CultureInfo.InvariantCulture);
+                    short favNumber = (short)int.Parse(values[4], CultureInfo.InvariantCulture);
+                    char favCharacter = values[5][0];
+                    string favGame = values[6];
+                    decimal donations = decimal.Parse(values[7], CultureInfo.InvariantCulture);
+
+                    return new FileCabinetRecord(id, firstName, lastName, dateOfBirth, favNumber, favCharacter, favGame, donations);
                 }
             }
 

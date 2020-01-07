@@ -52,6 +52,26 @@ namespace FileCabinetApp
         public IFileCabinetServiceSnapshot MakeSnapshot();
 
         /// <summary>
+        /// Makes a snapshot of records.
+        /// </summary>
+        /// <param name="recordsToSnapshot">Records to snapshot.</param>
+        /// <returns>Snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot(List<FileCabinetRecord> recordsToSnapshot);
+
+        /// <summary>
+        /// Makes an empty snapshot.
+        /// </summary>
+        /// <returns>Empty snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeEmptySnapshot();
+
+        /// <summary>
+        /// Restores the list of records by the snapshot.
+        /// </summary>
+        /// <param name="snapshot">Snapshot to restore by.</param>
+        /// <returns>Number of imported records.</returns>
+        public int Restore(IFileCabinetServiceSnapshot snapshot);
+
+        /// <summary>
         /// Gets all the records.
         /// </summary>
         /// <returns>The array of records.</returns>

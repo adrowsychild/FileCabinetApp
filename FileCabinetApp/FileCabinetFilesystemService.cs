@@ -229,6 +229,34 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Makes a snapshot of records.
+        /// </summary>
+        /// <param name="recordsToSnapshot">Records to snapshot.</param>
+        /// <returns>Snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeSnapshot(List<FileCabinetRecord> recordsToSnapshot)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Makes an empty snapshot.
+        /// </summary>
+        /// <returns>Empty snapshot.</returns>
+        public IFileCabinetServiceSnapshot MakeEmptySnapshot()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Restores the records from the snapshot.
+        /// </summary>
+        /// <param name="snapshot">A snapshot to restore.</param>
+        public void Restore(IFileCabinetServiceSnapshot snapshot)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Closes the stream.
         /// </summary>
         public void Close()

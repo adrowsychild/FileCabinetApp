@@ -410,7 +410,34 @@ namespace FileCabinetApp
         /// <param name="record">Record to show.</param>
         private static void ShowRecord(FileCabinetRecord record)
         {
-            Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
+            string output = "#";
+            PropertyInfo[] properties = record.GetType().GetProperties();
+
+            for (int i = 0; i < properties.Length; i++)
+            {
+                if (properties[i].PropertyType == typeof(DateTime))
+                {
+                    DateTime date = (DateTime)properties[i].GetValue(record);
+                    output += properties[i].PropertyType + ": ";
+                    output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (properties[i].Name != "Id")
+                    {
+                        output += properties[i].Name + ": ";
+                    }
+
+                    output += properties[i].GetValue(record);
+                }
+
+                if (i != properties.Length - 1)
+                {
+                    output += ", ";
+                }
+            }
+
+            Console.WriteLine(output);
         }
 
         /// <summary>

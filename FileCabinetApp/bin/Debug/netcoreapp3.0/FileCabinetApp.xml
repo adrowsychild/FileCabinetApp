@@ -209,6 +209,12 @@
             </summary>
             <param name="validator">Special validator.</param>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.#ctor(System.Collections.Generic.List{FileCabinetApp.FileCabinetRecord},FileCabinetApp.IRecordValidator)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetMemoryService"/> class.
+            </summary>
+            <param name="records">Records for the list.</param>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.CreateRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Creates a new record.

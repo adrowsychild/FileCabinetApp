@@ -10,6 +10,9 @@ namespace FileCabinetGenerator
     /// </summary>
     public class DefaultRecordGenerator : IRecordGenerator
     {
+        private const int MinStringLength = 2;
+        private const int MaxStringLength = 10;
+
         /// <summary>
         /// Generates a single record with the given id.
         /// </summary>
@@ -22,12 +25,12 @@ namespace FileCabinetGenerator
             return new FileCabinetRecord
             {
                 Id = id,
-                FirstName = GenerateString(rand, rand.Next(0, 60)),
-                LastName = GenerateString(rand, rand.Next(0, 60)),
+                FirstName = GenerateString(rand, rand.Next(MinStringLength, MaxStringLength)),
+                LastName = GenerateString(rand, rand.Next(MinStringLength, MaxStringLength)),
                 DateOfBirth = new DateTime(rand.Next(1950, DateTime.Now.Year), rand.Next(1, 12), rand.Next(1, 28)),
                 FavouriteNumber = (short)rand.Next(0, 100),
                 FavouriteCharacter = (char)rand.Next(97, 122),
-                FavouriteGame = GenerateString(rand, rand.Next(0, 60)),
+                FavouriteGame = GenerateString(rand, rand.Next(MinStringLength, MaxStringLength)),
                 Donations = (decimal)rand.Next(0, 100),
             };
         }

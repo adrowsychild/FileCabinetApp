@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 using FileCabinetApp;
 
 namespace FileCabinetGenerator
 {
-    class Program
+    public class Program
     {
         private static string OutputType;
         private static string OutputFileName;
@@ -70,14 +72,53 @@ namespace FileCabinetGenerator
 
             List<FileCabinetRecord> records = generator.GenerateRecords(StartId, RecordsAmount);
 
-            foreach(var record in records)
+            foreach (var record in records)
             {
                 ShowRecord(record);
             }
 
+            WriteToCsv(records, "file.csv");
+
             Console.WriteLine(RecordsAmount + " records were written to " + OutputFileName + ".");
 
             Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Writes records to the csv file.
+        /// </summary>
+        /// <param name="records">Records to write.</param>
+        /// <param name="path">Path to write to.</param>
+        private static void WriteToCsv(List<FileCabinetRecord> records, string path)
+        {
+            using (StreamWriter writer = new StreamWriter(path))
+            {
+                foreach (var record in records)
+                {
+
+                    PropertyInfo[] properties = record.GetType().GetProperties();
+
+                    for (int i = 0; i < properties.Length; i++)
+                    {
+                        if (properties[i].PropertyType == typeof(DateTime))
+                        {
+                            DateTime date = (DateTime)properties[i].GetValue(record);
+                            writer.Write(date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+                        }
+                        else
+                        {
+                            writer.Write(properties[i].GetValue(record));
+                        }
+
+                        if (i != properties.Length - 1)
+                        {
+                            writer.Write(',');
+                        }
+                    }
+
+                    writer.Write("\n");
+                }
+            }
         }
 
         /// <summary>
@@ -86,7 +127,34 @@ namespace FileCabinetGenerator
         /// <param name="record">Record to show.</param>
         private static void ShowRecord(FileCabinetRecord record)
         {
-            Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
+            string output = "#";
+            PropertyInfo[] properties = record.GetType().GetProperties();
+
+            for (int i = 0; i < properties.Length; i++)
+            {
+                if (properties[i].PropertyType == typeof(DateTime))
+                {
+                    DateTime date = (DateTime)properties[i].GetValue(record);
+                    output += properties[i].PropertyType + ": ";
+                    output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (properties[i].Name != "Id")
+                    {
+                        output += properties[i].Name + ": ";
+                    }
+
+                    output += properties[i].GetValue(record);
+                }
+
+                if (i != properties.Length - 1)
+                {
+                    output += ", ";
+                }
+            }
+
+            Console.WriteLine(output);
         }
 
         /// <summary>

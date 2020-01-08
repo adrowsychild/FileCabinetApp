@@ -37,5 +37,12 @@ namespace FileCabinetApp.Interfaces
         /// <param name="reader">Csv reader.</param>
         /// <returns>Whether operation succeeded.</returns>
         public IList<FileCabinetRecord> LoadFromCsv(StreamReader reader);
-    }
+
+        /// <summary>
+        /// Loads the records from xml file.
+        /// </summary>
+        /// <param name="reader">Xml reader.</param>
+        /// <returns>List of imported records.</returns>
+        public IList<FileCabinetRecord> LoadFromXml(StreamReader reader);
+        }
 }

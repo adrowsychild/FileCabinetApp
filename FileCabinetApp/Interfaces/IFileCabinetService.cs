@@ -25,6 +25,13 @@ namespace FileCabinetApp
         public int EditRecord(FileCabinetRecord record);
 
         /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record);
+
+        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>

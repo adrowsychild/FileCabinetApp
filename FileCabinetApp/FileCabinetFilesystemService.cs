@@ -94,6 +94,29 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record)
+        {
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                return -1;
+            }
+
+            this.WriteRecord(record, record.Id - 1);
+
+            return record.Id;
+        }
+
+        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>
@@ -251,7 +274,8 @@ namespace FileCabinetApp
         /// Restores the records from the snapshot.
         /// </summary>
         /// <param name="snapshot">A snapshot to restore.</param>
-        public void Restore(IFileCabinetServiceSnapshot snapshot)
+        /// <returns>Number of imported records.</returns>
+        public int Restore(IFileCabinetServiceSnapshot snapshot)
         {
             throw new NotImplementedException();
         }

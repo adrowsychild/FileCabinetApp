@@ -7,6 +7,7 @@
     using System.IO;
     using System.Reflection;
     using System.Xml;
+    using System.Xml.Serialization;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -46,6 +47,31 @@
             }
 
             record.Id = this.list.Count + 1;
+
+            this.list.Add(record);
+
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.ids.Add(record.Id);
+
+            return record.Id;
+        }
+
+        /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record)
+        {
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
 
             this.list.Add(record);
 
@@ -174,7 +200,8 @@
         /// Restores the list of records by the snapshot.
         /// </summary>
         /// <param name="snapshot">Snapshot to restore by.</param>
-        public void Restore(IFileCabinetServiceSnapshot snapshot)
+        /// <returns>Number of imported records.</returns>
+        public int Restore(IFileCabinetServiceSnapshot snapshot)
         {
             if (snapshot == null)
             {
@@ -193,12 +220,19 @@
                         this.EditRecord(record);
                         recordsImported++;
                     }
+                    else
+                    {
+                        this.AddRecord(record);
+                        recordsImported++;
+                    }
                 }
                 else
                 {
                     Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
                 }
             }
+
+            return recordsImported;
         }
 
         /// <summary>
@@ -357,11 +391,25 @@
             /// Loads the records from csv file.
             /// </summary>
             /// <param name="reader">Csv reader.</param>
-            /// <returns>Whether operation succeeded.</returns>
+            /// <returns>List of imported records.</returns>
             public IList<FileCabinetRecord> LoadFromCsv(StreamReader reader)
             {
                 FileCabinetRecordCsvReader csvReader = new FileCabinetRecordCsvReader(reader);
                 IList<FileCabinetRecord> records = csvReader.ReadAll();
+
+                return records;
+            }
+
+            /// <summary>
+            /// Loads the records from xml file.
+            /// </summary>
+            /// <param name="reader">Xml reader.</param>
+            /// <returns>List of imported records.</returns>
+            public IList<FileCabinetRecord> LoadFromXml(StreamReader reader)
+            {
+                XmlReader xmlReader = XmlReader.Create(reader);
+                FileCabinetXmlReader fileXmlReader = new FileCabinetXmlReader(xmlReader);
+                IList<FileCabinetRecord> records = fileXmlReader.ReadAll();
 
                 return records;
             }
@@ -520,6 +568,81 @@
                     this.writer.WriteEndElement();
 
                     return true;
+                }
+            }
+
+            /// <summary>
+            /// Loads information from xml file.
+            /// </summary>
+            internal class FileCabinetXmlReader : IFileCabinetXmlReader
+            {
+                private readonly XmlReader reader;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="FileCabinetXmlReader"/> class.
+                /// </summary>
+                /// <param name="reader">Xml writer.</param>
+                public FileCabinetXmlReader(XmlReader reader)
+                {
+                    this.reader = reader;
+                }
+
+                /// <summary>
+                /// Reads records from csv file.
+                /// </summary>
+                /// <returns>List of records.</returns>
+                public IList<FileCabinetRecord> ReadAll()
+                {
+                    IList<FileCabinetRecord> records = new List<FileCabinetRecord>();
+
+                    //this.reader.ReadStartElement("records");
+
+                    XmlSerializer ser = new XmlSerializer(typeof(List<FileCabinetRecord>));
+
+                    records = (IList<FileCabinetRecord>)ser.Deserialize(this.reader);
+
+                    /*
+                    while (this.reader.EOF != true)
+                    {
+                        FileCabinetRecord record = this.Read();
+                        if (record != null)
+                        {
+                            records.Add(record);
+                        }
+                        else
+                        {
+                            this.reader.ReadEndElement();
+                        }
+                    }*/
+
+                    return records;
+                }
+
+                /// <summary>
+                /// Reades a single record from xml file.
+                /// </summary>
+                /// <returns>Record.</returns>
+                public FileCabinetRecord Read()
+                {
+                    if (this.reader.GetAttribute("id") == null)
+                    {
+                        return null;
+                    }
+
+                    int id = int.Parse(this.reader.GetAttribute("id"), CultureInfo.InvariantCulture);
+                    this.reader.ReadStartElement();
+                    string firstName = this.reader.GetAttribute("first");
+                    string lastName = this.reader.GetAttribute("last");
+                    this.reader.ReadStartElement();
+                    DateTime dateOfBirth = DateTime.ParseExact(this.reader.ReadElementContentAsString(), "yyyy-MMM-d", CultureInfo.InvariantCulture);
+                    short favNumber = short.Parse(this.reader.GetAttribute("number"), CultureInfo.InvariantCulture);
+                    char favCharacter = this.reader.GetAttribute("character")[0];
+                    string favGame = this.reader.GetAttribute("game");
+                    this.reader.ReadStartElement();
+                    decimal donations = this.reader.ReadElementContentAsDecimal();
+                    this.reader.ReadEndElement();
+
+                    return new FileCabinetRecord(id, firstName, lastName, dateOfBirth, favNumber, favCharacter, favGame, donations);
                 }
             }
         }

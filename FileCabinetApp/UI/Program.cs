@@ -413,26 +413,27 @@ namespace FileCabinetApp
                 return;
             }
 
-            IFileCabinetServiceSnapshot emptySnapshot = fileCabinetService.MakeEmptySnapshot();
-
             using (StreamReader reader = new StreamReader(path))
             {
-                bool isSucceed = false;
                 int importedRecords = 0;
+                IList<FileCabinetRecord> records;
+                IFileCabinetServiceSnapshot emptySnapshot = fileCabinetService.MakeEmptySnapshot();
+                IFileCabinetServiceSnapshot snapshot;
                 switch (format)
                 {
                     case "csv":
-                        isSucceed = true;
-                        IList<FileCabinetRecord> records = emptySnapshot.LoadFromCsv(reader);
-                        IFileCabinetServiceSnapshot snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
+                        records = emptySnapshot.LoadFromCsv(reader);
+                        snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
                         importedRecords = fileCabinetService.Restore(snapshot);
                         break;
                     case "xml":
-                        //isSucceed = snapshot.LoadFromXml(reader);
+                        records = emptySnapshot.LoadFromXml(reader);
+                        snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
+                        importedRecords = fileCabinetService.Restore(snapshot);
                         break;
                 }
 
-                Console.WriteLine(importedRecords + "records were imported from " + path + ".");
+                Console.WriteLine(importedRecords + " records were imported from " + path + ".");
             }
         }
 

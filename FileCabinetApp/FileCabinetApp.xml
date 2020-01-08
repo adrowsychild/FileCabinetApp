@@ -171,6 +171,7 @@
             Restores the records from the snapshot.
             </summary>
             <param name="snapshot">A snapshot to restore.</param>
+            <returns>Number of imported records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.Close">
             <summary>
@@ -293,6 +294,7 @@
             Restores the list of records by the snapshot.
             </summary>
             <param name="snapshot">Snapshot to restore by.</param>
+            <returns>Number of imported records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetStat">
             <summary>
@@ -374,7 +376,14 @@
             Loads the records from csv file.
             </summary>
             <param name="reader">Csv reader.</param>
-            <returns>Whether operation succeeded.</returns>
+            <returns>List of imported records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.LoadFromXml(System.IO.StreamReader)">
+            <summary>
+            Loads the records from xml file.
+            </summary>
+            <param name="reader">Xml reader.</param>
+            <returns>List of imported records.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetRecordCsvWriter">
             <summary>
@@ -434,6 +443,29 @@
             </summary>
             <param name="record">Record to write about.</param>
             <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetXmlReader">
+            <summary>
+            Loads information from xml file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetXmlReader.#ctor(System.Xml.XmlReader)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetXmlReader"/> class.
+            </summary>
+            <param name="reader">Xml writer.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetXmlReader.ReadAll">
+            <summary>
+            Reads records from csv file.
+            </summary>
+            <returns>List of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FileCabinetServiceSnapshot.FileCabinetXmlReader.Read">
+            <summary>
+            Reades a single record from csv file.
+            </summary>
+            <returns>Record.</returns>
         </member>
         <member name="T:FileCabinetApp.IFileCabinetXmlWriter">
             <summary>
@@ -502,6 +534,24 @@
             <param name="reader">Csv reader.</param>
             <returns>Whether operation succeeded.</returns>
         </member>
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot.LoadFromXml(System.IO.StreamReader)">
+            <summary>
+            Loads the records from xml file.
+            </summary>
+            <param name="reader">Xml reader.</param>
+            <returns>List of imported records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Interfaces.IFileCabinetXmlReader">
+            <summary>
+            Loads information from xml file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IFileCabinetXmlReader.ReadAll">
+            <summary>
+            Reads records from xml file.
+            </summary>
+            <returns>List of records.</returns>
+        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             Interface for class for working with list of users.
@@ -566,6 +616,7 @@
             Restores the list of records by the snapshot.
             </summary>
             <param name="snapshot">Snapshot to restore by.</param>
+            <returns>Number of imported records.</returns>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.GetRecords">
             <summary>

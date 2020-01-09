@@ -59,19 +59,6 @@ namespace FileCabinetApp
         public IFileCabinetServiceSnapshot MakeSnapshot();
 
         /// <summary>
-        /// Makes a snapshot of records.
-        /// </summary>
-        /// <param name="recordsToSnapshot">Records to snapshot.</param>
-        /// <returns>Snapshot.</returns>
-        public IFileCabinetServiceSnapshot MakeSnapshot(List<FileCabinetRecord> recordsToSnapshot);
-
-        /// <summary>
-        /// Makes an empty snapshot.
-        /// </summary>
-        /// <returns>Empty snapshot.</returns>
-        public IFileCabinetServiceSnapshot MakeEmptySnapshot();
-
-        /// <summary>
         /// Restores the list of records by the snapshot.
         /// </summary>
         /// <param name="snapshot">Snapshot to restore by.</param>
@@ -89,6 +76,12 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>The number of records.</returns>
         public int GetStat();
+
+        /// <summary>
+        /// Returns list of ids in the list.
+        /// </summary>
+        /// <returns>List of ids in the list.</returns>
+        public List<int> GetIds();
 
         /// <summary>
         /// Gets the validator type.

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FileCabinetApp.Interfaces;
 
@@ -107,6 +108,7 @@ namespace FileCabinetApp
             Console.WriteLine(Program.INTRO);
 
             Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
+            Console.WriteLine("Using " + fileCabinetService.GetType().ToString()[26..fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
@@ -277,14 +279,16 @@ namespace FileCabinetApp
         {
             if (int.TryParse(parameters, out int id))
             {
-                if (id < 1 || id > fileCabinetService.GetStat())
+                if (id < 1 || !fileCabinetService.GetIds().Contains(id))
                 {
                     Console.WriteLine($"#{id} record is not found.");
                     return;
                 }
-
-                fileCabinetService.EditRecord(CheckRecordInput(id));
-                Console.WriteLine($"Record #{id} is updated.");
+                else
+                {
+                    fileCabinetService.EditRecord(CheckRecordInput(id));
+                    Console.WriteLine($"Record #{id} is updated.");
+                }
             }
         }
 
@@ -308,30 +312,17 @@ namespace FileCabinetApp
                 {
                     case "firstname":
                         foundRecords = fileCabinetService.FindByFirstName(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
+
                     case "lastname":
                         foundRecords = fileCabinetService.FindByLastName(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
+
                     case "dateofbirth":
                         foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
                 }
             }
@@ -348,7 +339,7 @@ namespace FileCabinetApp
         private static void Export(string parameters)
         {
             string[] args = parameters.Split();
-            if (args == null || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[1]))
+            if (args == null || args.Length < 2)
             {
                 Console.WriteLine("Incorrect parameters.");
                 return;
@@ -375,9 +366,14 @@ namespace FileCabinetApp
                     case "csv":
                         isSucceed = snapshot.SaveToCsv(writer);
                         break;
+
                     case "xml":
                         isSucceed = snapshot.SaveToXml(writer);
                         break;
+
+                    default:
+                        Console.WriteLine("Incorrect format: can be xml or csv.");
+                        return;
                 }
 
                 if (!isSucceed)
@@ -398,7 +394,7 @@ namespace FileCabinetApp
         private static void Import(string parameters)
         {
             string[] args = parameters.Split();
-            if (args == null || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[1]))
+            if (args == null || args.Length < 2)
             {
                 Console.WriteLine("Incorrect parameters.");
                 return;
@@ -417,20 +413,24 @@ namespace FileCabinetApp
             {
                 int importedRecords = 0;
                 IList<FileCabinetRecord> records;
-                IFileCabinetServiceSnapshot emptySnapshot = fileCabinetService.MakeEmptySnapshot();
-                IFileCabinetServiceSnapshot snapshot;
+                IFileCabinetServiceSnapshot snapshot = new FileCabinetServiceSnapshot();
                 switch (format)
                 {
                     case "csv":
-                        records = emptySnapshot.LoadFromCsv(reader);
-                        snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
+                        records = snapshot.LoadFromCsv(reader);
+                        snapshot = new FileCabinetServiceSnapshot(records);
                         importedRecords = fileCabinetService.Restore(snapshot);
                         break;
+
                     case "xml":
-                        records = emptySnapshot.LoadFromXml(reader);
-                        snapshot = fileCabinetService.MakeSnapshot((List<FileCabinetRecord>)records);
+                        records = snapshot.LoadFromXml(reader);
+                        snapshot = new FileCabinetServiceSnapshot(records);
                         importedRecords = fileCabinetService.Restore(snapshot);
                         break;
+
+                    default:
+                        Console.WriteLine("Incorrect format: can be xml or csv.");
+                        return;
                 }
 
                 Console.WriteLine(importedRecords + " records were imported from " + path + ".");
@@ -443,12 +443,7 @@ namespace FileCabinetApp
         /// <param name="parameters">Parameters.</param>
         private static void List(string parameters)
         {
-            ReadOnlyCollection<FileCabinetRecord> tempList = fileCabinetService.GetRecords();
-
-            foreach (var record in tempList)
-            {
-                ShowRecord(record);
-            }
+            ShowRecords(fileCabinetService.GetRecords());
         }
 
         /// <summary>
@@ -485,6 +480,19 @@ namespace FileCabinetApp
             }
 
             Console.WriteLine(output);
+        }
+
+        /// <summary>
+        /// Shows list of records to the user.
+        /// </summary>
+        /// <param name="records">Record to show.</param>
+        private static void ShowRecords(IReadOnlyCollection<FileCabinetRecord> records)
+        {
+            IEnumerable<FileCabinetRecord> orderedRecords = records.OrderBy(record => record.Id);
+            foreach (var record in orderedRecords)
+            {
+                ShowRecord(record);
+            }
         }
 
         /// <summary>

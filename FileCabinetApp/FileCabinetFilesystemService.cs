@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using FileCabinetApp.Interfaces;
 
@@ -16,7 +17,7 @@ namespace FileCabinetApp
         private const int RecordSize = 400;
         private const int StringSize = 120;
 
-        private const int IdOffset = 4;
+        private const int IdOffset = 2;
         private const int FirstNameOffset = 6;
         private const int LastNameOffset = 126;
         private const int YearOffset = 246;
@@ -32,6 +33,8 @@ namespace FileCabinetApp
         private readonly IRecordValidator validator;
 
         private int count;
+
+        private List<int> ids = new List<int>() { 0 };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -62,9 +65,13 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            record.Id = ++this.count;
+            record.Id = this.ids.Max() + 1;
 
-            this.WriteRecord(record, this.count - 1);
+            this.count++;
+            this.ids.Add(record.Id);
+
+            // this.fileStream.Seek(index * RecordSize, SeekOrigin.Begin);
+            this.WriteRecord(record, (this.count - 1) * RecordSize);
 
             return record.Id;
         }
@@ -81,14 +88,12 @@ namespace FileCabinetApp
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            if (record.Id < 0 || record.Id > this.count)
+            if (record.Id < 0 || !this.ids.Contains(record.Id))
             {
                 return -1;
             }
 
-            record.Id++;
-
-            this.WriteRecord(record, record.Id - 1);
+            this.WriteRecord(record, this.FindOffsetById(record.Id));
 
             return record.Id;
         }
@@ -111,9 +116,36 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            this.WriteRecord(record, record.Id - 1);
+            this.count++;
+            this.ids.Add(record.Id);
+
+            this.WriteRecord(record, (this.count - 1) * RecordSize);
 
             return record.Id;
+        }
+
+        /// <summary>
+        /// Searches for the record by id.
+        /// </summary>
+        /// <param name="id">Id to search by.</param>
+        /// <returns>Offset of the record.</returns>
+        public int FindOffsetById(int id)
+        {
+            int offset = -1;
+
+            for (int i = 0; i < this.count; i++)
+            {
+                this.fileStream.Seek(IdOffset + (RecordSize * i), SeekOrigin.Begin);
+                byte[] bytes = new byte[4];
+                this.fileStream.Read(bytes, 0, sizeof(int));
+                int tmpId = BitConverter.ToInt32(bytes);
+                if (tmpId == id)
+                {
+                    offset = RecordSize * i;
+                }
+            }
+
+            return offset;
         }
 
         /// <summary>
@@ -134,7 +166,7 @@ namespace FileCabinetApp
                 tmpFirstName = RemoveOffset(tmpFirstName);
                 if (tmpFirstName.ToLower() == firstName.ToLower())
                 {
-                    storedRecords.Add(this.ReadRecord(i));
+                    storedRecords.Add(this.ReadRecord(RecordSize * i));
                 }
             }
 
@@ -152,14 +184,14 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
-                this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
+                this.fileStream.Seek(LastNameOffset + (RecordSize * i), SeekOrigin.Begin);
                 byte[] bytes = new byte[StringSize];
                 this.fileStream.Read(bytes, 0, StringSize);
                 string tmpLastName = Encoding.ASCII.GetString(bytes);
                 tmpLastName = RemoveOffset(tmpLastName);
                 if (tmpLastName.ToLower() == lastName.ToLower())
                 {
-                    storedRecords.Add(this.ReadRecord(i));
+                    storedRecords.Add(this.ReadRecord(RecordSize * i));
                 }
             }
 
@@ -188,7 +220,7 @@ namespace FileCabinetApp
                 DateTime tmpDateOfBirth = new DateTime(tmpYear, tmpMonth, tmpDay);
                 if (tmpDateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower() == dateOfBirth.ToLower())
                 {
-                    storedRecords.Add(this.ReadRecord(i));
+                    storedRecords.Add(this.ReadRecord(RecordSize * i));
                 }
             }
 
@@ -205,7 +237,7 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
-                storedRecords.Add(this.ReadRecord(i));
+                storedRecords.Add(this.ReadRecord(i * RecordSize));
             }
 
             ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
@@ -220,6 +252,15 @@ namespace FileCabinetApp
         public int GetStat()
         {
             return this.count;
+        }
+
+        /// <summary>
+        /// Returns list of ids in the list.
+        /// </summary>
+        /// <returns>List of ids in the list.</returns>
+        public List<int> GetIds()
+        {
+            return this.ids;
         }
 
         /// <summary>
@@ -248,26 +289,9 @@ namespace FileCabinetApp
         /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
         public IFileCabinetServiceSnapshot MakeSnapshot()
         {
-            throw new NotImplementedException();
-        }
+            ReadOnlyCollection<FileCabinetRecord> records = this.GetRecords();
 
-        /// <summary>
-        /// Makes a snapshot of records.
-        /// </summary>
-        /// <param name="recordsToSnapshot">Records to snapshot.</param>
-        /// <returns>Snapshot.</returns>
-        public IFileCabinetServiceSnapshot MakeSnapshot(List<FileCabinetRecord> recordsToSnapshot)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Makes an empty snapshot.
-        /// </summary>
-        /// <returns>Empty snapshot.</returns>
-        public IFileCabinetServiceSnapshot MakeEmptySnapshot()
-        {
-            throw new NotImplementedException();
+            return new FileCabinetServiceSnapshot(records);
         }
 
         /// <summary>
@@ -277,7 +301,36 @@ namespace FileCabinetApp
         /// <returns>Number of imported records.</returns>
         public int Restore(IFileCabinetServiceSnapshot snapshot)
         {
-            throw new NotImplementedException();
+            if (snapshot == null)
+            {
+                throw new ArgumentNullException($"Snapshot is invalid.");
+            }
+
+            int recordsImported = 0;
+
+            foreach (var record in snapshot.Records)
+            {
+                string exceptionMessage = this.validator.ValidateParameters(record);
+                if (exceptionMessage == null)
+                {
+                    if (this.ids.Contains(record.Id))
+                    {
+                        this.EditRecord(record);
+                        recordsImported++;
+                    }
+                    else
+                    {
+                        this.AddRecord(record);
+                        recordsImported++;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                }
+            }
+
+            return recordsImported;
         }
 
         /// <summary>
@@ -371,9 +424,10 @@ namespace FileCabinetApp
         /// Writes a record to the file.
         /// </summary>
         /// <param name="record">A record to write.</param>
-        private void WriteRecord(FileCabinetRecord record, int index)
+        /// <param name="offset">Offset to start from.</param>
+        private void WriteRecord(FileCabinetRecord record, int offset)
         {
-            this.fileStream.Seek(index * RecordSize, SeekOrigin.Begin);
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
             this.fileStream.Write(new byte[2], 0, sizeof(short));
             this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
             this.fileStream.Write(MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
@@ -390,10 +444,10 @@ namespace FileCabinetApp
         /// <summary>
         /// Reads the record from the file.
         /// </summary>
-        /// <param name="index">Index to read by.</param>
-        private FileCabinetRecord ReadRecord(int index)
+        /// <param name="offset">Offset to read from.</param>
+        private FileCabinetRecord ReadRecord(int offset)
         {
-            this.fileStream.Seek((index * RecordSize) + 2, SeekOrigin.Begin);
+            this.fileStream.Seek(offset + 2, SeekOrigin.Begin);
             byte[] bytes = new byte[sizeof(int)];
             this.fileStream.Read(bytes, 0, sizeof(int));
             int id = BitConverter.ToInt32(bytes);

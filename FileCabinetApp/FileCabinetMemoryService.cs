@@ -119,11 +119,11 @@
 
             this.list[indexOfPrev] = record;
 
-            UpdateDictionary(this.list[indexOfPrev], this.firstNameDictionary, record.FirstName);
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(this.list[indexOfPrev], this.lastNameDictionary, record.LastName);
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
-            UpdateDictionary(this.list[indexOfPrev], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return 0;
         }
@@ -136,7 +136,20 @@
         /// </returns>
         public int RemoveRecord(int id)
         {
-            throw new NotImplementedException();
+            int indexToRemove = this.list.FindIndex(rec => rec.Id.Equals(id));
+            if (indexToRemove == -1)
+            {
+                return -1;
+            }
+
+            this.firstNameDictionary[this.list[indexToRemove].FirstName.ToLower()].Remove(this.list[indexToRemove]);
+            this.lastNameDictionary[this.list[indexToRemove].LastName.ToLower()].Remove(this.list[indexToRemove]);
+            this.dateOfBirthDictionary[this.list[indexToRemove].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.ids.Remove(this.list[indexToRemove].Id);
+
+            this.list.Remove(this.list[indexToRemove]);
+
+            return id;
         }
 
         /// <summary>

@@ -33,6 +33,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
             new Tuple<string, Action<string>>("import", Import),
+            new Tuple<string, Action<string>>("remove", Remove),
         };
 
         private static readonly string[][] HelpMessages = new string[][]
@@ -43,9 +44,10 @@ namespace FileCabinetApp
             new string[] { "create", "creates a new record", "The 'create' command creates a new record." },
             new string[] { "edit", "edits the existing record", "The 'edit' command edits the existing record." },
             new string[] { "find", "finds records by given criteria", "The 'find' command finds records by given criteria" },
-            new string[] { "list", "prints the records", "The 'list' prints the records." },
-            new string[] { "export", "exports the records to the file in xml or csv format.", "The 'export' command exports the records to the file in xml or csv format." },
-            new string[] { "import", "imports the records from the xml or csv file.", "The 'import' command imports the records from the xml or csv file." },
+            new string[] { "list", "prints the records", "The 'list' prints the records" },
+            new string[] { "export", "exports the records to the file in xml or csv format", "The 'export' command exports the records to the file in xml or csv format." },
+            new string[] { "import", "imports the records from the xml or csv file", "The 'import' command imports the records from the xml or csv file." },
+            new string[] { "remove", "removes the record from the list", "The 'remove' command removes the record from the list" },
         };
 
         /// <summary>
@@ -288,6 +290,27 @@ namespace FileCabinetApp
                 {
                     fileCabinetService.EditRecord(CheckRecordInput(id));
                     Console.WriteLine($"Record #{id} is updated.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes the existing record.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void Remove(string parameters)
+        {
+            if (int.TryParse(parameters, out int id))
+            {
+                if (id < 1 || !fileCabinetService.GetIds().Contains(id))
+                {
+                    Console.WriteLine($"#{id} record is not found.");
+                    return;
+                }
+                else
+                {
+                    fileCabinetService.RemoveRecord(id);
+                    Console.WriteLine($"Record #{id} is removed.");
                 }
             }
         }

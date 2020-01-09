@@ -99,6 +99,17 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Removes a record from the list by given id.
+        /// </summary>
+        /// <param name="id">Id to remove record by.</param>
+        /// <returns>Id of removed record if succeeded, -1 otherwise.
+        /// </returns>
+        public int RemoveRecord(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Adds record to the list of records.
         /// </summary>
         /// <param name="record">Record to add.</param>

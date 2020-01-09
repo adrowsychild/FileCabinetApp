@@ -102,6 +102,14 @@
             <param name="record">Record to edit.</param>
             <returns>Whether operation succeeded.</returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RemoveRecord(System.Int32)">
+            <summary>
+            Removes a record from the list by given id.
+            </summary>
+            <param name="id">Id to remove record by.</param>
+            <returns>Id of removed record if succeeded, -1 otherwise.
+            </returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.AddRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Adds record to the list of records.
@@ -257,6 +265,14 @@
             </summary>
             <param name="record">Record to edit.</param>
             <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.RemoveRecord(System.Int32)">
+            <summary>
+            Removes a record from the list by given id.
+            </summary>
+            <param name="id">Id to remove record by.</param>
+            <returns>Id of removed record if succeeded, -1 otherwise.
+            </returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFirstName(System.String)">
             <summary>
@@ -497,6 +513,14 @@
             </summary>
             <param name="record">Record to add.</param>
             <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.RemoveRecord(System.Int32)">
+            <summary>
+            Removes a record from the list by given id.
+            </summary>
+            <param name="id">Id to remove record by.</param>
+            <returns>Id of removed record if succeeded, -1 otherwise.
+            </returns>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.FindByFirstName(System.String)">
             <summary>
@@ -779,6 +803,12 @@
         <member name="M:FileCabinetApp.Program.Edit(System.String)">
             <summary>
             Edits the existing record.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Remove(System.String)">
+            <summary>
+            Removes the existing record.
             </summary>
             <param name="parameters">Parameters.</param>
         </member>

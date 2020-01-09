@@ -32,6 +32,14 @@ namespace FileCabinetApp
         public int AddRecord(FileCabinetRecord record);
 
         /// <summary>
+        /// Removes a record from the list by given id.
+        /// </summary>
+        /// <param name="id">Id to remove record by.</param>
+        /// <returns>Id of removed record if succeeded, -1 otherwise.
+        /// </returns>
+        public int RemoveRecord(int id);
+
+        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>

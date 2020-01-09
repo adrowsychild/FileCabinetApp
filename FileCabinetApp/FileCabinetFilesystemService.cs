@@ -120,11 +120,73 @@ namespace FileCabinetApp
             reservedBytes = BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(reservedBytes) | numToAdd));
             this.fileStream.Seek(offset, SeekOrigin.Begin);
             this.fileStream.Write(reservedBytes, 0, 2);
-
             this.ids.Remove(id);
             this.deleted++;
 
             return id;
+        }
+
+        // removed: 31 33 35 125 127
+
+        /// <summary>
+        /// Purges the list of records.
+        /// </summary>
+        /// <returns>The number of purged records,
+        /// -1 if not all the records were purged.
+        /// </returns>
+        public int Purge()
+        {
+            int recordsPurged = 0;
+            List<int> indexes = new List<int>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    indexes.Add(i);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            int currentIndex = 0;
+            int numOfRecords = this.count;
+            FileCabinetRecord currentRecord;
+
+            for (int i = 0; i < numOfRecords; i++)
+            {
+                if (!indexes.Contains(i))
+                {
+                    if (i == currentIndex)
+                    {
+                        currentIndex++;
+                        continue;
+                    }
+
+                    currentRecord = this.ReadRecord(i * RecordSize);
+                    this.WriteRecord(currentRecord, currentIndex * RecordSize);
+                    currentIndex++;
+                }
+                else
+                {
+                    recordsPurged++;
+                    continue;
+                }
+            }
+
+            this.count -= recordsPurged;
+
+            if (this.deleted == recordsPurged)
+            {
+                this.deleted = 0;
+                return recordsPurged;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         /// <summary>

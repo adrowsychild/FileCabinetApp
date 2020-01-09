@@ -110,6 +110,14 @@
             <returns>Id of removed record if succeeded, -1 otherwise.
             </returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.Purge">
+            <summary>
+            Purges the list of records.
+            </summary>
+            <returns>The number of purged records,
+            -1 if not all the records were purged.
+            </returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.AddRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Adds record to the list of records.
@@ -809,6 +817,12 @@
         <member name="M:FileCabinetApp.Program.Remove(System.String)">
             <summary>
             Removes the existing record.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="M:FileCabinetApp.Program.Purge(System.String)">
+            <summary>
+            Purges the list of records, if fileSystemService.
             </summary>
             <param name="parameters">Parameters.</param>
         </member>

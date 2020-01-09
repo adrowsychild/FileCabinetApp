@@ -34,6 +34,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("export", Export),
             new Tuple<string, Action<string>>("import", Import),
             new Tuple<string, Action<string>>("remove", Remove),
+            new Tuple<string, Action<string>>("purge", Purge),
         };
 
         private static readonly string[][] HelpMessages = new string[][]
@@ -48,6 +49,7 @@ namespace FileCabinetApp
             new string[] { "export", "exports the records to the file in xml or csv format", "The 'export' command exports the records to the file in xml or csv format." },
             new string[] { "import", "imports the records from the xml or csv file", "The 'import' command imports the records from the xml or csv file." },
             new string[] { "remove", "removes the record from the list", "The 'remove' command removes the record from the list" },
+            new string[] { "purge", "purges the deleted records from the list", "The 'purge' command purges the deleted records from the list." },
         };
 
         /// <summary>
@@ -312,6 +314,22 @@ namespace FileCabinetApp
                     fileCabinetService.RemoveRecord(id);
                     Console.WriteLine($"Record #{id} is removed.");
                 }
+            }
+        }
+
+        /// <summary>
+        /// Purges the list of records, if fileSystemService.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
+        private static void Purge(string parameters)
+        {
+            if (fileCabinetService.GetType() == typeof(FileCabinetFilesystemService))
+            {
+                int initialNumOfRecords = fileCabinetService.GetStat();
+
+                MethodInfo method = typeof(FileCabinetFilesystemService).GetMethod("Purge");
+                int recordsPurged = (int)method.Invoke(fileCabinetService, null);
+                Console.WriteLine("Data file processing is completed: " + recordsPurged + " of " + (initialNumOfRecords + recordsPurged) + " records were purged.");
             }
         }
 

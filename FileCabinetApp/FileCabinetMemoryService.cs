@@ -5,8 +5,10 @@
     using System.Collections.ObjectModel;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Xml;
+    using System.Xml.Serialization;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -14,13 +16,15 @@
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
-        private readonly List<FileCabinetRecord> list = new List<FileCabinetRecord>();
-
-        private readonly Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-        private readonly Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
-
         private readonly IRecordValidator validator;
+
+        private List<FileCabinetRecord> list = new List<FileCabinetRecord>();
+
+        private Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+
+        private List<int> ids = new List<int>() { 0 };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetMemoryService"/> class.
@@ -43,7 +47,13 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            record.Id = this.list.Count + 1;
+            record.Id = this.ids.Max() + 1;
+
+            string validationException = this.validator.ValidateParameters(record);
+            if (validationException != null)
+            {
+                return -1;
+            }
 
             this.list.Add(record);
 
@@ -52,6 +62,33 @@
             UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.ids.Add(record.Id);
+
+            return record.Id;
+        }
+
+        /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record)
+        {
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            this.list.Add(record);
+
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            this.ids.Add(record.Id);
 
             return record.Id;
         }
@@ -68,24 +105,25 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            if (record.Id < 0 || record.Id > this.GetStat())
+            if (record.Id < 0 || !this.ids.Contains(record.Id))
             {
                 return -1;
             }
 
-            this.firstNameDictionary[this.list[record.Id].FirstName.ToLower()].Remove(this.list[record.Id]);
-            this.lastNameDictionary[this.list[record.Id].LastName.ToLower()].Remove(this.list[record.Id]);
-            this.dateOfBirthDictionary[this.list[record.Id].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[record.Id]);
+            int indexOfPrev = this.list.FindIndex(rec => rec.Id.Equals(record.Id));
 
-            this.list[record.Id] = record;
+            this.firstNameDictionary[this.list[indexOfPrev].FirstName.ToLower()].Remove(this.list[indexOfPrev]);
+            this.lastNameDictionary[this.list[indexOfPrev].LastName.ToLower()].Remove(this.list[indexOfPrev]);
+            this.dateOfBirthDictionary[this.list[indexOfPrev].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexOfPrev]);
+            this.ids.Remove(this.list[indexOfPrev].Id);
 
-            UpdateDictionary(this.list[record.Id], this.firstNameDictionary, record.FirstName);
+            this.list[indexOfPrev] = record;
 
-            UpdateDictionary(this.list[record.Id], this.lastNameDictionary, record.LastName);
+            UpdateDictionary(this.list[indexOfPrev], this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(this.list[record.Id], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(this.list[indexOfPrev], this.lastNameDictionary, record.LastName);
 
-            this.list[record.Id].Id++;
+            UpdateDictionary(this.list[indexOfPrev], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return 0;
         }
@@ -144,12 +182,60 @@
         }
 
         /// <summary>
+        /// Restores the list of records by the snapshot.
+        /// </summary>
+        /// <param name="snapshot">Snapshot to restore by.</param>
+        /// <returns>Number of imported records.</returns>
+        public int Restore(IFileCabinetServiceSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                throw new ArgumentNullException($"Snapshot is invalid.");
+            }
+
+            int recordsImported = 0;
+
+            foreach (var record in snapshot.Records)
+            {
+                string exceptionMessage = this.validator.ValidateParameters(record);
+                if (exceptionMessage == null)
+                {
+                    if (this.ids.Contains(record.Id))
+                    {
+                        this.EditRecord(record);
+                    }
+                    else
+                    {
+                        this.AddRecord(record);
+                    }
+
+                    recordsImported++;
+                }
+                else
+                {
+                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                }
+            }
+
+            return recordsImported;
+        }
+
+        /// <summary>
         /// Returns the number of records in the list.
         /// </summary>
         /// <returns>The number of records.</returns>
         public int GetStat()
         {
             return this.list.Count;
+        }
+
+        /// <summary>
+        /// Returns list of ids in the list.
+        /// </summary>
+        /// <returns>List of ids in the list.</returns>
+        public List<int> GetIds()
+        {
+            return this.ids;
         }
 
         /// <summary>
@@ -225,171 +311,6 @@
             else
             {
                 throw new ArgumentException("No records found.");
-            }
-        }
-
-        /// <summary>
-        /// Snapshot of records and methods saving them.
-        /// </summary>
-        internal class FileCabinetServiceSnapshot : IFileCabinetServiceSnapshot
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FileCabinetServiceSnapshot"/> class.
-            /// </summary>
-            /// <param name="records">Records to snapshot.</param>
-            public FileCabinetServiceSnapshot(ReadOnlyCollection<FileCabinetRecord> records)
-            {
-                this.Records = records;
-            }
-
-            /// <summary>
-            /// Gets a snapshot of records.
-            /// </summary>
-            /// <value>A snapshot of records in the concrete moment.</value>
-            public ReadOnlyCollection<FileCabinetRecord> Records { get; }
-
-            /// <summary>
-            /// Saves the records to csv file.
-            /// </summary>
-            /// <param name="writer">Csv writer.</param>
-            /// <returns>Whether operation succeeded.</returns>
-            public bool SaveToCsv(StreamWriter writer)
-            {
-                FileCabinetRecordCsvWriter csvWriter = new FileCabinetRecordCsvWriter(writer);
-                foreach (var record in this.Records)
-                {
-                    csvWriter.Write(record);
-                }
-
-                return true;
-            }
-
-            /// <summary>
-            /// Saves the records to xml file.
-            /// </summary>
-            /// <param name="writer">Xml writer.</param>
-            /// <returns>Whether operation succeeded.</returns>
-            public bool SaveToXml(StreamWriter writer)
-            {
-                XmlWriter xmlWriter = XmlWriter.Create(writer);
-                FileCabinetXmlWriter fileXmlWriter = new FileCabinetXmlWriter(xmlWriter);
-
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteStartElement("records");
-
-                foreach (var record in this.Records)
-                {
-                    fileXmlWriter.Write(record);
-                }
-
-                xmlWriter.WriteEndDocument();
-                xmlWriter.Close();
-
-                return true;
-            }
-
-            /// <summary>
-            /// Saves information to csv file.
-            /// </summary>
-            internal class FileCabinetRecordCsvWriter : IFileCabinetRecordCsvWriter
-            {
-                private readonly TextWriter writer;
-
-                /// <summary>
-                /// Initializes a new instance of the <see cref="FileCabinetRecordCsvWriter"/> class.
-                /// </summary>
-                /// <param name="writer">Csv writer.</param>
-                public FileCabinetRecordCsvWriter(TextWriter writer)
-                {
-                    this.writer = writer;
-                }
-
-                /// <summary>
-                /// Writes information to csv file.
-                /// </summary>
-                /// <param name="record">Record to write about.</param>
-                /// <returns>Whether operation succeeded.</returns>
-                public bool Write(FileCabinetRecord record)
-                {
-                    if (record == null)
-                    {
-                        return false;
-                    }
-
-                    PropertyInfo[] properties = record.GetType().GetProperties();
-
-                    for (int i = 0; i < properties.Length; i++)
-                    {
-                        if (properties[i].PropertyType == typeof(DateTime))
-                        {
-                            DateTime date = (DateTime)properties[i].GetValue(record);
-                            this.writer.Write(date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-                        }
-                        else
-                        {
-                            this.writer.Write(properties[i].GetValue(record));
-                        }
-
-                        if (i != properties.Length - 1)
-                        {
-                            this.writer.Write(',');
-                        }
-                    }
-
-                    this.writer.Write("\n");
-                    return true;
-                }
-            }
-
-            /// <summary>
-            /// Saves information to xml file.
-            /// </summary>
-            internal class FileCabinetXmlWriter : IFileCabinetXmlWriter
-            {
-                private readonly XmlWriter writer;
-
-                /// <summary>
-                /// Initializes a new instance of the <see cref="FileCabinetXmlWriter"/> class.
-                /// </summary>
-                /// <param name="writer">Xml writer.</param>
-                public FileCabinetXmlWriter(XmlWriter writer)
-                {
-                    this.writer = writer;
-                }
-
-                /// <summary>
-                /// Writes information to xml file.
-                /// </summary>
-                /// <param name="record">Record to write about.</param>
-                /// <returns>Whether operation succeeded.</returns>
-                public bool Write(FileCabinetRecord record)
-                {
-                    if (record == null)
-                    {
-                        return false;
-                    }
-
-                    this.writer.WriteStartElement("record");
-                    this.writer.WriteAttributeString("id", record.Id.ToString(CultureInfo.InvariantCulture));
-                    this.writer.WriteStartElement("name");
-                    this.writer.WriteAttributeString("first", record.FirstName);
-                    this.writer.WriteAttributeString("last", record.LastName);
-                    this.writer.WriteEndElement();
-                    this.writer.WriteStartElement("dateOfBirth");
-                    this.writer.WriteString(record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-                    this.writer.WriteEndElement();
-                    this.writer.WriteStartElement("favourite");
-                    this.writer.WriteAttributeString("number", record.FavouriteNumber.ToString(CultureInfo.InvariantCulture));
-                    this.writer.WriteAttributeString("character", record.FavouriteCharacter.ToString(CultureInfo.InvariantCulture));
-                    this.writer.WriteAttributeString("game", record.FavouriteGame);
-                    this.writer.WriteEndElement();
-                    this.writer.WriteStartElement("donations");
-                    this.writer.WriteString(record.Donations.ToString(CultureInfo.InvariantCulture));
-                    this.writer.WriteEndElement();
-                    this.writer.WriteEndElement();
-
-                    return true;
-                }
             }
         }
     }

@@ -25,6 +25,13 @@ namespace FileCabinetApp
         public int EditRecord(FileCabinetRecord record);
 
         /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record);
+
+        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>
@@ -52,6 +59,13 @@ namespace FileCabinetApp
         public IFileCabinetServiceSnapshot MakeSnapshot();
 
         /// <summary>
+        /// Restores the list of records by the snapshot.
+        /// </summary>
+        /// <param name="snapshot">Snapshot to restore by.</param>
+        /// <returns>Number of imported records.</returns>
+        public int Restore(IFileCabinetServiceSnapshot snapshot);
+
+        /// <summary>
         /// Gets all the records.
         /// </summary>
         /// <returns>The array of records.</returns>
@@ -62,6 +76,12 @@ namespace FileCabinetApp
         /// </summary>
         /// <returns>The number of records.</returns>
         public int GetStat();
+
+        /// <summary>
+        /// Returns list of ids in the list.
+        /// </summary>
+        /// <returns>List of ids in the list.</returns>
+        public List<int> GetIds();
 
         /// <summary>
         /// Gets the validator type.

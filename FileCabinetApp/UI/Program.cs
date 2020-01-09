@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using FileCabinetApp.Interfaces;
 
@@ -31,6 +32,7 @@ namespace FileCabinetApp
             new Tuple<string, Action<string>>("edit", Edit),
             new Tuple<string, Action<string>>("find", Find),
             new Tuple<string, Action<string>>("export", Export),
+            new Tuple<string, Action<string>>("import", Import),
         };
 
         private static readonly string[][] HelpMessages = new string[][]
@@ -43,6 +45,7 @@ namespace FileCabinetApp
             new string[] { "find", "finds records by given criteria", "The 'find' command finds records by given criteria" },
             new string[] { "list", "prints the records", "The 'list' prints the records." },
             new string[] { "export", "exports the records to the file in xml or csv format.", "The 'export' command exports the records to the file in xml or csv format." },
+            new string[] { "import", "imports the records from the xml or csv file.", "The 'import' command imports the records from the xml or csv file." },
         };
 
         /// <summary>
@@ -52,10 +55,10 @@ namespace FileCabinetApp
         /// </summary>
         private static readonly Dictionary<string, Settings> ChangeSettings = new Dictionary<string, Settings>
         {
-            ["-s"] = new Settings(SetStorageRules),
-            ["--storage"] = new Settings(SetStorageRules),
             ["-v"] = new Settings(SetValidationRules),
             ["--validation-rules"] = new Settings(SetValidationRules),
+            ["-s"] = new Settings(SetStorageRules),
+            ["--storage"] = new Settings(SetStorageRules),
         };
 
         private static bool isRunning = true;
@@ -78,17 +81,34 @@ namespace FileCabinetApp
 
             if (args != null && args.Length > 0)
             {
-                for (int i = 1; i < args.Length; i += 2)
+                for (int i = 1; i <= args.Length;)
                 {
                     tempArgs[0] = args[i - 1];
-                    tempArgs[1] = args[i];
-                    SettingsParser(tempArgs);
+                    if (i != args.Length)
+                    {
+                        tempArgs[1] = args[i];
+                    }
+
+                    int parsedSetting = SettingsParser(tempArgs);
+                    if (parsedSetting == 0)
+                    {
+                        break;
+                    }
+                    else if (parsedSetting == 1)
+                    {
+                        i++;
+                    }
+                    else if (parsedSetting == 2)
+                    {
+                        i += 2;
+                    }
                 }
             }
 
             Console.WriteLine(Program.INTRO);
 
             Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
+            Console.WriteLine("Using " + fileCabinetService.GetType().ToString()[26..fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
@@ -126,11 +146,12 @@ namespace FileCabinetApp
         /// and searches for given operation in the dictionary.
         /// </summary>
         /// <param name="args">Arguments to parse.</param>
-        private static void SettingsParser(string[] args)
+        private static int SettingsParser(string[] args)
         {
             string operation = string.Empty;
             string parameter = string.Empty;
             Settings makeChanges = null;
+            int parsedSetting = 0;
 
             // --some-operation=paramater
             if (args[0].StartsWith("--", StringComparison.InvariantCulture))
@@ -143,6 +164,7 @@ namespace FileCabinetApp
                     if (ChangeSettings.ContainsKey(operation.ToLower()))
                     {
                         makeChanges = ChangeSettings[operation.ToLower()];
+                        parsedSetting = 1;
                     }
                 }
             }
@@ -159,6 +181,7 @@ namespace FileCabinetApp
                 if (ChangeSettings.ContainsKey(operation.ToLower()))
                 {
                     makeChanges = ChangeSettings[operation.ToLower()];
+                    parsedSetting = 2;
                 }
             }
 
@@ -166,6 +189,8 @@ namespace FileCabinetApp
             {
                 makeChanges.Invoke(parameter.ToLower());
             }
+
+            return parsedSetting;
         }
 
         /// <summary>
@@ -254,15 +279,16 @@ namespace FileCabinetApp
         {
             if (int.TryParse(parameters, out int id))
             {
-                if (id < 1 || id > fileCabinetService.GetStat())
+                if (id < 1 || !fileCabinetService.GetIds().Contains(id))
                 {
                     Console.WriteLine($"#{id} record is not found.");
                     return;
                 }
-
-                id--;
-                fileCabinetService.EditRecord(CheckRecordInput(id));
-                Console.WriteLine($"Record #{++id} is updated.");
+                else
+                {
+                    fileCabinetService.EditRecord(CheckRecordInput(id));
+                    Console.WriteLine($"Record #{id} is updated.");
+                }
             }
         }
 
@@ -286,30 +312,17 @@ namespace FileCabinetApp
                 {
                     case "firstname":
                         foundRecords = fileCabinetService.FindByFirstName(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
+
                     case "lastname":
                         foundRecords = fileCabinetService.FindByLastName(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
+
                     case "dateofbirth":
                         foundRecords = fileCabinetService.FindByDateOfBirth(args[1]);
-
-                        foreach (var record in foundRecords)
-                        {
-                            ShowRecord(record);
-                        }
-
+                        ShowRecords(foundRecords);
                         break;
                 }
             }
@@ -326,7 +339,7 @@ namespace FileCabinetApp
         private static void Export(string parameters)
         {
             string[] args = parameters.Split();
-            if (args == null || string.IsNullOrEmpty(args[0]) || string.IsNullOrEmpty(args[1]))
+            if (args == null || args.Length < 2)
             {
                 Console.WriteLine("Incorrect parameters.");
                 return;
@@ -353,9 +366,14 @@ namespace FileCabinetApp
                     case "csv":
                         isSucceed = snapshot.SaveToCsv(writer);
                         break;
+
                     case "xml":
                         isSucceed = snapshot.SaveToXml(writer);
                         break;
+
+                    default:
+                        Console.WriteLine("Incorrect format: can be xml or csv.");
+                        return;
                 }
 
                 if (!isSucceed)
@@ -370,17 +388,62 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Imports the records from csv or xml file.
+        /// </summary>
+        /// <param name="parameters">Format to write in and path to write to.</param>
+        private static void Import(string parameters)
+        {
+            string[] args = parameters.Split();
+            if (args == null || args.Length < 2)
+            {
+                Console.WriteLine("Incorrect parameters.");
+                return;
+            }
+
+            string format = args[0].ToLower();
+            string path = args[1];
+
+            if (!File.Exists(path))
+            {
+                Console.WriteLine("Import error: " + path + " does not exist");
+                return;
+            }
+
+            using (StreamReader reader = new StreamReader(path))
+            {
+                int importedRecords = 0;
+                IList<FileCabinetRecord> records;
+                IFileCabinetServiceSnapshot snapshot = new FileCabinetServiceSnapshot();
+                switch (format)
+                {
+                    case "csv":
+                        records = snapshot.LoadFromCsv(reader);
+                        snapshot = new FileCabinetServiceSnapshot(records);
+                        importedRecords = fileCabinetService.Restore(snapshot);
+                        break;
+
+                    case "xml":
+                        records = snapshot.LoadFromXml(reader);
+                        snapshot = new FileCabinetServiceSnapshot(records);
+                        importedRecords = fileCabinetService.Restore(snapshot);
+                        break;
+
+                    default:
+                        Console.WriteLine("Incorrect format: can be xml or csv.");
+                        return;
+                }
+
+                Console.WriteLine(importedRecords + " records were imported from " + path + ".");
+            }
+        }
+
+        /// <summary>
         /// Shows all the records to the user.
         /// </summary>
         /// <param name="parameters">Parameters.</param>
         private static void List(string parameters)
         {
-            ReadOnlyCollection<FileCabinetRecord> tempList = fileCabinetService.GetRecords();
-
-            foreach (var record in tempList)
-            {
-                ShowRecord(record);
-            }
+            ShowRecords(fileCabinetService.GetRecords());
         }
 
         /// <summary>
@@ -389,7 +452,47 @@ namespace FileCabinetApp
         /// <param name="record">Record to show.</param>
         private static void ShowRecord(FileCabinetRecord record)
         {
-            Console.WriteLine($"#{record.Id}, {record.FirstName}, {record.LastName}, {record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture)}, favourite number: {record.FavouriteNumber}, favourite character: {record.FavouriteCharacter}, favourite game: {record.FavouriteGame}, donations: {record.Donations}");
+            string output = "#";
+            PropertyInfo[] properties = record.GetType().GetProperties();
+
+            for (int i = 0; i < properties.Length; i++)
+            {
+                if (properties[i].PropertyType == typeof(DateTime))
+                {
+                    DateTime date = (DateTime)properties[i].GetValue(record);
+                    output += "Date of birth" + ": ";
+                    output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    if (properties[i].Name != "Id")
+                    {
+                        output += properties[i].Name + ": ";
+                    }
+
+                    output += properties[i].GetValue(record);
+                }
+
+                if (i != properties.Length - 1)
+                {
+                    output += ", ";
+                }
+            }
+
+            Console.WriteLine(output);
+        }
+
+        /// <summary>
+        /// Shows list of records to the user.
+        /// </summary>
+        /// <param name="records">Record to show.</param>
+        private static void ShowRecords(IReadOnlyCollection<FileCabinetRecord> records)
+        {
+            IEnumerable<FileCabinetRecord> orderedRecords = records.OrderBy(record => record.Id);
+            foreach (var record in orderedRecords)
+            {
+                ShowRecord(record);
+            }
         }
 
         /// <summary>
@@ -397,7 +500,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="id">Id to create the record with.</param>
         /// <returns>Valid record.</returns>
-        private static FileCabinetRecord CheckRecordInput(int id = 0)
+        private static FileCabinetRecord CheckRecordInput(int id = 1)
         {
             Console.WriteLine("First Name: ");
             string tmpFirstName = ReadInput(Converter<string>, Validator, "FirstName");

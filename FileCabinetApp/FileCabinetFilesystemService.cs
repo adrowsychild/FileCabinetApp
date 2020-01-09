@@ -33,6 +33,7 @@ namespace FileCabinetApp
         private readonly IRecordValidator validator;
 
         private int count;
+        private int deleted;
 
         private List<int> ids = new List<int>() { 0 };
 
@@ -70,7 +71,6 @@ namespace FileCabinetApp
             this.count++;
             this.ids.Add(record.Id);
 
-            // this.fileStream.Seek(index * RecordSize, SeekOrigin.Begin);
             this.WriteRecord(record, (this.count - 1) * RecordSize);
 
             return record.Id;
@@ -106,7 +106,25 @@ namespace FileCabinetApp
         /// </returns>
         public int RemoveRecord(int id)
         {
-            throw new NotImplementedException();
+            int offset = this.FindOffsetById(id);
+            if (offset == -1)
+            {
+                return -1;
+            }
+
+            // 0x0100
+            ushort numToAdd = 4;
+            byte[] reservedBytes = new byte[2];
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            this.fileStream.Read(reservedBytes, 0, 2);
+            reservedBytes = BitConverter.GetBytes((ushort)(BitConverter.ToUInt16(reservedBytes) | numToAdd));
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            this.fileStream.Write(reservedBytes, 0, 2);
+
+            this.ids.Remove(id);
+            this.deleted++;
+
+            return id;
         }
 
         /// <summary>
@@ -170,6 +188,11 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    continue;
+                }
+
                 this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
                 byte[] bytes = new byte[StringSize];
                 this.fileStream.Read(bytes, 0, StringSize);
@@ -195,6 +218,11 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    continue;
+                }
+
                 this.fileStream.Seek(LastNameOffset + (RecordSize * i), SeekOrigin.Begin);
                 byte[] bytes = new byte[StringSize];
                 this.fileStream.Read(bytes, 0, StringSize);
@@ -220,6 +248,11 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    continue;
+                }
+
                 this.fileStream.Seek(YearOffset + (RecordSize * i), SeekOrigin.Begin);
                 byte[] bytes = new byte[4];
                 this.fileStream.Read(bytes, 0, sizeof(int));
@@ -248,6 +281,11 @@ namespace FileCabinetApp
 
             for (int i = 0; i < this.count; i++)
             {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    continue;
+                }
+
                 storedRecords.Add(this.ReadRecord(i * RecordSize));
             }
 
@@ -262,7 +300,7 @@ namespace FileCabinetApp
         /// <returns>The number of records.</returns>
         public int GetStat()
         {
-            return this.count;
+            return this.count - this.deleted;
         }
 
         /// <summary>
@@ -458,7 +496,9 @@ namespace FileCabinetApp
         /// <param name="offset">Offset to read from.</param>
         private FileCabinetRecord ReadRecord(int offset)
         {
-            this.fileStream.Seek(offset + 2, SeekOrigin.Begin);
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            byte[] reservedBytes = new byte[2];
+            this.fileStream.Read(reservedBytes, 0, 2);
             byte[] bytes = new byte[sizeof(int)];
             this.fileStream.Read(bytes, 0, sizeof(int));
             int id = BitConverter.ToInt32(bytes);
@@ -488,6 +528,23 @@ namespace FileCabinetApp
             decimal donations = BytesToDecimal(bytes);
 
             return new FileCabinetRecord(id, firstName, lastName, new DateTime(year, month, day), favNumber, favCharacter, favGame, donations);
+        }
+
+        private bool IsDeleted(int offset)
+        {
+            // 0x0100
+            byte[] reservedBytes = new byte[2];
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            this.fileStream.Read(reservedBytes, 0, 2);
+
+            if ((ushort)((BitConverter.ToUInt16(reservedBytes) >> 2) & 1) == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

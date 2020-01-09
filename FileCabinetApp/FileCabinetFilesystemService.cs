@@ -362,7 +362,16 @@ namespace FileCabinetApp
         /// <returns>The number of records.</returns>
         public int GetStat()
         {
-            return this.count - this.deleted;
+            return this.count;
+        }
+
+        /// <summary>
+        /// Returns the number of deleted records in the list.
+        /// </summary>
+        /// <returns>The number of deleted records.</returns>
+        public int GetDeleted()
+        {
+            return this.deleted;
         }
 
         /// <summary>

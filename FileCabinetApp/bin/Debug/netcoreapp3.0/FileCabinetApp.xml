@@ -165,6 +165,12 @@
             </summary>
             <returns>The number of records.</returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetDeleted">
+            <summary>
+            Returns the number of deleted records in the list.
+            </summary>
+            <returns>The number of deleted records.</returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetIds">
             <summary>
             Returns list of ids in the list.
@@ -327,6 +333,12 @@
             Returns the number of records in the list.
             </summary>
             <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetDeleted">
+            <summary>
+            Returns the number of deleted records in the list.
+            </summary>
+            <returns>The number of deleted records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetIds">
             <summary>
@@ -575,6 +587,12 @@
             Returns the number of records in the list.
             </summary>
             <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.GetDeleted">
+            <summary>
+            Returns the number of deleted records in the list.
+            </summary>
+            <returns>The number of deleted records.</returns>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.GetIds">
             <summary>

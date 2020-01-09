@@ -263,6 +263,7 @@ namespace FileCabinetApp
         {
             var recordsCount = fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
+            Console.WriteLine($"{fileCabinetService.GetDeleted()} records are ready to be purged.");
         }
 
         /// <summary>
@@ -329,7 +330,7 @@ namespace FileCabinetApp
 
                 MethodInfo method = typeof(FileCabinetFilesystemService).GetMethod("Purge");
                 int recordsPurged = (int)method.Invoke(fileCabinetService, null);
-                Console.WriteLine("Data file processing is completed: " + recordsPurged + " of " + (initialNumOfRecords + recordsPurged) + " records were purged.");
+                Console.WriteLine("Data file processing is completed: " + recordsPurged + " of " + initialNumOfRecords + " records were purged.");
             }
         }
 

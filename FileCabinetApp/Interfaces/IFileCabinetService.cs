@@ -86,6 +86,12 @@ namespace FileCabinetApp
         public int GetStat();
 
         /// <summary>
+        /// Returns the number of deleted records in the list.
+        /// </summary>
+        /// <returns>The number of deleted records.</returns>
+        public int GetDeleted();
+
+        /// <summary>
         /// Returns list of ids in the list.
         /// </summary>
         /// <returns>List of ids in the list.</returns>

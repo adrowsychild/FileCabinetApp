@@ -16,6 +16,7 @@
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
+        private const int Deleted = 0;
         private readonly IRecordValidator validator;
 
         private List<FileCabinetRecord> list = new List<FileCabinetRecord>();
@@ -251,6 +252,15 @@
         public int GetStat()
         {
             return this.list.Count;
+        }
+
+        /// <summary>
+        /// Returns the number of deleted records in the list.
+        /// </summary>
+        /// <returns>The number of deleted records.</returns>
+        public int GetDeleted()
+        {
+            return Deleted;
         }
 
         /// <summary>

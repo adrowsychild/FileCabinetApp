@@ -16,6 +16,7 @@
     /// </summary>
     public class FileCabinetMemoryService : IFileCabinetService
     {
+        private const int Deleted = 0;
         private readonly IRecordValidator validator;
 
         private List<FileCabinetRecord> list = new List<FileCabinetRecord>();
@@ -119,13 +120,37 @@
 
             this.list[indexOfPrev] = record;
 
-            UpdateDictionary(this.list[indexOfPrev], this.firstNameDictionary, record.FirstName);
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
 
-            UpdateDictionary(this.list[indexOfPrev], this.lastNameDictionary, record.LastName);
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
-            UpdateDictionary(this.list[indexOfPrev], this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
 
             return 0;
+        }
+
+        /// <summary>
+        /// Removes a record from the list by given id.
+        /// </summary>
+        /// <param name="id">Id to remove record by.</param>
+        /// <returns>Id of removed record if succeeded, -1 otherwise.
+        /// </returns>
+        public int RemoveRecord(int id)
+        {
+            int indexToRemove = this.list.FindIndex(rec => rec.Id.Equals(id));
+            if (indexToRemove == -1)
+            {
+                return -1;
+            }
+
+            this.firstNameDictionary[this.list[indexToRemove].FirstName.ToLower()].Remove(this.list[indexToRemove]);
+            this.lastNameDictionary[this.list[indexToRemove].LastName.ToLower()].Remove(this.list[indexToRemove]);
+            this.dateOfBirthDictionary[this.list[indexToRemove].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.ids.Remove(this.list[indexToRemove].Id);
+
+            this.list.Remove(this.list[indexToRemove]);
+
+            return id;
         }
 
         /// <summary>
@@ -227,6 +252,15 @@
         public int GetStat()
         {
             return this.list.Count;
+        }
+
+        /// <summary>
+        /// Returns the number of deleted records in the list.
+        /// </summary>
+        /// <returns>The number of deleted records.</returns>
+        public int GetDeleted()
+        {
+            return Deleted;
         }
 
         /// <summary>

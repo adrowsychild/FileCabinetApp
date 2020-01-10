@@ -32,7 +32,7 @@ namespace FileCabinetApp
         {
             IList<FileCabinetRecord> records = new List<FileCabinetRecord>();
 
-            //this.reader.ReadStartElement("records");
+            // this.reader.ReadStartElement("records");
 
             XmlSerializer ser = new XmlSerializer(typeof(List<FileCabinetRecord>));
 

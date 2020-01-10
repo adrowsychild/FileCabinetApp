@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using static FileCabinetApp.Program;
+using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -9,13 +9,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ListCommandHandler : ServiceCommandHandlerBase
     {
+        private readonly IRecordPrinter printer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ListCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to show records from.</param>
-        public ListCommandHandler(IFileCabinetService fileCabinetService)
+        /// <param name="printer">Printer for records.</param>
+        public ListCommandHandler(IFileCabinetService fileCabinetService, IRecordPrinter printer)
         {
             this.service = fileCabinetService;
+            this.printer = printer;
         }
 
         /// <summary>
@@ -46,7 +50,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void List()
         {
-            ShowRecords(this.service.GetRecords());
+            this.printer.Print(this.service.GetRecords());
         }
     }
 }

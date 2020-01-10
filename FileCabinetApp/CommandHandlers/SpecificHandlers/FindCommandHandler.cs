@@ -10,13 +10,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class FindCommandHandler : ServiceCommandHandlerBase
     {
+        private readonly IRecordPrinter printer;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FindCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to find record in.</param>
-        public FindCommandHandler(IFileCabinetService fileCabinetService)
+        /// <param name="printer">Printer for records.</param>
+        public FindCommandHandler(IFileCabinetService fileCabinetService, IRecordPrinter printer)
         {
             this.service = fileCabinetService;
+            this.printer = printer;
         }
 
         /// <summary>
@@ -62,17 +66,17 @@ namespace FileCabinetApp.CommandHandlers
                 {
                     case "firstname":
                         foundRecords = this.service.FindByFirstName(args[1]);
-                        ShowRecords(foundRecords);
+                        this.printer.Print(foundRecords);
                         break;
 
                     case "lastname":
                         foundRecords = this.service.FindByLastName(args[1]);
-                        ShowRecords(foundRecords);
+                        this.printer.Print(foundRecords);
                         break;
 
                     case "dateofbirth":
                         foundRecords = this.service.FindByDateOfBirth(args[1]);
-                        ShowRecords(foundRecords);
+                        this.printer.Print(foundRecords);
                         break;
                 }
             }

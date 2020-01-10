@@ -28,147 +28,29 @@
             </summary>
             <value>The command's parameters.</value>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.CommandHandler">
-            <summary>
-            General handler for the user's commands.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <summary>
-            Handles the request.
-            </summary>
-            <param name="request">Request to handle.</param>
-            <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Create(System.String)">
-            <summary>
-            Creates a new record.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Edit(System.String)">
-            <summary>
-            Edits the existing record.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Remove(System.String)">
-            <summary>
-            Removes the existing record.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Purge(System.String)">
-            <summary>
-            Purges the list of records, if fileSystemService.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Find(System.String)">
-            <summary>
-            Searches for the record by key.
-            </summary>
-            <param name="parameters">Parameters to search by.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Export(System.String)">
-            <summary>
-            Exports the records to csv or xml format.
-            </summary>
-            <param name="parameters">Format to write in and path to write to.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Import(System.String)">
-            <summary>
-            Imports the records from csv or xml file.
-            </summary>
-            <param name="parameters">Format to write in and path to write to.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.List(System.String)">
-            <summary>
-            Shows all the records to the user.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Stat(System.String)">
-            <summary>
-            Shows the number of records to the user.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.ShowRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Shows one record.
-            </summary>
-            <param name="record">Record to show.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.ShowRecords(System.Collections.Generic.IReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
-            <summary>
-            Shows list of records to the user.
-            </summary>
-            <param name="records">Record to show.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.CheckRecordInput(System.Int32)">
-            <summary>
-            Requests and checks the user's input.
-            </summary>
-            <param name="id">Id to create the record with.</param>
-            <returns>Valid record.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{FileCabinetApp.IRecordValidator,System.String,``0,System.Tuple{System.Boolean,System.String}},System.String)">
-            <summary>
-            Parses and validates the user's input.
-            </summary>
-            <typeparam name="T">The type of input.</typeparam>
-            <param name="converter">Converter from string to specific type.</param>
-            <param name="validator">Validator for the converted input.</param>
-            <param name="field">Field to check.</param>
-            <returns>Converted and validated value.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Converter``1(System.String)">
-            <summary>
-            Converts the value to specific type.
-            </summary>
-            <typeparam name="T">The type to convert to.</typeparam>
-            <param name="input">The input to convert.</param>
-            <returns>
-            Bool whether the conversion succeeded.
-            Type of conversion as string.
-            Converted value itself.
-            </returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Validator``1(FileCabinetApp.IRecordValidator,System.String,``0)">
-            <summary>
-            Validates the user's value.
-            </summary>
-            <typeparam name="T">The type of value to validate.</typeparam>
-            <param name="validator">The specific validator.</param>
-            <param name="field">The field to validate.</param>
-            <param name="input">The value to validate.</param>
-            <returns>
-            Bool whether the validation succeeded.
-            Type of conversion as string.
-            </returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.PrintMissedCommandInfo(System.String)">
-            <summary>
-            Notifies there's no such command.
-            </summary>
-            <param name="command">Incorrect command.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.PrintHelp(System.String)">
-            <summary>
-            Prints help message to the user.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.CommandHandler.Exit(System.String)">
-            <summary>
-            Exits the application.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.CommandHandlerBase">
             <summary>
             Handler for the user's commands.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CommandHandlers.CommandHandlerBase.COMMANDHELPINDEX">
+            <summary>
+            Index of command's name in HelpMessages table.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CommandHandlers.CommandHandlerBase.DESCRIPTIONHELPINDEX">
+            <summary>
+            Index of command's description in HelpMessages table.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CommandHandlers.CommandHandlerBase.EXPLANATIONHELPINDEX">
+            <summary>
+            Index of command's explanation in HelpMessages table.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.CommandHandlers.CommandHandlerBase.HelpMessages">
+            <summary>
+            Prints the help messages to the user.
             </summary>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.SetNext(FileCabinetApp.CommandHandlers.ICommandHandler)">
@@ -184,6 +66,66 @@
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.ShowRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Shows one record.
+            </summary>
+            <param name="record">Record to show.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.ShowRecords(System.Collections.Generic.IReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
+            <summary>
+            Shows list of records to the user.
+            </summary>
+            <param name="records">Record to show.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.CheckRecordInput(System.Int32)">
+            <summary>
+            Requests and checks the user's input.
+            </summary>
+            <param name="id">Id to create the record with.</param>
+            <returns>Valid record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{FileCabinetApp.IRecordValidator,System.String,``0,System.Tuple{System.Boolean,System.String}},System.String)">
+            <summary>
+            Parses and validates the user's input.
+            </summary>
+            <typeparam name="T">The type of input.</typeparam>
+            <param name="converter">Converter from string to specific type.</param>
+            <param name="validator">Validator for the converted input.</param>
+            <param name="field">Field to check.</param>
+            <returns>Converted and validated value.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.Converter``1(System.String)">
+            <summary>
+            Converts the value to specific type.
+            </summary>
+            <typeparam name="T">The type to convert to.</typeparam>
+            <param name="input">The input to convert.</param>
+            <returns>
+            Bool whether the conversion succeeded.
+            Type of conversion as string.
+            Converted value itself.
+            </returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.Validator``1(FileCabinetApp.IRecordValidator,System.String,``0)">
+            <summary>
+            Validates the user's value.
+            </summary>
+            <typeparam name="T">The type of value to validate.</typeparam>
+            <param name="validator">The specific validator.</param>
+            <param name="field">The field to validate.</param>
+            <param name="input">The value to validate.</param>
+            <returns>
+            Bool whether the validation succeeded.
+            Type of conversion as string.
+            </returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CommandHandlerBase.PrintMissedCommandInfo(System.String)">
+            <summary>
+            Notifies there's no such command.
+            </summary>
+            <param name="command">Incorrect command.</param>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.ICommandHandler">
             <summary>
@@ -203,6 +145,200 @@
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.CreateCommandHandler">
+            <summary>
+            Handler for the user's 'create' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CreateCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.CreateCommandHandler.Create">
+            <summary>
+            Creates a new record.
+            </summary>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.EditCommandHandler">
+            <summary>
+            Handler for the user's 'edit' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.Edit(System.String)">
+            <summary>
+            Edits the existing record.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.ExitCommandHandler">
+            <summary>
+            Handler for the user's 'exit' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExitCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExitCommandHandler.Exit">
+            <summary>
+            Exits the application.
+            </summary>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.ExportCommandHandler">
+            <summary>
+            Handler for the user's 'export' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExportCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExportCommandHandler.Export(System.String)">
+            <summary>
+            Exports the records to csv or xml format.
+            </summary>
+            <param name="parameters">Format to write in and path to write to.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.FindCommandHandler">
+            <summary>
+            Handler for the user's 'find' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
+            <summary>
+            Searches for the record by key.
+            </summary>
+            <param name="parameters">Parameters to search by.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.HelpCommandHandler">
+            <summary>
+            Handler for the user's 'help' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.HelpCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.HelpCommandHandler.PrintHelp(System.String)">
+            <summary>
+            Prints help message to the user.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.ImportCommandHandler">
+            <summary>
+            Handler for the user's 'import' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ImportCommandHandler.Import(System.String)">
+            <summary>
+            Imports the records from csv or xml file.
+            </summary>
+            <param name="parameters">Format to write in and path to write to.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.ListCommandHandler">
+            <summary>
+            Handler for the user's 'list' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
+            <summary>
+            Shows all the records to the user.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.PurgeCommandHandler">
+            <summary>
+            Handler for the user's 'purge' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.PurgeCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.PurgeCommandHandler.Purge">
+            <summary>
+            Purges the list of records, if fileSystemService.
+            </summary>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.RemoveCommandHandler">
+            <summary>
+            Handler for the user's 'remove' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHandler.Remove(System.String)">
+            <summary>
+            Removes the existing record.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.StatCommandHandler">
+            <summary>
+            Handler for the user's 'stat' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.StatCommandHandler.Stat">
+            <summary>
+            Shows the number of records to the user.
+            </summary>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>

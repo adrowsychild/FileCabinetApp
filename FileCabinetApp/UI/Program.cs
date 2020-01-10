@@ -126,11 +126,26 @@ namespace FileCabinetApp
             while (IsRunning);
         }
 
+        /// <summary>
+        /// Creates the chain of command handlers.
+        /// </summary>
+        /// <returns>The first handler of the chain.</returns>
         private static ICommandHandler CreateCommandHandlers()
         {
-            var commandHandler = new CommandHandler();
+            var createHandler = new CreateCommandHandler();
+            var editHandler = new EditCommandHandler();
+            var removeHandler = new RemoveCommandHandler();
+            var purgeHandler = new PurgeCommandHandler();
+            var importHandler = new ImportCommandHandler();
+            var exportHandler = new ExportCommandHandler();
+            var findHandler = new FindCommandHandler();
+            var listHandler = new ListCommandHandler();
+            var statHandler = new StatCommandHandler();
+            var helpHandler = new HelpCommandHandler();
 
-            return commandHandler;
+            createHandler.SetNext(editHandler).SetNext(removeHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler);
+
+            return createHandler;
         }
 
         /// <summary>

@@ -189,7 +189,7 @@ namespace FileCabinetApp.CommandHandlers
 
                 value = conversionResult.Item3;
 
-                var validationResult = validator(FileCabinetService.GetValidator(), field, value);
+                var validationResult = validator(fileCabinetService.GetValidator(), field, value);
                 if (!validationResult.Item1)
                 {
                     Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");

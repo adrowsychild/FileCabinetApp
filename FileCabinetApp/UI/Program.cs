@@ -43,6 +43,8 @@ namespace FileCabinetApp
             ["--storage"] = new Settings(SetStorageRules),
         };
 
+        private static IFileCabinetService fileCabinetService;
+
         private static IRecordValidator validator;
 
         private delegate void Settings(string args);
@@ -52,12 +54,6 @@ namespace FileCabinetApp
         /// </summary>
         /// <value>Whether the program is running or not.</value>
         public static bool IsRunning { get; set; }
-
-        /// <summary>
-        /// Gets the instance of service.
-        /// </summary>
-        /// <value>The instance of service.</value>
-        public static IFileCabinetService FileCabinetService { get; private set; }
 
         /// <summary>
         /// Method for handling user's commands.
@@ -97,8 +93,8 @@ namespace FileCabinetApp
 
             Console.WriteLine(Program.INTRO);
 
-            Console.WriteLine("Using " + FileCabinetService.GetValidatorType() + " validation rules.");
-            Console.WriteLine("Using " + FileCabinetService.GetType().ToString()[26..FileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
+            Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
+            Console.WriteLine("Using " + fileCabinetService.GetType().ToString()[26..fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
@@ -132,15 +128,15 @@ namespace FileCabinetApp
         /// <returns>The first handler of the chain.</returns>
         private static ICommandHandler CreateCommandHandlers()
         {
-            var createHandler = new CreateCommandHandler();
-            var editHandler = new EditCommandHandler();
-            var removeHandler = new RemoveCommandHandler();
-            var purgeHandler = new PurgeCommandHandler();
-            var importHandler = new ImportCommandHandler();
-            var exportHandler = new ExportCommandHandler();
-            var findHandler = new FindCommandHandler();
-            var listHandler = new ListCommandHandler();
-            var statHandler = new StatCommandHandler();
+            var createHandler = new CreateCommandHandler(fileCabinetService);
+            var editHandler = new EditCommandHandler(fileCabinetService);
+            var removeHandler = new RemoveCommandHandler(fileCabinetService);
+            var purgeHandler = new PurgeCommandHandler(fileCabinetService);
+            var importHandler = new ImportCommandHandler(fileCabinetService);
+            var exportHandler = new ExportCommandHandler(fileCabinetService);
+            var findHandler = new FindCommandHandler(fileCabinetService);
+            var listHandler = new ListCommandHandler(fileCabinetService);
+            var statHandler = new StatCommandHandler(fileCabinetService);
             var helpHandler = new HelpCommandHandler();
 
             createHandler.SetNext(editHandler).SetNext(removeHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler);
@@ -249,11 +245,11 @@ namespace FileCabinetApp
             {
                 case "file":
                     FileStream fileStream = new FileStream(FILENAME, FileMode.Create);
-                    FileCabinetService = new FileCabinetFilesystemService(fileStream, validator);
+                    fileCabinetService = new FileCabinetFilesystemService(fileStream, validator);
 
                     break;
                 default:
-                    FileCabinetService = new FileCabinetMemoryService(validator);
+                    fileCabinetService = new FileCabinetMemoryService(validator);
                     break;
             }
         }

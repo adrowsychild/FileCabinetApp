@@ -9,6 +9,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class StatCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StatCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to get stats from.</param>
+        public StatCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -23,7 +34,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "stat")
             {
-                Stat();
+                this.Stat();
                 return true;
             }
             else
@@ -35,11 +46,11 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Shows the number of records to the user.
         /// </summary>
-        private static void Stat()
+        private void Stat()
         {
-            var recordsCount = FileCabinetService.GetStat();
+            var recordsCount = this.fileCabinetService.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
-            Console.WriteLine($"{FileCabinetService.GetDeleted()} records are ready to be purged.");
+            Console.WriteLine($"{this.fileCabinetService.GetDeleted()} records are ready to be purged.");
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using static FileCabinetApp.Program;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -9,6 +8,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class CreateCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to create record in.</param>
+        public CreateCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -23,7 +33,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "create")
             {
-                Create();
+                this.Create();
                 return true;
             }
             else
@@ -35,9 +45,9 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Creates a new record.
         /// </summary>
-        private static void Create()
+        private void Create()
         {
-            int id = FileCabinetService.CreateRecord(CheckRecordInput());
+            int id = this.fileCabinetService.CreateRecord(CheckRecordInput());
             Console.WriteLine($"Record #{id} is created.");
         }
     }

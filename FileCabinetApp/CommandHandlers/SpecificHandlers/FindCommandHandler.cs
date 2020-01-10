@@ -10,6 +10,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class FindCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FindCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to find record in.</param>
+        public FindCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -24,7 +35,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "find")
             {
-                Find(request.Parameters);
+                this.Find(request.Parameters);
                 return true;
             }
             else
@@ -37,7 +48,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Searches for the record by key.
         /// </summary>
         /// <param name="parameters">Parameters to search by.</param>
-        private static void Find(string parameters)
+        private void Find(string parameters)
         {
             string[] args = parameters.Split();
             if (args.Length > 2)
@@ -52,17 +63,17 @@ namespace FileCabinetApp.CommandHandlers
                 switch (args[0].ToLower())
                 {
                     case "firstname":
-                        foundRecords = FileCabinetService.FindByFirstName(args[1]);
+                        foundRecords = this.fileCabinetService.FindByFirstName(args[1]);
                         ShowRecords(foundRecords);
                         break;
 
                     case "lastname":
-                        foundRecords = FileCabinetService.FindByLastName(args[1]);
+                        foundRecords = this.fileCabinetService.FindByLastName(args[1]);
                         ShowRecords(foundRecords);
                         break;
 
                     case "dateofbirth":
-                        foundRecords = FileCabinetService.FindByDateOfBirth(args[1]);
+                        foundRecords = this.fileCabinetService.FindByDateOfBirth(args[1]);
                         ShowRecords(foundRecords);
                         break;
                 }

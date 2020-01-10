@@ -11,6 +11,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ExportCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to export records from.</param>
+        public ExportCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -25,7 +36,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "export")
             {
-                Export(request.Parameters);
+                this.Export(request.Parameters);
                 return true;
             }
             else
@@ -38,7 +49,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Exports the records to csv or xml format.
         /// </summary>
         /// <param name="parameters">Format to write in and path to write to.</param>
-        private static void Export(string parameters)
+        private void Export(string parameters)
         {
             string[] args = parameters.Split();
             if (args == null || args.Length < 2)
@@ -61,7 +72,7 @@ namespace FileCabinetApp.CommandHandlers
 
             using (StreamWriter writer = new StreamWriter(path))
             {
-                IFileCabinetServiceSnapshot snapshot = FileCabinetService.MakeSnapshot();
+                IFileCabinetServiceSnapshot snapshot = this.fileCabinetService.MakeSnapshot();
                 bool isSucceed = false;
                 switch (format)
                 {

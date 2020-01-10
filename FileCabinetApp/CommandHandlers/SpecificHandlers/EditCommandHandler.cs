@@ -9,6 +9,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class EditCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EditCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to edit record in.</param>
+        public EditCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -23,7 +34,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "edit")
             {
-                Edit(request.Parameters);
+                this.Edit(request.Parameters);
                 return true;
             }
             else
@@ -36,18 +47,18 @@ namespace FileCabinetApp.CommandHandlers
         /// Edits the existing record.
         /// </summary>
         /// <param name="parameters">Parameters.</param>
-        private static void Edit(string parameters)
+        private void Edit(string parameters)
         {
             if (int.TryParse(parameters, out int id))
             {
-                if (id < 1 || !FileCabinetService.GetIds().Contains(id))
+                if (id < 1 || !this.fileCabinetService.GetIds().Contains(id))
                 {
                     Console.WriteLine($"#{id} record is not found.");
                     return;
                 }
                 else
                 {
-                    FileCabinetService.EditRecord(CheckRecordInput(id));
+                    this.fileCabinetService.EditRecord(CheckRecordInput(id));
                     Console.WriteLine($"Record #{id} is updated.");
                 }
             }

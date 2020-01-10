@@ -9,6 +9,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ListCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to show records from.</param>
+        public ListCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -23,7 +34,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "list")
             {
-                List();
+                this.List();
                 return true;
             }
             else
@@ -35,9 +46,9 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Shows all the records to the user.
         /// </summary>
-        private static void List()
+        private void List()
         {
-            ShowRecords(FileCabinetService.GetRecords());
+            ShowRecords(this.fileCabinetService.GetRecords());
         }
     }
 }

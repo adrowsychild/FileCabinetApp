@@ -11,6 +11,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ImportCommandHandler : CommandHandlerBase
     {
+        private readonly IFileCabinetService fileCabinetService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
+        /// </summary>
+        /// <param name="fileCabinetService">Service to import records to.</param>
+        public ImportCommandHandler(IFileCabinetService fileCabinetService)
+        {
+            this.fileCabinetService = fileCabinetService;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -25,7 +36,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "import")
             {
-                Import(request.Parameters);
+                this.Import(request.Parameters);
                 return true;
             }
             else
@@ -38,7 +49,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Imports the records from csv or xml file.
         /// </summary>
         /// <param name="parameters">Format to write in and path to write to.</param>
-        private static void Import(string parameters)
+        private void Import(string parameters)
         {
             string[] args = parameters.Split();
             if (args == null || args.Length < 2)
@@ -66,13 +77,13 @@ namespace FileCabinetApp.CommandHandlers
                     case "csv":
                         records = snapshot.LoadFromCsv(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = FileCabinetService.Restore(snapshot);
+                        importedRecords = this.fileCabinetService.Restore(snapshot);
                         break;
 
                     case "xml":
                         records = snapshot.LoadFromXml(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = FileCabinetService.Restore(snapshot);
+                        importedRecords = this.fileCabinetService.Restore(snapshot);
                         break;
 
                     default:

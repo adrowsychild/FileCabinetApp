@@ -39,7 +39,6 @@ namespace FileCabinetApp.CommandHandlers
         private static void Exit()
         {
             Console.WriteLine("Exiting an application...");
-            FileCabinetService.Close();
             IsRunning = false;
         }
     }

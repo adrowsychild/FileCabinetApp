@@ -10,6 +10,17 @@ namespace FileCabinetApp.CommandHandlers
     /// </summary>
     public class ExitCommandHandler : CommandHandlerBase
     {
+        private Action<bool> state;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExitCommandHandler"/> class.
+        /// </summary>
+        /// <param name="state">Action to change the running state of the service.</param>
+        public ExitCommandHandler(Action<bool> state)
+        {
+            this.state = state;
+        }
+
         /// <summary>
         /// Handles the request.
         /// </summary>
@@ -24,7 +35,7 @@ namespace FileCabinetApp.CommandHandlers
 
             if (request.Command.ToLower() == "exit")
             {
-                Exit();
+                this.Exit();
                 return true;
             }
             else
@@ -36,10 +47,10 @@ namespace FileCabinetApp.CommandHandlers
         /// <summary>
         /// Exits the application.
         /// </summary>
-        private static void Exit()
+        private void Exit()
         {
             Console.WriteLine("Exiting an application...");
-            IsRunning = false;
+            this.state.Invoke(false);
         }
     }
 }

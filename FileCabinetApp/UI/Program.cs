@@ -43,17 +43,13 @@ namespace FileCabinetApp
             ["--storage"] = new Settings(SetStorageRules),
         };
 
+        private static bool isRunning = true;
+
         private static IFileCabinetService fileCabinetService;
 
         private static IRecordValidator validator;
 
         private delegate void Settings(string args);
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the program is running or not.
-        /// </summary>
-        /// <value>Whether the program is running or not.</value>
-        public static bool IsRunning { get; set; }
 
         /// <summary>
         /// Method for handling user's commands.
@@ -100,7 +96,6 @@ namespace FileCabinetApp
             Console.WriteLine();
 
             var commandHandler = CreateCommandHandlers();
-            IsRunning = true;
 
             do
             {
@@ -119,7 +114,12 @@ namespace FileCabinetApp
                 var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
                 commandHandler.Handle(new AppCommandRequest(command, parameters));
             }
-            while (IsRunning);
+            while (isRunning);
+        }
+
+        private static void ChangeServiceState(bool toSet)
+        {
+            isRunning = toSet;
         }
 
         /// <summary>
@@ -138,8 +138,9 @@ namespace FileCabinetApp
             var listHandler = new ListCommandHandler(fileCabinetService);
             var statHandler = new StatCommandHandler(fileCabinetService);
             var helpHandler = new HelpCommandHandler();
+            var exitHandler = new ExitCommandHandler(ChangeServiceState);
 
-            createHandler.SetNext(editHandler).SetNext(removeHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler);
+            createHandler.SetNext(editHandler).SetNext(removeHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler).SetNext(exitHandler);
 
             return createHandler;
         }

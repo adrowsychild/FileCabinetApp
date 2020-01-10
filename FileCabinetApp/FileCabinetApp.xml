@@ -102,23 +102,6 @@
             The service to get information and modify.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.CheckRecordInput(System.Int32)">
-            <summary>
-            Requests and checks the user's input.
-            </summary>
-            <param name="id">Id to create the record with.</param>
-            <returns>Valid record.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{FileCabinetApp.IRecordValidator,System.String,``0,System.Tuple{System.Boolean,System.String}},System.String)">
-            <summary>
-            Parses and validates the user's input.
-            </summary>
-            <typeparam name="T">The type of input.</typeparam>
-            <param name="converter">Converter from string to specific type.</param>
-            <param name="validator">Validator for the converted input.</param>
-            <param name="field">Field to check.</param>
-            <returns>Converted and validated value.</returns>
-        </member>
         <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ShowRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Shows one record.
@@ -155,6 +138,23 @@
             Bool whether the validation succeeded.
             Type of conversion as string.
             </returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.CheckRecordInput(System.Int32)">
+            <summary>
+            Requests and checks the user's input.
+            </summary>
+            <param name="id">Id to create the record with.</param>
+            <returns>Valid record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{FileCabinetApp.IRecordValidator,System.String,``0,System.Tuple{System.Boolean,System.String}},System.String)">
+            <summary>
+            Parses and validates the user's input.
+            </summary>
+            <typeparam name="T">The type of input.</typeparam>
+            <param name="converter">Converter from string to specific type.</param>
+            <param name="validator">Validator for the converted input.</param>
+            <param name="field">Field to check.</param>
+            <returns>Converted and validated value.</returns>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.CreateCommandHandler">
             <summary>
@@ -207,6 +207,12 @@
             <summary>
             Handler for the user's 'exit' command.
             </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ExitCommandHandler.#ctor(System.Action{System.Boolean})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ExitCommandHandler"/> class.
+            </summary>
+            <param name="state">Action to change the running state of the service.</param>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.ExitCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
             <summary>
@@ -1202,12 +1208,6 @@
             Then, if we need to add settings, we only need to add values to the dictionary.
             Warning: Both forms of command should be added one after another.
             </summary>
-        </member>
-        <member name="P:FileCabinetApp.Program.IsRunning">
-            <summary>
-            Gets or sets a value indicating whether the program is running or not.
-            </summary>
-            <value>Whether the program is running or not.</value>
         </member>
         <member name="M:FileCabinetApp.Program.Main(System.String[])">
             <summary>

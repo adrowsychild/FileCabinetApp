@@ -4,6 +4,9 @@ using System.Text;
 
 namespace FileCabinetApp.Interfaces
 {
+    /// <summary>
+    /// Printer for the records.
+    /// </summary>
     public interface IRecordPrinter
     {
         /// <summary>

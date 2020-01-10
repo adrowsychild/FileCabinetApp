@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FileCabinetApp.Interfaces;
-using static FileCabinetApp.Program;
 
 namespace FileCabinetApp.CommandHandlers
 {

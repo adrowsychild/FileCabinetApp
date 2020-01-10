@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using FileCabinetApp.Validators.DefaultValidator;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -15,60 +16,6 @@ namespace FileCabinetApp.CommandHandlers
         /// The service to get information and modify.
         /// </summary>
         protected IFileCabinetService service;
-
-        /// <summary>
-        /// Shows one record.
-        /// </summary>
-        /// <param name="record">Record to show.</param>
-        protected static void ShowRecord(FileCabinetRecord record)
-        {
-            if (record == null)
-            {
-                throw new ArgumentNullException($"Record is null.");
-            }
-
-            string output = "#";
-            PropertyInfo[] properties = record.GetType().GetProperties();
-
-            for (int i = 0; i < properties.Length; i++)
-            {
-                if (properties[i].PropertyType == typeof(DateTime))
-                {
-                    DateTime date = (DateTime)properties[i].GetValue(record);
-                    output += "Date of birth" + ": ";
-                    output += date.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture);
-                }
-                else
-                {
-                    if (properties[i].Name != "Id")
-                    {
-                        output += properties[i].Name + ": ";
-                    }
-
-                    output += properties[i].GetValue(record);
-                }
-
-                if (i != properties.Length - 1)
-                {
-                    output += ", ";
-                }
-            }
-
-            Console.WriteLine(output);
-        }
-
-        /// <summary>
-        /// Shows list of records to the user.
-        /// </summary>
-        /// <param name="records">Record to show.</param>
-        protected static void ShowRecords(IReadOnlyCollection<FileCabinetRecord> records)
-        {
-            IEnumerable<FileCabinetRecord> orderedRecords = records.OrderBy(record => record.Id);
-            foreach (var record in orderedRecords)
-            {
-                ShowRecord(record);
-            }
-        }
 
         /// <summary>
         /// Converts the value to specific type.
@@ -109,7 +56,7 @@ namespace FileCabinetApp.CommandHandlers
         /// Bool whether the validation succeeded.
         /// Type of conversion as string.
         /// </returns>
-        protected static Tuple<bool, string> Validator<T>(IRecordValidator validator, string field, T input)
+        protected Tuple<bool, string> Validator<T>(IRecordValidator validator, string field, T input)
         {
             if (validator == null)
             {
@@ -118,10 +65,14 @@ namespace FileCabinetApp.CommandHandlers
 
             bool validationSucceeded;
             string validationType = field + " field";
-            Type validatorType = validator.GetType();
-            MethodInfo validateField = validatorType.GetMethod("Validate" + field);
+            string validatorType = this.service.GetValidatorType();
+            validatorType = validatorType.First().ToString(CultureInfo.InvariantCulture).ToUpper() + validatorType.Substring(1);
 
-            validationSucceeded = (bool)validateField.Invoke(validator, new object[] { input });
+            var asm = Assembly.Load("FileCabinetApp");
+            var partValidatorType = asm.GetTypes().Where(v => v.Name.Contains(field, StringComparison.InvariantCulture) && v.Name.Contains(validatorType.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture)).ToList();
+            MethodInfo validateMethod = partValidatorType[0].GetMethod("Validate");
+            object classInstance = Activator.CreateInstance(partValidatorType[0], null);
+            validationSucceeded = (bool)validateMethod.Invoke(classInstance, new object[] { input });
 
             return new Tuple<bool, string>(validationSucceeded, validationType);
         }

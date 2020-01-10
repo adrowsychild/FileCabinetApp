@@ -8,17 +8,15 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'find' command.
     /// </summary>
-    public class FindCommandHandler : CommandHandlerBase
+    public class FindCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IFileCabinetService fileCabinetService;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="FindCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to find record in.</param>
         public FindCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.fileCabinetService = fileCabinetService;
+            this.service = fileCabinetService;
         }
 
         /// <summary>
@@ -63,17 +61,17 @@ namespace FileCabinetApp.CommandHandlers
                 switch (args[0].ToLower())
                 {
                     case "firstname":
-                        foundRecords = this.fileCabinetService.FindByFirstName(args[1]);
+                        foundRecords = this.service.FindByFirstName(args[1]);
                         ShowRecords(foundRecords);
                         break;
 
                     case "lastname":
-                        foundRecords = this.fileCabinetService.FindByLastName(args[1]);
+                        foundRecords = this.service.FindByLastName(args[1]);
                         ShowRecords(foundRecords);
                         break;
 
                     case "dateofbirth":
-                        foundRecords = this.fileCabinetService.FindByDateOfBirth(args[1]);
+                        foundRecords = this.service.FindByDateOfBirth(args[1]);
                         ShowRecords(foundRecords);
                         break;
                 }

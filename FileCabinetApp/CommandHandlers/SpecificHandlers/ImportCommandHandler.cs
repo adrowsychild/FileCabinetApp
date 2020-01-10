@@ -9,17 +9,15 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'import' command.
     /// </summary>
-    public class ImportCommandHandler : CommandHandlerBase
+    public class ImportCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IFileCabinetService fileCabinetService;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ImportCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to import records to.</param>
         public ImportCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.fileCabinetService = fileCabinetService;
+            this.service = fileCabinetService;
         }
 
         /// <summary>
@@ -77,13 +75,13 @@ namespace FileCabinetApp.CommandHandlers
                     case "csv":
                         records = snapshot.LoadFromCsv(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = this.fileCabinetService.Restore(snapshot);
+                        importedRecords = this.service.Restore(snapshot);
                         break;
 
                     case "xml":
                         records = snapshot.LoadFromXml(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = this.fileCabinetService.Restore(snapshot);
+                        importedRecords = this.service.Restore(snapshot);
                         break;
 
                     default:

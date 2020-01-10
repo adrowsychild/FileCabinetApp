@@ -8,17 +8,15 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'purge' command.
     /// </summary>
-    public class PurgeCommandHandler : CommandHandlerBase
+    public class PurgeCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IFileCabinetService fileCabinetService;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="PurgeCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to purge.</param>
         public PurgeCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.fileCabinetService = fileCabinetService;
+            this.service = fileCabinetService;
         }
 
         /// <summary>
@@ -49,12 +47,12 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Purge()
         {
-            if (this.fileCabinetService.GetType() == typeof(FileCabinetFilesystemService))
+            if (this.service.GetType() == typeof(FileCabinetFilesystemService))
             {
-                int initialNumOfRecords = this.fileCabinetService.GetStat();
+                int initialNumOfRecords = this.service.GetStat();
 
                 MethodInfo method = typeof(FileCabinetFilesystemService).GetMethod("Purge");
-                int recordsPurged = (int)method.Invoke(this.fileCabinetService, null);
+                int recordsPurged = (int)method.Invoke(this.service, null);
                 Console.WriteLine("Data file processing is completed: " + recordsPurged + " of " + initialNumOfRecords + " records were purged.");
             }
         }

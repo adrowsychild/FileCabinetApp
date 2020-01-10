@@ -9,17 +9,15 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'export' command.
     /// </summary>
-    public class ExportCommandHandler : CommandHandlerBase
+    public class ExportCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IFileCabinetService fileCabinetService;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ExportCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to export records from.</param>
         public ExportCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.fileCabinetService = fileCabinetService;
+            this.service = fileCabinetService;
         }
 
         /// <summary>
@@ -72,7 +70,7 @@ namespace FileCabinetApp.CommandHandlers
 
             using (StreamWriter writer = new StreamWriter(path))
             {
-                IFileCabinetServiceSnapshot snapshot = this.fileCabinetService.MakeSnapshot();
+                IFileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
                 bool isSucceed = false;
                 switch (format)
                 {

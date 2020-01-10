@@ -6,17 +6,15 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'create' command.
     /// </summary>
-    public class CreateCommandHandler : CommandHandlerBase
+    public class CreateCommandHandler : ServiceCommandHandlerBase
     {
-        private readonly IFileCabinetService fileCabinetService;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateCommandHandler"/> class.
         /// </summary>
         /// <param name="fileCabinetService">Service to create record in.</param>
         public CreateCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.fileCabinetService = fileCabinetService;
+            this.service = fileCabinetService;
         }
 
         /// <summary>
@@ -47,7 +45,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Create()
         {
-            int id = this.fileCabinetService.CreateRecord(CheckRecordInput());
+            int id = this.service.CreateRecord(this.CheckRecordInput());
             Console.WriteLine($"Record #{id} is created.");
         }
     }

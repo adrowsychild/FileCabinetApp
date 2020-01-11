@@ -4,11 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Serialization;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -50,20 +46,14 @@
 
             record.Id = this.ids.Max() + 1;
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
 
             this.list.Add(record);
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-
+            this.UpdateDictionaries(record);
             this.ids.Add(record.Id);
 
             return record.Id;
@@ -82,13 +72,7 @@
             }
 
             this.list.Add(record);
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-
+            this.UpdateDictionaries(record);
             this.ids.Add(record.Id);
 
             return record.Id;
@@ -119,12 +103,7 @@
             this.ids.Remove(this.list[indexOfPrev].Id);
 
             this.list[indexOfPrev] = record;
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            this.UpdateDictionaries(record);
 
             return 0;
         }
@@ -222,7 +201,7 @@
 
             foreach (var record in snapshot.Records)
             {
-                string exceptionMessage = this.validator.ValidateParameters(record);
+                string exceptionMessage = this.validator.Validate(record);
                 if (exceptionMessage == null)
                 {
                     if (this.ids.Contains(record.Id))
@@ -238,7 +217,7 @@
                 }
                 else
                 {
-                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                    Console.WriteLine("#" + record.Id + " record is invalid.");
                 }
             }
 
@@ -273,31 +252,12 @@
         }
 
         /// <summary>
-        /// Gets the validator type.
-        /// </summary>
-        /// <returns>The type of validator in string form.</returns>
-        public string GetValidatorType()
-        {
-            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
-            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
-            return validationType;
-        }
-
-        /// <summary>
         /// Gets the validator.
         /// </summary>
         /// <returns>Validator.</returns>
         public IRecordValidator GetValidator()
         {
             return this.validator;
-        }
-
-        /// <summary>
-        /// Clears the list.
-        /// </summary>
-        public void Close()
-        {
-            this.list.Clear();
         }
 
         /// <summary>
@@ -346,6 +306,19 @@
             {
                 throw new ArgumentException("No records found.");
             }
+        }
+
+        /// <summary>
+        /// Updates all the dictionaries.
+        /// </summary>
+        /// <param name="record">Record to get values from.</param>
+        private void UpdateDictionaries(FileCabinetRecord record)
+        {
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
     }
 }

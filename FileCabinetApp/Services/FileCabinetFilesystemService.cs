@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using FileCabinetApp.Helpers;
 using FileCabinetApp.Interfaces;
 
 namespace FileCabinetApp
@@ -49,6 +50,15 @@ namespace FileCabinetApp
         }
 
         /// <summary>
+        /// Finalizes an instance of the <see cref="FileCabinetFilesystemService"/> class.
+        /// Closes the stream.
+        /// </summary>
+        ~FileCabinetFilesystemService()
+        {
+            this.fileStream.Close();
+        }
+
+        /// <summary>
         /// Creates a new record.
         /// </summary>
         /// <param name="record">User's info.</param>
@@ -60,13 +70,39 @@ namespace FileCabinetApp
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
 
             record.Id = this.ids.Max() + 1;
+
+            this.count++;
+            this.ids.Add(record.Id);
+
+            this.WriteRecord(record, (this.count - 1) * RecordSize);
+
+            return record.Id;
+        }
+
+        /// <summary>
+        /// Adds record to the list of records.
+        /// </summary>
+        /// <param name="record">Record to add.</param>
+        /// <returns>Record's id.</returns>
+        public int AddRecord(FileCabinetRecord record)
+        {
+            if (record == null)
+            {
+                throw new ArgumentNullException($"Record object is invalid.");
+            }
+
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
+            {
+                return -1;
+            }
 
             this.count++;
             this.ids.Add(record.Id);
@@ -136,6 +172,8 @@ namespace FileCabinetApp
         /// </returns>
         public int Purge()
         {
+            this.PurgeIds();
+
             int recordsPurged = 0;
             List<int> indexes = new List<int>();
 
@@ -190,56 +228,6 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Adds record to the list of records.
-        /// </summary>
-        /// <param name="record">Record to add.</param>
-        /// <returns>Record's id.</returns>
-        public int AddRecord(FileCabinetRecord record)
-        {
-            if (record == null)
-            {
-                throw new ArgumentNullException($"Record object is invalid.");
-            }
-
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
-            {
-                return -1;
-            }
-
-            this.count++;
-            this.ids.Add(record.Id);
-
-            this.WriteRecord(record, (this.count - 1) * RecordSize);
-
-            return record.Id;
-        }
-
-        /// <summary>
-        /// Searches for the record by id.
-        /// </summary>
-        /// <param name="id">Id to search by.</param>
-        /// <returns>Offset of the record.</returns>
-        public int FindOffsetById(int id)
-        {
-            int offset = -1;
-
-            for (int i = 0; i < this.count; i++)
-            {
-                this.fileStream.Seek(IdOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[4];
-                this.fileStream.Read(bytes, 0, sizeof(int));
-                int tmpId = BitConverter.ToInt32(bytes);
-                if (tmpId == id)
-                {
-                    offset = RecordSize * i;
-                }
-            }
-
-            return offset;
-        }
-
-        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>
@@ -259,7 +247,7 @@ namespace FileCabinetApp
                 byte[] bytes = new byte[StringSize];
                 this.fileStream.Read(bytes, 0, StringSize);
                 string tmpFirstName = Encoding.ASCII.GetString(bytes);
-                tmpFirstName = RemoveOffset(tmpFirstName);
+                tmpFirstName = WorkWithBytesHelper.RemoveOffset(tmpFirstName);
                 if (tmpFirstName.ToLower() == firstName.ToLower())
                 {
                     storedRecords.Add(this.ReadRecord(RecordSize * i));
@@ -289,7 +277,7 @@ namespace FileCabinetApp
                 byte[] bytes = new byte[StringSize];
                 this.fileStream.Read(bytes, 0, StringSize);
                 string tmpLastName = Encoding.ASCII.GetString(bytes);
-                tmpLastName = RemoveOffset(tmpLastName);
+                tmpLastName = WorkWithBytesHelper.RemoveOffset(tmpLastName);
                 if (tmpLastName.ToLower() == lastName.ToLower())
                 {
                     storedRecords.Add(this.ReadRecord(RecordSize * i));
@@ -393,17 +381,6 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Gets the validator type.
-        /// </summary>
-        /// <returns>The type of validator in string form.</returns>
-        public string GetValidatorType()
-        {
-            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
-            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
-            return validationType;
-        }
-
-        /// <summary>
         /// Makes a snapshot of records in the concrete moment.
         /// </summary>
         /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
@@ -430,7 +407,7 @@ namespace FileCabinetApp
 
             foreach (var record in snapshot.Records)
             {
-                string exceptionMessage = this.validator.ValidateParameters(record);
+                string exceptionMessage = this.validator.Validate(record);
                 if (exceptionMessage == null)
                 {
                     if (this.ids.Contains(record.Id))
@@ -446,7 +423,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                    Console.WriteLine("#" + record.Id + " record is invalid.");
                 }
             }
 
@@ -454,90 +431,35 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Closes the stream.
+        /// Removes duplicates from the ids list.
         /// </summary>
-        public void Close()
+        private void PurgeIds()
         {
-            this.fileStream.Close();
+            this.ids = this.ids.Distinct().ToList();
         }
 
         /// <summary>
-        /// Makes an offset for the string.
+        /// Searches for the record by id.
         /// </summary>
-        /// <param name="value">String to make offset to.</param>
-        /// <returns>String with offset in bytes.</returns>
-        private static byte[] MakeStringOffset(string value, int offset)
+        /// <param name="id">Id to search by.</param>
+        /// <returns>Offset of the record.</returns>
+        private int FindOffsetById(int id)
         {
-            byte[] bytes = new byte[offset];
-            byte[] somebytes = Encoding.ASCII.GetBytes(value);
-            for (int i = 0; i < somebytes.Length; i++)
+            int offset = -1;
+
+            for (int i = 0; i < this.count; i++)
             {
-                bytes[i] = somebytes[i];
-            }
-
-            return bytes;
-        }
-
-        /// <summary>
-        /// Removes the offset from the string.
-        /// </summary>
-        /// <param name="value">String to remove offset from.</param>
-        /// <returns>String without offset.</returns>
-        private static string RemoveOffset(string value)
-        {
-            int i = 0;
-            int actualLength = 1;
-
-            while (i < value.Length && value[i] != 0x0)
-            {
-                actualLength++;
-                i++;
-            }
-
-            value = value.Substring(0, i);
-
-            return value;
-        }
-
-        /// <summary>
-        /// Converts decimal value to array of bytes.
-        /// </summary>
-        /// <param name="value">Value to convert.</param>
-        /// <returns>Array of bytes.</returns>
-        private static byte[] DecimalToBytes(decimal value)
-        {
-            byte[] bytes = new byte[sizeof(decimal)];
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (BinaryWriter writer = new BinaryWriter(stream))
+                this.fileStream.Seek(IdOffset + (RecordSize * i), SeekOrigin.Begin);
+                byte[] bytes = new byte[4];
+                this.fileStream.Read(bytes, 0, sizeof(int));
+                int tmpId = BitConverter.ToInt32(bytes);
+                if (tmpId == id)
                 {
-                    writer.Write(value);
-                    bytes = stream.ToArray();
+                    offset = RecordSize * i;
                 }
             }
 
-            return bytes;
-        }
-
-        /// <summary>
-        /// Converts array of bytes to decimal value.
-        /// </summary>
-        /// <param name="bytes">Bytes to convert.</param>
-        /// <returns>Decimal value.</returns>
-        private static decimal BytesToDecimal(byte[] bytes)
-        {
-            decimal value;
-
-            using (MemoryStream stream = new MemoryStream(bytes))
-            {
-                using (BinaryReader reader = new BinaryReader(stream))
-                {
-                    value = reader.ReadDecimal();
-                }
-            }
-
-            return value;
+            return offset;
         }
 
         /// <summary>
@@ -550,15 +472,15 @@ namespace FileCabinetApp
             this.fileStream.Seek(offset, SeekOrigin.Begin);
             this.fileStream.Write(new byte[2], 0, sizeof(short));
             this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
-            this.fileStream.Write(MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
-            this.fileStream.Write(MakeStringOffset(record.LastName, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.LastName, StringSize), 0, StringSize);
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
             this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
             this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
-            this.fileStream.Write(MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
-            this.fileStream.Write(DecimalToBytes(record.Donations), 0, sizeof(decimal));
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.DecimalToBytes(record.Donations), 0, sizeof(decimal));
         }
 
         /// <summary>
@@ -575,9 +497,9 @@ namespace FileCabinetApp
             int id = BitConverter.ToInt32(bytes);
             bytes = new byte[StringSize];
             this.fileStream.Read(bytes, 0, StringSize);
-            string firstName = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            string firstName = WorkWithBytesHelper.RemoveOffset(Encoding.ASCII.GetString(bytes));
             this.fileStream.Read(bytes, 0, StringSize);
-            string lastName = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            string lastName = WorkWithBytesHelper.RemoveOffset(Encoding.ASCII.GetString(bytes));
             bytes = new byte[sizeof(int)];
             this.fileStream.Read(bytes, 0, sizeof(int));
             int year = BitConverter.ToInt32(bytes);
@@ -593,10 +515,10 @@ namespace FileCabinetApp
             char favCharacter = BitConverter.ToChar(bytes);
             bytes = new byte[StringSize];
             this.fileStream.Read(bytes, 0, StringSize);
-            string favGame = RemoveOffset(Encoding.ASCII.GetString(bytes));
+            string favGame = WorkWithBytesHelper.RemoveOffset(Encoding.ASCII.GetString(bytes));
             bytes = new byte[sizeof(decimal)];
             this.fileStream.Read(bytes, 0, sizeof(decimal));
-            decimal donations = BytesToDecimal(bytes);
+            decimal donations = WorkWithBytesHelper.BytesToDecimal(bytes);
 
             return new FileCabinetRecord(id, firstName, lastName, new DateTime(year, month, day), favNumber, favCharacter, favGame, donations);
         }

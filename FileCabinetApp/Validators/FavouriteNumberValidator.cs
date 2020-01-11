@@ -9,15 +9,15 @@ namespace FileCabinetApp.Validators
     /// </summary>
     public class FavouriteNumberValidator : IRecordValidator
     {
-        private int minValue;
-        private int maxValue;
+        private short minValue;
+        private short maxValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FavouriteNumberValidator"/> class.
         /// </summary>
         /// <param name="minValue">Minimum possible value.</param>
         /// <param name="maxValue">Maximum possible value.</param>
-        public FavouriteNumberValidator(int minValue, int maxValue)
+        public FavouriteNumberValidator(short minValue, short maxValue)
         {
             this.minValue = minValue;
             this.maxValue = maxValue;

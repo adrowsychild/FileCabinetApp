@@ -1,69 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using FileCabinetApp.Validators;
 
-namespace FileCabinetApp
+namespace FileCabinetApp.Validators
 {
     /// <summary>
     /// Custom validator for user's input.
     /// </summary>
-    public class CustomValidator : IRecordValidator
+    public class CustomValidator : CompositeValidator
     {
         /// <summary>
-        /// Validates the user's input.
+        /// Initializes a new instance of the <see cref="CustomValidator"/> class.
         /// </summary>
-        /// <param name="record">Record to validate.</param>
-        /// <returns>Whether record is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        public CustomValidator()
+            : base(new IRecordValidator[]
+            {
+                new FirstNameValidator(2, 15),
+                new LastNameValidator(2, 15),
+                new DateOfBirthValidator(18, 65),
+                new FavouriteNumberValidator(0, 10),
+                new FavouriteCharacterValidator(-1),
+                new FavouriteGameValidator(2, 15),
+                new DonationsValidator(0.5m),
+            })
         {
-            if (record == null)
-            {
-                throw new ArgumentNullException($"{record} object is invalid.");
-            }
-
-            if (!new FirstNameValidator(2, 15).Validate(record))
-            {
-                // return "First name is invalid.";
-                return false;
-            }
-
-            if (!new LastNameValidator(2, 15).Validate(record))
-            {
-                // return "Last name is invalid.";
-                return false;
-            }
-
-            if (!new DateOfBirthValidator(18, 65).Validate(record))
-            {
-                // return "Date of birth is invalid.";
-                return false;
-            }
-
-            if (!new FavouriteNumberValidator(0, 10).Validate(record))
-            {
-                // return "Favourite number is invalid.";
-                return false;
-            }
-
-            if (!new FavouriteCharacterValidator(-1).Validate(record))
-            {
-                // return "Favourite character is invalid.";
-                return false;
-            }
-
-            if (!new FavouriteGameValidator(1, 15).Validate(record))
-            {
-                // return "Favourite game is invalid.";
-                return false;
-            }
-
-            if (!new DonationsValidator(0.5m).Validate(record))
-            {
-                // return "Donations are invalid.";
-                return false;
-            }
-
-            return true;
         }
     }
 }

@@ -50,8 +50,8 @@
 
             record.Id = this.ids.Max() + 1;
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
@@ -222,7 +222,7 @@
 
             foreach (var record in snapshot.Records)
             {
-                string exceptionMessage = this.validator.ValidateParameters(record);
+                string exceptionMessage = this.validator.Validate(record);
                 if (exceptionMessage == null)
                 {
                     if (this.ids.Contains(record.Id))
@@ -238,7 +238,7 @@
                 }
                 else
                 {
-                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                    Console.WriteLine("#" + record.Id + " record is invalid.");
                 }
             }
 
@@ -270,17 +270,6 @@
         public List<int> GetIds()
         {
             return this.ids;
-        }
-
-        /// <summary>
-        /// Gets the validator type.
-        /// </summary>
-        /// <returns>The type of validator in string form.</returns>
-        public string GetValidatorType()
-        {
-            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
-            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
-            return validationType;
         }
 
         /// <summary>

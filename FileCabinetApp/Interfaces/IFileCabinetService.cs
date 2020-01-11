@@ -98,12 +98,6 @@ namespace FileCabinetApp
         public List<int> GetIds();
 
         /// <summary>
-        /// Gets the validator type.
-        /// </summary>
-        /// <returns>The type of validator in string form.</returns>
-        public string GetValidatorType();
-
-        /// <summary>
         /// Gets the validator.
         /// </summary>
         /// <returns>Validator.</returns>

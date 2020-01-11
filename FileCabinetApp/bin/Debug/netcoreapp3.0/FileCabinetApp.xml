@@ -114,19 +114,6 @@
             Converted value itself.
             </returns>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.Validator``1(FileCabinetApp.IRecordValidator,System.String,``0)">
-            <summary>
-            Validates the user's value.
-            </summary>
-            <typeparam name="T">The type of value to validate.</typeparam>
-            <param name="validator">The specific validator.</param>
-            <param name="field">The field to validate.</param>
-            <param name="input">The value to validate.</param>
-            <returns>
-            Bool whether the validation succeeded.
-            Type of conversion as string.
-            </returns>
-        </member>
         <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.CheckRecordInput(System.Int32)">
             <summary>
             Requests and checks the user's input.
@@ -134,14 +121,12 @@
             <param name="id">Id to create the record with.</param>
             <returns>Valid record.</returns>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}},System.Func{FileCabinetApp.IRecordValidator,System.String,``0,System.Tuple{System.Boolean,System.String}},System.String)">
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}})">
             <summary>
             Parses and validates the user's input.
             </summary>
             <typeparam name="T">The type of input.</typeparam>
             <param name="converter">Converter from string to specific type.</param>
-            <param name="validator">Validator for the converted input.</param>
-            <param name="field">Field to check.</param>
             <returns>Converted and validated value.</returns>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.CreateCommandHandler">
@@ -578,12 +563,6 @@
             </summary>
             <returns>Validator.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetValidatorType">
-            <summary>
-            Gets the validator type.
-            </summary>
-            <returns>The type of validator in string form.</returns>
-        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.MakeSnapshot">
             <summary>
             Makes a snapshot of records in the concrete moment.
@@ -740,12 +719,6 @@
             Returns list of ids in the list.
             </summary>
             <returns>List of ids in the list.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetValidatorType">
-            <summary>
-            Gets the validator type.
-            </summary>
-            <returns>The type of validator in string form.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetValidator">
             <summary>
@@ -914,90 +887,6 @@
             </summary>
             <param name="records">Records to print.</param>
         </member>
-        <member name="T:FileCabinetApp.Interfaces.IDateOfBirthValidator">
-            <summary>
-            Date of birth validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IDateOfBirthValidator.Validate(System.DateTime)">
-            <summary>
-            Validates date of birth of user's input.
-            </summary>
-            <param name="dateOfBirth">Date of birth to validate.</param>
-            <returns>Whether date of birth is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.IDonationsValidator">
-            <summary>
-            Donations validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IDonationsValidator.Validate(System.Decimal)">
-            <summary>
-            Validates donations of user's input.
-            </summary>
-            <param name="donations">Donations to validate.</param>
-            <returns>Whether donations are valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.IFavouriteCharacterValidator">
-            <summary>
-            Favourite character validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IFavouriteCharacterValidator.Validate(System.Char)">
-            <summary>
-            Validates favourite character of user's input.
-            </summary>
-            <param name="favCharacter">Favourite character to validate.</param>
-            <returns>Whether favourite character is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.IFavouriteGameValidator">
-            <summary>
-            Favourite game validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IFavouriteGameValidator.Validate(System.String)">
-            <summary>
-            Validates favourite game of user's input.
-            </summary>
-            <param name="favGame">Favourite game to validate.</param>
-            <returns>Whether favourite game is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.IFavouriteNumberValidator">
-            <summary>
-            Favourite number validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IFavouriteNumberValidator.Validate(System.Int16)">
-            <summary>
-            Validates favourite number of user's input.
-            </summary>
-            <param name="favNumber">Favourite number to validate.</param>
-            <returns>Whether favourite number is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.IFirstNameValidator">
-            <summary>
-            First name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IFirstNameValidator.Validate(System.String)">
-            <summary>
-            Validates first name of user's input.
-            </summary>
-            <param name="firstName">First name to validate.</param>
-            <returns>Whether first name is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Interfaces.ILastNameValidator">
-            <summary>
-            Last name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.ILastNameValidator.Validate(System.String)">
-            <summary>
-            Validates last name of user's input.
-            </summary>
-            <param name="lastName">Last name to validate.</param>
-            <returns>Whether last name is valid.</returns>
-        </member>
         <member name="T:FileCabinetApp.IFileCabinetService">
             <summary>
             Interface for class for working with list of users.
@@ -1090,12 +979,6 @@
             </summary>
             <returns>List of ids in the list.</returns>
         </member>
-        <member name="M:FileCabinetApp.IFileCabinetService.GetValidatorType">
-            <summary>
-            Gets the validator type.
-            </summary>
-            <returns>The type of validator in string form.</returns>
-        </member>
         <member name="M:FileCabinetApp.IFileCabinetService.GetValidator">
             <summary>
             Gets the validator.
@@ -1124,7 +1007,7 @@
             Validator for user's input.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.IRecordValidator.ValidateParameters(FileCabinetApp.FileCabinetRecord)">
+        <member name="M:FileCabinetApp.IRecordValidator.Validate(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Validates the user's input.
             </summary>
@@ -1298,194 +1181,152 @@
             </summary>
             <param name="storageRules">Storage rules to set.</param>
         </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomDateOfBirthValidator">
+        <member name="T:FileCabinetApp.Validators.CompositeValidator">
             <summary>
-            Custom date of birth validator.
+            Composite validator.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomDateOfBirthValidator.Validate(System.DateTime)">
+        <member name="M:FileCabinetApp.Validators.CompositeValidator.#ctor(System.Collections.Generic.IEnumerable{FileCabinetApp.IRecordValidator})">
             <summary>
-            Validates date of birth of user's input.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.CompositeValidator"/> class.
             </summary>
-            <param name="dateOfBirth">Date of birth to validate.</param>
-            <returns>Whether date of birth is valid.</returns>
+            <param name="validators">List of validators.</param>
         </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomDonationsValidator">
+        <member name="M:FileCabinetApp.Validators.CompositeValidator.Validate(FileCabinetApp.FileCabinetRecord)">
             <summary>
-            Custom donations validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomDonationsValidator.Validate(System.Decimal)">
-            <summary>
-            Validates donations of user's input.
-            </summary>
-            <param name="donations">Donations to validate.</param>
-            <returns>Whether donations are valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomFavouriteCharacterValidator">
-            <summary>
-            Custom favourite character validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomFavouriteCharacterValidator.Validate(System.Char)">
-            <summary>
-            Validates favourite character of user's input.
-            </summary>
-            <param name="favCharacter">Favourite character to validate.</param>
-            <returns>Whether favourite character is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomFavouriteGameValidator">
-            <summary>
-            Custom favourite game validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomFavouriteGameValidator.Validate(System.String)">
-            <summary>
-            Validates favourite game of user's input.
-            </summary>
-            <param name="favGame">Favourite game to validate.</param>
-            <returns>Whether favourite game is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomFavouriteNumberValidator">
-            <summary>
-            Custom favourite number validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomFavouriteNumberValidator.Validate(System.Int16)">
-            <summary>
-            Validates favourite number of user's input.
-            </summary>
-            <param name="favNumber">Favourite number to validate.</param>
-            <returns>Whether favourite number is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomFirstNameValidator">
-            <summary>
-            Custom first name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomFirstNameValidator.Validate(System.String)">
-            <summary>
-            Validates first name of user's input.
-            </summary>
-            <param name="firstName">First name to validate.</param>
-            <returns>Whether first name is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.CustomValidator.CustomLastNameValidator">
-            <summary>
-            Custom last name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.CustomValidator.CustomLastNameValidator.Validate(System.String)">
-            <summary>
-            Validates last name of user's input.
-            </summary>
-            <param name="lastName">Last name to validate.</param>
-            <returns>Whether last name is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultDateOfBirthValidator">
-            <summary>
-            Date of birth validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultDateOfBirthValidator.Validate(System.DateTime)">
-            <summary>
-            Validates date of birth of user's input.
-            </summary>
-            <param name="dateOfBirth">Date of birth to validate.</param>
-            <returns>Whether date of birth is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultDonationsValidator">
-            <summary>
-            Donations validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultDonationsValidator.Validate(System.Decimal)">
-            <summary>
-            Validates donations of user's input.
-            </summary>
-            <param name="donations">Donations to validate.</param>
-            <returns>Whether donations are valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteCharacterValidator">
-            <summary>
-            Favourite character validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteCharacterValidator.Validate(System.Char)">
-            <summary>
-            Validates favourite character of user's input.
-            </summary>
-            <param name="favCharacter">Favourite character to validate.</param>
-            <returns>Whether favourite character is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteGameValidator">
-            <summary>
-            Favourite game validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteGameValidator.Validate(System.String)">
-            <summary>
-            Validates favourite game of user's input.
-            </summary>
-            <param name="favGame">Favourite game to validate.</param>
-            <returns>Whether favourite game is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteNumberValidator">
-            <summary>
-            Favourite number validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultFavouriteNumberValidator.Validate(System.Int16)">
-            <summary>
-            Validates favourite number of user's input.
-            </summary>
-            <param name="favNumber">Favourite number to validate.</param>
-            <returns>Whether favourite number is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultFirstNameValidator">
-            <summary>
-            First name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultFirstNameValidator.Validate(System.String)">
-            <summary>
-            Validates first name of user's input.
-            </summary>
-            <param name="firstName">First name to validate.</param>
-            <returns>Whether first name is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.Validators.DefaultValidator.DefaultLastNameValidator">
-            <summary>
-            Last name validator.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Validators.DefaultValidator.DefaultLastNameValidator.Validate(System.String)">
-            <summary>
-            Validates last name of user's input.
-            </summary>
-            <param name="lastName">Last name to validate.</param>
-            <returns>Whether last name is valid.</returns>
-        </member>
-        <member name="T:FileCabinetApp.CustomValidator">
-            <summary>
-            Custom validator for user's input.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CustomValidator.ValidateParameters(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Validates the user's input.
+            Validates user's input.
             </summary>
             <param name="record">Record to validate.</param>
             <returns>Exception message.</returns>
         </member>
-        <member name="T:FileCabinetApp.DefaultValidator">
+        <member name="T:FileCabinetApp.Validators.DateOfBirthValidator">
             <summary>
-            Default validator for user's input.
+            Custom date of birth validator.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.DefaultValidator.ValidateParameters(FileCabinetApp.FileCabinetRecord)">
+        <member name="M:FileCabinetApp.Validators.DateOfBirthValidator.#ctor(System.Int32,System.Int32)">
             <summary>
-            Validates the user's input.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.DateOfBirthValidator"/> class.
+            </summary>
+            <param name="from">Minimum possible age.</param>
+            <param name="to">Maximum possible age.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.DateOfBirthValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates date of birth of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.DonationsValidator">
+            <summary>
+            Donations validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.DonationsValidator.#ctor(System.Decimal)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.DonationsValidator"/> class.
+            </summary>
+            <param name="minValue">Minimum possible value.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.DonationsValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates donations of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.FavouriteCharacterValidator">
+            <summary>
+            Favourite character validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteCharacterValidator.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.FavouriteCharacterValidator"/> class.
+            </summary>
+            <param name="symbolCase">Case of character: 0 if case insensitive,
+            -1 if only lowercase allowed, 1 if only uppercase allowed.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteCharacterValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates favourite character of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.FavouriteGameValidator">
+            <summary>
+            Favourite game validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteGameValidator.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.FavouriteGameValidator"/> class.
+            </summary>
+            <param name="min">Minimum possible length of name of the game.</param>
+            <param name="max">Maximum possible length of name of the game.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteGameValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates favourite game of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.FavouriteNumberValidator">
+            <summary>
+            Favourite number validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteNumberValidator.#ctor(System.Int16,System.Int16)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.FavouriteNumberValidator"/> class.
+            </summary>
+            <param name="minValue">Minimum possible value.</param>
+            <param name="maxValue">Maximum possible value.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FavouriteNumberValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates favourite number of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.FirstNameValidator">
+            <summary>
+            First name validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FirstNameValidator.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.FirstNameValidator"/> class.
+            </summary>
+            <param name="min">Minimum possible length of first name.</param>
+            <param name="max">Maximum possible length of last name.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.FirstNameValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates first name of user's input.
+            </summary>
+            <param name="record">Record to validate.</param>
+            <returns>Exception message.</returns>
+        </member>
+        <member name="T:FileCabinetApp.Validators.LastNameValidator">
+            <summary>
+            Last name validator.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Validators.LastNameValidator.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.Validators.LastNameValidator"/> class.
+            </summary>
+            <param name="min">Minimum possible length of first name.</param>
+            <param name="max">Maximum possible length of last name.</param>
+        </member>
+        <member name="M:FileCabinetApp.Validators.LastNameValidator.Validate(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Validates last name of user's input.
             </summary>
             <param name="record">Record to validate.</param>
             <returns>Exception message.</returns>

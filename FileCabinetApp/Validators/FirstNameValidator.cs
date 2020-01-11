@@ -27,8 +27,8 @@ namespace FileCabinetApp.Validators
         /// Validates first name of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether first name is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
@@ -37,11 +37,11 @@ namespace FileCabinetApp.Validators
 
             if (record.FirstName.Length < this.minLength || record.FirstName.Length > this.maxLength)
             {
-                return false;
+                return "First name is invalid. Should contain from " + this.minLength + " to " + this.maxLength + " characters.";
             }
             else
             {
-                return true;
+                return null;
             }
         }
     }

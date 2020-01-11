@@ -27,8 +27,8 @@ namespace FileCabinetApp.Validators
         /// Validates favourite game of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether favourite game is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
@@ -37,10 +37,10 @@ namespace FileCabinetApp.Validators
 
             if (string.IsNullOrEmpty(record.FavouriteGame) || record.FavouriteGame.Length < this.minLength || record.FavouriteGame.Length > this.maxLength)
             {
-                return false;
+                return "Favourite game is invalid. Should contain from " + this.minLength + " to " + this.maxLength + " characters.";
             }
 
-            return true;
+            return null;
         }
     }
 }

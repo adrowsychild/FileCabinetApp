@@ -27,8 +27,8 @@ namespace FileCabinetApp.Validators
         /// Validates favourite number of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether favourite number is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
@@ -37,10 +37,10 @@ namespace FileCabinetApp.Validators
 
             if (record.FavouriteNumber < this.minValue || record.FavouriteNumber > this.maxValue)
             {
-                return false;
+                return "Favourite number is invalid. Should be from " + this.minValue + " to " + this.maxValue + ".";
             }
 
-            return true;
+            return null;
         }
     }
 }

@@ -18,6 +18,34 @@ namespace FileCabinetApp.CommandHandlers
         protected IFileCabinetService service;
 
         /// <summary>
+        /// Parses and validates the user's input.
+        /// </summary>
+        /// <typeparam name="T">The type of input.</typeparam>
+        /// <param name="converter">Converter from string to specific type.</param>
+        /// <returns>Converted and validated value.</returns>
+        protected static T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter)
+        {
+            do
+            {
+                T value;
+
+                var input = Console.ReadLine();
+                var conversionResult = converter(input);
+
+                if (!conversionResult.Item1)
+                {
+                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
+                    continue;
+                }
+
+                value = conversionResult.Item3;
+
+                return value;
+            }
+            while (true);
+        }
+
+        /// <summary>
         /// Converts the value to specific type.
         /// </summary>
         /// <typeparam name="T">The type to convert to.</typeparam>
@@ -46,105 +74,50 @@ namespace FileCabinetApp.CommandHandlers
         }
 
         /// <summary>
-        /// Validates the user's value.
-        /// </summary>
-        /// <typeparam name="T">The type of value to validate.</typeparam>
-        /// <param name="validator">The specific validator.</param>
-        /// <param name="field">The field to validate.</param>
-        /// <param name="input">The value to validate.</param>
-        /// <returns>
-        /// Bool whether the validation succeeded.
-        /// Type of conversion as string.
-        /// </returns>
-        protected Tuple<bool, string> Validator<T>(IRecordValidator validator, string field, T input)
-        {
-            if (validator == null)
-            {
-                throw new ArgumentNullException($"Validator is null.");
-            }
-
-            bool validationSucceeded;
-            string validationType = field + " field";
-            string validatorType = this.service.GetValidatorType();
-            validatorType = validatorType.First().ToString(CultureInfo.InvariantCulture).ToUpper() + validatorType.Substring(1);
-
-            var asm = Assembly.Load("FileCabinetApp");
-            var partValidatorType = asm.GetTypes().Where(v => v.Name.Contains(field, StringComparison.InvariantCulture) && v.Name.Contains(validatorType.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture)).ToList();
-            MethodInfo validateMethod = partValidatorType[0].GetMethod("Validate");
-            object classInstance = Activator.CreateInstance(partValidatorType[0], null);
-            validationSucceeded = (bool)validateMethod.Invoke(classInstance, new object[] { input });
-
-            return new Tuple<bool, string>(validationSucceeded, validationType);
-        }
-
-        /// <summary>
         /// Requests and checks the user's input.
         /// </summary>
         /// <param name="id">Id to create the record with.</param>
         /// <returns>Valid record.</returns>
         protected FileCabinetRecord CheckRecordInput(int id = 1)
         {
-            Console.WriteLine("First Name: ");
-            string tmpFirstName = this.ReadInput(Converter<string>, this.Validator, "FirstName");
+            FileCabinetRecord record = null;
+            string exceptionMessage = null;
 
-            Console.WriteLine("Last Name: ");
-            string tmpLastName = this.ReadInput(Converter<string>, this.Validator, "LastName");
-
-            Console.WriteLine("Date of Birth: ");
-            DateTime tmpDateOfBirth = this.ReadInput(Converter<DateTime>, this.Validator, "DateOfBirth");
-
-            Console.WriteLine("Favourite number: ");
-            short tmpFavouriteNumber = this.ReadInput(Converter<short>, this.Validator, "FavouriteNumber");
-
-            Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = this.ReadInput(Converter<char>, this.Validator, "FavouriteCharacter");
-
-            Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = this.ReadInput(Converter<string>, this.Validator, "FavouriteGame");
-
-            Console.WriteLine("Donations: ");
-            decimal tmpDonations = this.ReadInput(Converter<decimal>, this.Validator, "Donations");
-
-            FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
-
-            return record;
-        }
-
-        /// <summary>
-        /// Parses and validates the user's input.
-        /// </summary>
-        /// <typeparam name="T">The type of input.</typeparam>
-        /// <param name="converter">Converter from string to specific type.</param>
-        /// <param name="validator">Validator for the converted input.</param>
-        /// <param name="field">Field to check.</param>
-        /// <returns>Converted and validated value.</returns>
-        protected T ReadInput<T>(Func<string, Tuple<bool, string, T>> converter, Func<IRecordValidator, string, T, Tuple<bool, string>> validator, string field)
-        {
             do
             {
-                T value;
+                Console.WriteLine("First Name: ");
+                string tmpFirstName = ReadInput(Converter<string>);
 
-                var input = Console.ReadLine();
-                var conversionResult = converter(input);
+                Console.WriteLine("Last Name: ");
+                string tmpLastName = ReadInput(Converter<string>);
 
-                if (!conversionResult.Item1)
+                Console.WriteLine("Date of Birth: ");
+                DateTime tmpDateOfBirth = ReadInput(Converter<DateTime>);
+
+                Console.WriteLine("Favourite number: ");
+                short tmpFavouriteNumber = ReadInput(Converter<short>);
+
+                Console.WriteLine("Favourite character: ");
+                char tmpFavouriteCharacter = ReadInput(Converter<char>);
+
+                Console.WriteLine("Favourite game: ");
+                string tmpFavouriteGame = ReadInput(Converter<string>);
+
+                Console.WriteLine("Donations: ");
+                decimal tmpDonations = ReadInput(Converter<decimal>);
+
+                record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
+                exceptionMessage = this.service.GetValidator().Validate(record);
+                if (exceptionMessage != null)
                 {
-                    Console.WriteLine($"Conversion failed: {conversionResult.Item2}. Please, correct your input.");
-                    continue;
+                    Console.WriteLine("Validation failed:");
+                    Console.WriteLine(exceptionMessage);
+                    Console.WriteLine("Please Try again.");
                 }
-
-                value = conversionResult.Item3;
-
-                var validationResult = validator(this.service.GetValidator(), field, value);
-                if (!validationResult.Item1)
-                {
-                    Console.WriteLine($"Validation failed: {validationResult.Item2}. Please, correct your input.");
-                    continue;
-                }
-
-                return value;
             }
-            while (true);
+            while (exceptionMessage != null);
+
+            return record;
         }
     }
 }

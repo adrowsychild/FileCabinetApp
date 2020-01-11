@@ -25,8 +25,8 @@ namespace FileCabinetApp.Validators
         /// Validates donations of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether donations are valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
@@ -35,10 +35,10 @@ namespace FileCabinetApp.Validators
 
             if (record.Donations < this.minValue)
             {
-                return false;
+                return "Donations are invalid. Should be more than " + this.minValue + ".";
             }
 
-            return true;
+            return null;
         }
     }
 }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using FileCabinetApp.CommandHandlers;
+using FileCabinetApp.Extensions;
 using FileCabinetApp.Printers;
+using FileCabinetApp.Validators;
 
 namespace FileCabinetApp
 {
@@ -50,6 +52,8 @@ namespace FileCabinetApp
 
         private static IRecordValidator validator;
 
+        private static string validatorType;
+
         private delegate void Settings(string args);
 
         /// <summary>
@@ -90,7 +94,7 @@ namespace FileCabinetApp
 
             Console.WriteLine(Program.INTRO);
 
-            Console.WriteLine("Using " + fileCabinetService.GetValidatorType() + " validation rules.");
+            Console.WriteLine("Using " + validatorType + " validation rules.");
             Console.WriteLine("Using " + fileCabinetService.GetType().ToString()[26..fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
 
             Console.WriteLine(Program.HINTMESSAGE);
@@ -231,11 +235,17 @@ namespace FileCabinetApp
         /// <param name="validationRules">Validation rules to set.</param>
         private static void SetValidationRules(string validationRules)
         {
-            validator = validationRules switch
+            switch (validationRules)
             {
-                "custom" => new CustomValidator(),
-                _ => new DefaultValidator(),
-            };
+                case "custom":
+                    validator = ValidatorExtensions.CreateСustom(new ValidatorBuilder());
+                    validatorType = "custom";
+                    break;
+                default:
+                    validator = ValidatorExtensions.CreateDefault(new ValidatorBuilder());
+                    validatorType = "default";
+                    break;
+            }
         }
 
         /// <summary>

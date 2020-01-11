@@ -27,25 +27,20 @@ namespace FileCabinetApp.Validators
         /// Validates date of birth of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether date of birth is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
                 throw new ArgumentNullException($"Record is invalid.");
             }
 
-            if (record.DateOfBirth < new DateTime(1950, 1, 1) || record.DateOfBirth > DateTime.Now)
-            {
-                return false;
-            }
-
             if ((DateTime.Today.Year - record.DateOfBirth.Year) < this.from || (DateTime.Today.Year - record.DateOfBirth.Year) > this.to)
             {
-                return false;
+                return "Date of birth is invalid. Should be from " + this.from + " to " + this.to + " years old.";
             }
 
-            return true;
+            return null;
         }
     }
 }

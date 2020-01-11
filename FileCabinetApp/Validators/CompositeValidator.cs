@@ -23,17 +23,24 @@ namespace FileCabinetApp.Validators
         /// Validates user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether record is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
-            bool isValid = false;
+            string exceptionMessage = null;
+            string tmpExceptionMessage = null;
 
             foreach (var validator in this.validators)
             {
-                isValid = validator.Validate(record);
+                tmpExceptionMessage = validator.Validate(record);
+                if (tmpExceptionMessage != null)
+                {
+                    exceptionMessage += tmpExceptionMessage;
+                    exceptionMessage += "\n";
+                    tmpExceptionMessage = null;
+                }
             }
 
-            return isValid;
+            return exceptionMessage;
         }
     }
 }

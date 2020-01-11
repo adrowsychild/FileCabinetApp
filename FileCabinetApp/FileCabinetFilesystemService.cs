@@ -60,8 +60,8 @@ namespace FileCabinetApp
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
@@ -201,8 +201,8 @@ namespace FileCabinetApp
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            string validationException = this.validator.ValidateParameters(record);
-            if (validationException != null)
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
@@ -393,17 +393,6 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Gets the validator type.
-        /// </summary>
-        /// <returns>The type of validator in string form.</returns>
-        public string GetValidatorType()
-        {
-            int validatorIndex = this.validator.GetType().ToString().IndexOf("Validator", StringComparison.InvariantCulture);
-            string validationType = this.validator.GetType().ToString()[15..validatorIndex].ToLower();
-            return validationType;
-        }
-
-        /// <summary>
         /// Makes a snapshot of records in the concrete moment.
         /// </summary>
         /// <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
@@ -430,7 +419,7 @@ namespace FileCabinetApp
 
             foreach (var record in snapshot.Records)
             {
-                string exceptionMessage = this.validator.ValidateParameters(record);
+                string exceptionMessage = this.validator.Validate(record);
                 if (exceptionMessage == null)
                 {
                     if (this.ids.Contains(record.Id))
@@ -446,7 +435,7 @@ namespace FileCabinetApp
                 }
                 else
                 {
-                    Console.WriteLine("#" + record.Id + " record is invalid: " + exceptionMessage);
+                    Console.WriteLine("#" + record.Id + " record is invalid.");
                 }
             }
 

@@ -26,8 +26,8 @@ namespace FileCabinetApp.Validators
         /// Validates favourite character of user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Whether favourite character is valid.</returns>
-        public bool Validate(FileCabinetRecord record)
+        /// <returns>Exception message.</returns>
+        public string Validate(FileCabinetRecord record)
         {
             if (record == null)
             {
@@ -36,7 +36,7 @@ namespace FileCabinetApp.Validators
 
             if (!char.IsLetter(record.FavouriteCharacter))
             {
-                return false;
+                return "Favourite character is invalid. Should be letter.";
             }
 
             switch (this.symbolCase)
@@ -44,7 +44,7 @@ namespace FileCabinetApp.Validators
                 case -1:
                     if (char.IsUpper(record.FavouriteCharacter))
                     {
-                        return false;
+                        return "Favourite character is invalid. Should be lowercase.";
                     }
 
                     break;
@@ -52,13 +52,13 @@ namespace FileCabinetApp.Validators
                 case 1:
                     if (char.IsLower(record.FavouriteCharacter))
                     {
-                        return false;
+                        return "Favourite character is invalid. Should be uppercase.";
                     }
 
                     break;
             }
 
-            return true;
+            return null;
         }
     }
 }

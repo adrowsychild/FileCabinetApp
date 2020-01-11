@@ -54,6 +54,8 @@ namespace FileCabinetApp
 
         private static string validatorType;
 
+        private static string serviceType;
+
         private delegate void Settings(string args);
 
         /// <summary>
@@ -95,7 +97,7 @@ namespace FileCabinetApp
             Console.WriteLine(Program.INTRO);
 
             Console.WriteLine("Using " + validatorType + " validation rules.");
-            Console.WriteLine("Using " + fileCabinetService.GetType().ToString()[26..fileCabinetService.GetType().ToString().IndexOf("Service", StringComparison.InvariantCulture)].ToLower() + " service type.");
+            Console.WriteLine("Using " + serviceType + " service type.");
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
@@ -259,10 +261,12 @@ namespace FileCabinetApp
                 case "file":
                     FileStream fileStream = new FileStream(FILENAME, FileMode.Create);
                     fileCabinetService = new FileCabinetFilesystemService(fileStream, validator);
+                    serviceType = "file";
 
                     break;
                 default:
                     fileCabinetService = new FileCabinetMemoryService(validator);
+                    serviceType = "memory";
                     break;
             }
         }

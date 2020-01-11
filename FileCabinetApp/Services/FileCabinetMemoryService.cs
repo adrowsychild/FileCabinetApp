@@ -4,11 +4,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
-    using System.Reflection;
-    using System.Xml;
-    using System.Xml.Serialization;
     using FileCabinetApp.Interfaces;
 
     /// <summary>
@@ -57,13 +53,7 @@
             }
 
             this.list.Add(record);
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-
+            this.UpdateDictionaries(record);
             this.ids.Add(record.Id);
 
             return record.Id;
@@ -82,13 +72,7 @@
             }
 
             this.list.Add(record);
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-
+            this.UpdateDictionaries(record);
             this.ids.Add(record.Id);
 
             return record.Id;
@@ -119,12 +103,7 @@
             this.ids.Remove(this.list[indexOfPrev].Id);
 
             this.list[indexOfPrev] = record;
-
-            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
-
-            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
-
-            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+            this.UpdateDictionaries(record);
 
             return 0;
         }
@@ -282,14 +261,6 @@
         }
 
         /// <summary>
-        /// Clears the list.
-        /// </summary>
-        public void Close()
-        {
-            this.list.Clear();
-        }
-
-        /// <summary>
         /// Adds a new record to the dictionary by given key.
         /// </summary>
         /// <param name="record">The record to add.</param>
@@ -335,6 +306,19 @@
             {
                 throw new ArgumentException("No records found.");
             }
+        }
+
+        /// <summary>
+        /// Updates all the dictionaries.
+        /// </summary>
+        /// <param name="record">Record to get values from.</param>
+        private void UpdateDictionaries(FileCabinetRecord record)
+        {
+            UpdateDictionary(record, this.firstNameDictionary, record.FirstName);
+
+            UpdateDictionary(record, this.lastNameDictionary, record.LastName);
+
+            UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
     }
 }

@@ -27,7 +27,7 @@ namespace FileCabinetApp.Validators
         public string Validate(FileCabinetRecord record)
         {
             string exceptionMessage = null;
-            string tmpExceptionMessage = null;
+            string tmpExceptionMessage;
 
             foreach (var validator in this.validators)
             {

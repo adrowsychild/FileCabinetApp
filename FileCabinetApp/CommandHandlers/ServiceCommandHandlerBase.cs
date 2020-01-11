@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using FileCabinetApp.Validators.DefaultValidator;
+using FileCabinetApp.Validators;
 
 namespace FileCabinetApp.CommandHandlers
 {
@@ -85,25 +85,25 @@ namespace FileCabinetApp.CommandHandlers
         protected FileCabinetRecord CheckRecordInput(int id = 1)
         {
             Console.WriteLine("First Name: ");
-            string tmpFirstName = this.ReadInput(Converter<string>, Validator, "FirstName");
+            string tmpFirstName = this.ReadInput(Converter<string>, this.Validator, "FirstName");
 
             Console.WriteLine("Last Name: ");
-            string tmpLastName = this.ReadInput(Converter<string>, Validator, "LastName");
+            string tmpLastName = this.ReadInput(Converter<string>, this.Validator, "LastName");
 
             Console.WriteLine("Date of Birth: ");
-            DateTime tmpDateOfBirth = this.ReadInput(Converter<DateTime>, Validator, "DateOfBirth");
+            DateTime tmpDateOfBirth = this.ReadInput(Converter<DateTime>, this.Validator, "DateOfBirth");
 
             Console.WriteLine("Favourite number: ");
-            short tmpFavouriteNumber = this.ReadInput(Converter<short>, Validator, "FavouriteNumber");
+            short tmpFavouriteNumber = this.ReadInput(Converter<short>, this.Validator, "FavouriteNumber");
 
             Console.WriteLine("Favourite character: ");
-            char tmpFavouriteCharacter = this.ReadInput(Converter<char>, Validator, "FavouriteCharacter");
+            char tmpFavouriteCharacter = this.ReadInput(Converter<char>, this.Validator, "FavouriteCharacter");
 
             Console.WriteLine("Favourite game: ");
-            string tmpFavouriteGame = this.ReadInput(Converter<string>, Validator, "FavouriteGame");
+            string tmpFavouriteGame = this.ReadInput(Converter<string>, this.Validator, "FavouriteGame");
 
             Console.WriteLine("Donations: ");
-            decimal tmpDonations = this.ReadInput(Converter<decimal>, Validator, "Donations");
+            decimal tmpDonations = this.ReadInput(Converter<decimal>, this.Validator, "Donations");
 
             FileCabinetRecord record = new FileCabinetRecord(id, tmpFirstName, tmpLastName, tmpDateOfBirth, tmpFavouriteNumber, tmpFavouriteCharacter, tmpFavouriteGame, tmpDonations);
 

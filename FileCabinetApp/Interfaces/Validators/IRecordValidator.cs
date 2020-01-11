@@ -12,7 +12,7 @@ namespace FileCabinetApp
         /// Validates the user's input.
         /// </summary>
         /// <param name="record">Record to validate.</param>
-        /// <returns>Exception message.</returns>
-        string ValidateParameters(FileCabinetRecord record);
+        /// <returns>The result of validation.</returns>
+        bool Validate(FileCabinetRecord record);
     }
 }

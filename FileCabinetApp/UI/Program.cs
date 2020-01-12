@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FileCabinetApp.CommandHandlers;
-using FileCabinetApp.Extensions;
+using FileCabinetApp.Extensions.ValidatorExtensions;
 using FileCabinetApp.Printers;
 using FileCabinetApp.Validators;
 
@@ -240,11 +240,11 @@ namespace FileCabinetApp
             switch (validationRules)
             {
                 case "custom":
-                    validator = ValidatorExtensions.CreateСustom(new ValidatorBuilder());
+                    validator = ValidatorExtension.CreateСustom(new ValidatorBuilder());
                     validatorType = "custom";
                     break;
                 default:
-                    validator = ValidatorExtensions.CreateDefault(new ValidatorBuilder());
+                    validator = ValidatorExtension.CreateDefault(new ValidatorBuilder());
                     validatorType = "default";
                     break;
             }

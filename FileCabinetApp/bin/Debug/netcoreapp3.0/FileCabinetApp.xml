@@ -456,19 +456,187 @@
             </summary>
             <value> Given donations. </value>
         </member>
-        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions">
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.AgeConstraints">
+            <summary>
+            Data class for Json serialization.
+            Contains Age validation rules.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.AgeConstraints.From">
+            <summary>
+            Gets or sets minimum possible age.
+            </summary>
+            <value>Minimum possible age.</value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.AgeConstraints.To">
+            <summary>
+            Gets or sets maximum possible age.
+            </summary>
+            <value>Maximum possible age.</value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.AppConfiguration">
+            <summary>
+            Data class designed for Json serialization.
+            Contains custom and default rulesets.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.AppConfiguration.Default">
+            <summary>
+            Gets or sets default validation ruleset.
+            </summary>
+            <value>
+            Default validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.AppConfiguration.Custom">
+            <summary>
+            Gets or sets custom validation ruleset.
+            </summary>
+            <value>
+            custom validation ruleset.
+            </value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.DonationsConstraints">
+            <summary>
+            Data class for Json serialization.
+            Contains donations validation rules.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.DonationsConstraints.MinValue">
+            <summary>
+            Gets or sets minimum possible value.
+            </summary>
+            <value>Minimum possible value.</value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.FavCharConstraints">
+            <summary>
+            Data class for Json serialization.
+            Contains favourite character validation rules.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.FavCharConstraints.SymbolCase">
+            <summary>
+            Gets or sets case of character. 0 if case insensitive,
+            -1 if only lowercase allowed, 1 if only uppercase allowed.
+            </summary>
+            <value>Case of character: 0 if case insensitive,
+            -1 if only lowercase allowed, 1 if only uppercase allowed.</value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.FavNumConstraints">
+            <summary>
+            Data class for Json serialization.
+            Contains favourite number validation rules.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.FavNumConstraints.MinValue">
+            <summary>
+            Gets or sets minimum possible value.
+            </summary>
+            <value>Minimum possible value.</value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.FavNumConstraints.MaxValue">
+            <summary>
+            Gets or sets maximum possible value.
+            </summary>
+            <value>Maximum possible value.</value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.StringConstraints">
+            <summary>
+            Data class for Json serialization.
+            Contains Name validation rules.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.StringConstraints.MinLength">
+            <summary>
+            Gets or sets minimum possible length of the name.
+            </summary>
+            <value>
+            Minimum possible length of the name.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.StringConstraints.MaxLength">
+            <summary>
+            Gets or sets maximum possible length of the name.
+            </summary>
+            <value>
+            Maximum possible length of the name.
+            </value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset">
+            <summary>
+            Data class designed for Json deserialization.
+            Contains validation ruleset for all FileCabinetRecord properties.
+            </summary>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.FirstName">
+            <summary>
+            Gets or sets first name validation ruleset.
+            </summary>
+            <value>
+            First name validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.LastName">
+            <summary>
+            Gets or sets last name validation ruleset.
+            </summary>
+            <value>
+            Last name validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.DateOfBirth">
+            <summary>
+            Gets or sets date of birth validation ruleset.
+            </summary>
+            <value>
+            Date of birth validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.FavNumber">
+            <summary>
+            Gets or sets favourite number validation ruleset.
+            </summary>
+            <value>
+            Favourite number validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.FavCharacter">
+            <summary>
+            Gets or sets favourite character validation ruleset.
+            </summary>
+            <value>
+            Favourite character validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.FavGame">
+            <summary>
+            Gets or sets favourite game validation ruleset.
+            </summary>
+            <value>
+            Favourite game validation ruleset.
+            </value>
+        </member>
+        <member name="P:FileCabinetApp.Extensions.ValidatorExtensions.ValidationRuleset.Donations">
+            <summary>
+            Gets or sets donations validation ruleset.
+            </summary>
+            <value>
+            Donations validation ruleset.
+            </value>
+        </member>
+        <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.ValidatorExtension">
             <summary>
             Extends ValidatorBuilder class.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.Extensions.ValidatorExtensions.CreateDefault(FileCabinetApp.Validators.ValidatorBuilder)">
+        <member name="M:FileCabinetApp.Extensions.ValidatorExtensions.ValidatorExtension.CreateDefault(FileCabinetApp.Validators.ValidatorBuilder)">
             <summary>
             Creates default validator.
             </summary>
             <param name="validatorBuilder">The instance of ValidatorBuilder class.</param>
             <returns>The instance of IRecordValidator class.</returns>
         </member>
-        <member name="M:FileCabinetApp.Extensions.ValidatorExtensions.CreateСustom(FileCabinetApp.Validators.ValidatorBuilder)">
+        <member name="M:FileCabinetApp.Extensions.ValidatorExtensions.ValidatorExtension.CreateСustom(FileCabinetApp.Validators.ValidatorBuilder)">
             <summary>
             Creates custom validator.
             </summary>
@@ -895,6 +1063,13 @@
             <param name="record">User's info.</param>
             <returns>User's id in the users' list.</returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.AddRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds record to the list of records.
+            </summary>
+            <param name="record">Record to add.</param>
+            <returns>Record's id.</returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.EditRecord(FileCabinetApp.FileCabinetRecord)">
             <summary>
             Edits the existing record.
@@ -917,13 +1092,6 @@
             <returns>The number of purged records,
             -1 if not all the records were purged.
             </returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.AddRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds record to the list of records.
-            </summary>
-            <param name="record">Record to add.</param>
-            <returns>Record's id.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFirstName(System.String)">
             <summary>
@@ -988,6 +1156,11 @@
             </summary>
             <param name="snapshot">A snapshot to restore.</param>
             <returns>Number of imported records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.PurgeIds">
+            <summary>
+            Removes duplicates from the ids list.
+            </summary>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindOffsetById(System.Int32)">
             <summary>
@@ -1128,6 +1301,12 @@
             <param name="key">The key to search by.</param>
             <param name="dictionary">The dictionary to search in.</param>
             <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.UpdateDictionaries(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Updates all the dictionaries.
+            </summary>
+            <param name="record">Record to get values from.</param>
         </member>
         <member name="T:FileCabinetApp.Program">
             <summary>

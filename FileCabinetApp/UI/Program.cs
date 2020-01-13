@@ -56,6 +56,8 @@ namespace FileCabinetApp
 
         private static string serviceType;
 
+        private static bool stopwatchAdded;
+
         private delegate void Settings(string args);
 
         /// <summary>
@@ -76,6 +78,13 @@ namespace FileCabinetApp
                     if (i != args.Length)
                     {
                         tempArgs[1] = args[i];
+                    }
+
+                    if (tempArgs[0] == "--use-stopwatch")
+                    {
+                        stopwatchAdded = true;
+                        i++;
+                        continue;
                     }
 
                     int parsedSetting = SettingsParser(tempArgs);
@@ -101,6 +110,11 @@ namespace FileCabinetApp
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
+
+            if (stopwatchAdded)
+            {
+                fileCabinetService = new ServiceMeter(fileCabinetService);
+            }
 
             var commandHandler = CreateCommandHandlers();
 
@@ -269,6 +283,11 @@ namespace FileCabinetApp
                     serviceType = "memory";
                     break;
             }
+        }
+
+        private static void AddStopwatch(string args)
+        {
+            stopwatchAdded = true;
         }
     }
 }

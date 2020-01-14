@@ -1367,6 +1367,29 @@
             </summary>
             <param name="offset">Offset to read from.</param>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.UpdateDictionary``1(System.Collections.Generic.SortedList{``0,System.Collections.Generic.List{System.Int32}},``0,System.Int32)">
+            <summary>
+            Updates a single dictionary containing offset.
+            </summary>
+            <typeparam name="T">Specifies the type of property.</typeparam>
+            <param name="dictionary">Dictionary to update.</param>
+            <param name="value">Key to add or find by.</param>
+            <param name="offset">Offset to add.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.UpdateOffsets(FileCabinetApp.FileCabinetRecord,System.Int32)">
+            <summary>
+            Updates all the dictionaries containing offsets.
+            </summary>
+            <param name="record">Record to add properties from.</param>
+            <param name="recordOffset">Record's offset in the file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.DeleteOffsets(FileCabinetApp.FileCabinetRecord,System.Int32)">
+            <summary>
+            Deletes from all the dictionaries containing offsets.
+            </summary>
+            <param name="record">Record to delelte properties from.</param>
+            <param name="recordOffset">Record's offset in the file.</param>
+        </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>
             Class for working with list of users.

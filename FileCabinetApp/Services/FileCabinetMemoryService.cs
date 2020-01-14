@@ -320,5 +320,10 @@
 
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
+
+        public void Close()
+        {
+            //
+        }
     }
 }

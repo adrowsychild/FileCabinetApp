@@ -57,6 +57,7 @@ namespace FileCabinetApp
         private static string serviceType;
 
         private static bool stopwatchAdded;
+        private static bool loggerAdded;
 
         private delegate void Settings(string args);
 
@@ -86,6 +87,12 @@ namespace FileCabinetApp
                         i++;
                         continue;
                     }
+                    else if (tempArgs[0] == "--use-logger")
+                    {
+                        loggerAdded = true;
+                        i++;
+                        continue;
+                    }
 
                     int parsedSetting = SettingsParser(tempArgs);
                     if (parsedSetting == 0)
@@ -110,6 +117,14 @@ namespace FileCabinetApp
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
+
+            StreamWriter logWriter = null;
+
+            if (loggerAdded)
+            {
+                logWriter = new StreamWriter("logs.txt", true, System.Text.Encoding.Default);
+                fileCabinetService = new ServiceLogger(fileCabinetService, logWriter);
+            }
 
             if (stopwatchAdded)
             {
@@ -136,6 +151,11 @@ namespace FileCabinetApp
                 commandHandler.Handle(new AppCommandRequest(command, parameters));
             }
             while (isRunning);
+
+            if (loggerAdded == true)
+            {
+                logWriter.Close();
+            }
         }
 
         private static void ChangeServiceState(bool toSet)

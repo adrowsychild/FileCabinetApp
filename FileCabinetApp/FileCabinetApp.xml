@@ -1016,6 +1016,110 @@
             </summary>
             <param name="record">Record to print.</param>
         </member>
+        <member name="T:FileCabinetApp.ServiceLogger">
+            <summary>
+            Class for adding loggs of service's methods to the file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.#ctor(FileCabinetApp.IFileCabinetService,System.IO.StreamWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.ServiceLogger"/> class.
+            </summary>
+            <param name="service">Service to decorate.</param>
+            <param name="writer">Writer to write to.</param>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.AddRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about AddRecord method in the textfile.
+            </summary>
+            <param name="record">Record to add.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.CreateRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about CreateRecord method in the textfile.
+            </summary>
+            <param name="record">Record to create.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.EditRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about EditRecord method in the textfile.
+            </summary>
+            <param name="record">Record to edit.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByDateOfBirth(System.String)">
+            <summary>
+            Adds logs about FindByDateOfBirth method in the textfile.
+            </summary>
+            <param name="dateOfBirth">Date of birth to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByFirstName(System.String)">
+            <summary>
+            Adds logs about FindByFirstName method in the textfile.
+            </summary>
+            <param name="firstName">First name to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByLastName(System.String)">
+            <summary>
+            Adds logs about FindByLastName method in the textfile.
+            </summary>
+            <param name="lastName">Last name to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetDeleted">
+            <summary>
+            Returns the number of deleted records in the list.
+            </summary>
+            <returns>The number of deleted records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetIds">
+            <summary>
+            Returns list of ids in the list.
+            </summary>
+            <returns>List of ids in the list.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetRecords">
+            <summary>
+            Adds logs about GetRecords method in the textfile.
+            </summary>
+            <returns>The list of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetStat">
+            <summary>
+            Adds logs about GetStat method in the textfile.
+            </summary>
+            <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetValidator">
+            <summary>
+            Gets the validator.
+            </summary>
+            <returns>Validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.MakeSnapshot">
+            <summary>
+            Adds logs about MakeSnapshot method in the textfile.
+            </summary>
+            <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.RemoveRecord(System.Int32)">
+            <summary>
+            Adds logs about Remove method in the textfile.
+            </summary>
+            <param name="id">Id to remove by.</param>
+            <returns>Id of removed record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.Restore(FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot)">
+            <summary>
+            Adds logs about Restore method in the textfile.
+            </summary>
+            <param name="snapshot">Snapshot to restore by.</param>
+            <returns>Number of imported records.</returns>
+        </member>
         <member name="T:FileCabinetApp.ServiceMeter">
             <summary>
             Class for measuring timings of service's methods.

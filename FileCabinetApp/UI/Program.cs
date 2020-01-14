@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FileCabinetApp.CommandHandlers;
-using FileCabinetApp.Extensions;
+using FileCabinetApp.Extensions.ValidatorExtensions;
 using FileCabinetApp.Printers;
 using FileCabinetApp.Validators;
 
@@ -56,6 +56,9 @@ namespace FileCabinetApp
 
         private static string serviceType;
 
+        private static bool stopwatchAdded;
+        private static bool loggerAdded;
+
         private delegate void Settings(string args);
 
         /// <summary>
@@ -76,6 +79,19 @@ namespace FileCabinetApp
                     if (i != args.Length)
                     {
                         tempArgs[1] = args[i];
+                    }
+
+                    if (tempArgs[0] == "--use-stopwatch")
+                    {
+                        stopwatchAdded = true;
+                        i++;
+                        continue;
+                    }
+                    else if (tempArgs[0] == "--use-logger")
+                    {
+                        loggerAdded = true;
+                        i++;
+                        continue;
                     }
 
                     int parsedSetting = SettingsParser(tempArgs);
@@ -102,6 +118,19 @@ namespace FileCabinetApp
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
 
+            StreamWriter logWriter = null;
+
+            if (loggerAdded)
+            {
+                logWriter = new StreamWriter("logs.txt", true, System.Text.Encoding.Default);
+                fileCabinetService = new ServiceLogger(fileCabinetService, logWriter);
+            }
+
+            if (stopwatchAdded)
+            {
+                fileCabinetService = new ServiceMeter(fileCabinetService);
+            }
+
             var commandHandler = CreateCommandHandlers();
 
             do
@@ -122,6 +151,11 @@ namespace FileCabinetApp
                 commandHandler.Handle(new AppCommandRequest(command, parameters));
             }
             while (isRunning);
+
+            if (loggerAdded == true)
+            {
+                logWriter.Close();
+            }
         }
 
         private static void ChangeServiceState(bool toSet)
@@ -240,11 +274,11 @@ namespace FileCabinetApp
             switch (validationRules)
             {
                 case "custom":
-                    validator = ValidatorExtensions.CreateСustom(new ValidatorBuilder());
+                    validator = ValidatorExtension.CreateСustom(new ValidatorBuilder());
                     validatorType = "custom";
                     break;
                 default:
-                    validator = ValidatorExtensions.CreateDefault(new ValidatorBuilder());
+                    validator = ValidatorExtension.CreateDefault(new ValidatorBuilder());
                     validatorType = "default";
                     break;
             }
@@ -269,6 +303,11 @@ namespace FileCabinetApp
                     serviceType = "memory";
                     break;
             }
+        }
+
+        private static void AddStopwatch(string args)
+        {
+            stopwatchAdded = true;
         }
     }
 }

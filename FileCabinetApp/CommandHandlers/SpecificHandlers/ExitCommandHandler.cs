@@ -7,7 +7,7 @@ namespace FileCabinetApp.CommandHandlers
     /// <summary>
     /// Handler for the user's 'exit' command.
     /// </summary>
-    public class ExitCommandHandler : CommandHandlerBase
+    public class ExitCommandHandler : ServiceCommandHandlerBase
     {
         private Action<bool> state;
 

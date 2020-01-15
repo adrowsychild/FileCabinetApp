@@ -14,5 +14,7 @@ namespace FileCabinetApp.Interfaces
         /// </summary>
         /// <param name="records">Records to print.</param>
         void Print(IEnumerable<FileCabinetRecord> records);
+
+        public void Print(IRecordIterator records);
     }
 }

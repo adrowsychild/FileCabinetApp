@@ -137,9 +137,9 @@
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IRecordIterator FindByFirstName(string firstName)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            IRecordIterator foundRecords = FindByKey(firstName, this.firstNameDictionary);
             return foundRecords;
         }
 
@@ -148,9 +148,9 @@
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IRecordIterator FindByLastName(string lastName)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            IRecordIterator foundRecords = FindByKey(lastName, this.lastNameDictionary);
             return foundRecords;
         }
 
@@ -159,9 +159,9 @@
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            IRecordIterator foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
             return foundRecords;
         }
 
@@ -290,7 +290,7 @@
         /// <param name="key">The key to search by.</param>
         /// <param name="dictionary">The dictionary to search in.</param>
         /// <returns>The array of records.</returns>
-        private static ReadOnlyCollection<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
+        private static IRecordIterator FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -299,8 +299,8 @@
 
             if (dictionary.ContainsKey(key.ToLower()))
             {
-                ReadOnlyCollection<FileCabinetRecord> foundRecords = new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]);
-                return foundRecords;
+                IRecordIterator iterator = new MemoryIterator(new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]));
+                return iterator;
             }
             else
             {

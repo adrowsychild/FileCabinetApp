@@ -15,7 +15,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetFilesystemService : IFileCabinetService
     {
-        private const int RecordSize = 400;
+        public const int RecordSize = 400;
         private const int StringSize = 120;
 
         private const int IdOffset = 2;
@@ -248,7 +248,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IRecordIterator FindByFirstName(string firstName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -267,7 +267,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -275,7 +275,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IRecordIterator FindByLastName(string lastName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -294,7 +294,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -323,7 +323,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -468,7 +468,7 @@ namespace FileCabinetApp
         /// Reads the record from the file.
         /// </summary>
         /// <param name="offset">Offset to read from.</param>
-        private FileCabinetRecord ReadRecord(int offset)
+        public FileCabinetRecord ReadRecord(int offset)
         {
             this.fileStream.Seek(offset, SeekOrigin.Begin);
             byte[] reservedBytes = new byte[2];

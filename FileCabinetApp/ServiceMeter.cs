@@ -74,10 +74,10 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
         {
             this.watch = Stopwatch.StartNew();
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = this.service.FindByDateOfBirth(dateOfBirth);
+            var foundRecords = this.service.FindByDateOfBirth(dateOfBirth);
             this.watch.Stop();
             Console.WriteLine($"FindByDateOfBirth method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 
@@ -89,10 +89,10 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IRecordIterator FindByFirstName(string firstName)
         {
             this.watch = Stopwatch.StartNew();
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = this.service.FindByFirstName(firstName);
+            var foundRecords = this.service.FindByFirstName(firstName);
             this.watch.Stop();
             Console.WriteLine($"FindByFirstName method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 
@@ -104,10 +104,10 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IRecordIterator FindByLastName(string lastName)
         {
             this.watch = Stopwatch.StartNew();
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = this.service.FindByLastName(lastName);
+            var foundRecords = this.service.FindByLastName(lastName);
             this.watch.Stop();
             Console.WriteLine($"FindByLastName method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 

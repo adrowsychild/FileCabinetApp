@@ -882,6 +882,23 @@
             </summary>
             <returns>List of records.</returns>
         </member>
+        <member name="T:FileCabinetApp.Interfaces.IRecordIterator">
+            <summary>
+            Iterator for iterating over records.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IRecordIterator.GetNext">
+            <summary>
+            Gets the next record from the list.
+            </summary>
+            <returns>A single record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.Interfaces.IRecordIterator.HasMore">
+            <summary>
+            Whether collection has more records.
+            </summary>
+            <returns>Bool whether collection has more records.</returns>
+        </member>
         <member name="T:FileCabinetApp.Interfaces.IRecordPrinter">
             <summary>
             Printer for the records.
@@ -1015,6 +1032,12 @@
             Prints single record.
             </summary>
             <param name="record">Record to print.</param>
+        </member>
+        <member name="M:FileCabinetApp.Printers.DefaultRecordPrinter.Print(FileCabinetApp.Interfaces.IRecordIterator)">
+            <summary>
+            Prints the list of records to the user.
+            </summary>
+            <param name="records">Records to print.</param>
         </member>
         <member name="T:FileCabinetApp.ServiceLogger">
             <summary>
@@ -1346,13 +1369,6 @@
             <summary>
             Removes duplicates from the ids list.
             </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindOffsetById(System.Int32)">
-            <summary>
-            Searches for the record by id.
-            </summary>
-            <param name="id">Id to search by.</param>
-            <returns>Offset of the record.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
             <summary>

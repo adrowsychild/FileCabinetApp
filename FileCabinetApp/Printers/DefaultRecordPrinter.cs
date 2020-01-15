@@ -65,5 +65,23 @@ namespace FileCabinetApp.Printers
 
             Console.WriteLine(output);
         }
+
+        /// <summary>
+        /// Prints the list of records to the user.
+        /// </summary>
+        /// <param name="records">Records to print.</param>
+        public void Print(IRecordIterator records)
+        {
+            //IEnumerable<FileCabinetRecord> orderedRecords = ((List<FileCabinetRecord>)records).OrderBy(record => record.Id);
+            /*foreach (var record in records)
+            {
+                this.PrintRecord(record);
+            }*/
+
+            while (records.HasMore())
+            {
+                this.PrintRecord(records.GetNext());
+            }
+        }
     }
 }

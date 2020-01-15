@@ -57,7 +57,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            IReadOnlyCollection<FileCabinetRecord> foundRecords;
+            IEnumerable<FileCabinetRecord> foundRecords;
 
             try
             {

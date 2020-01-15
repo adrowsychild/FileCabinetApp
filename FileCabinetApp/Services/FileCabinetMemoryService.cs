@@ -1,6 +1,7 @@
 ﻿namespace FileCabinetApp
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
@@ -137,9 +138,9 @@
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
             return foundRecords;
         }
 
@@ -148,9 +149,9 @@
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
             return foundRecords;
         }
 
@@ -159,9 +160,9 @@
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            ReadOnlyCollection<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
             return foundRecords;
         }
 
@@ -290,7 +291,7 @@
         /// <param name="key">The key to search by.</param>
         /// <param name="dictionary">The dictionary to search in.</param>
         /// <returns>The array of records.</returns>
-        private static ReadOnlyCollection<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
+        private static IEnumerable<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -299,7 +300,7 @@
 
             if (dictionary.ContainsKey(key.ToLower()))
             {
-                ReadOnlyCollection<FileCabinetRecord> foundRecords = new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]);
+                IEnumerable<FileCabinetRecord> foundRecords = dictionary[key.ToLower()];
                 return foundRecords;
             }
             else
@@ -323,7 +324,6 @@
 
         public void Close()
         {
-            //
         }
     }
 }

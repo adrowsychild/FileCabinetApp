@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -102,25 +103,24 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Date of birth to find by.</param>
         /// <returns>List of found records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
             string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + dateOfBirth + "'" + "\n";
             this.writer.Write(toWrite);
 
-            ReadOnlyCollection<FileCabinetRecord> records = this.service.FindByDateOfBirth(dateOfBirth);
+            var records = this.service.FindByDateOfBirth(dateOfBirth);
 
             if (records != null)
             {
                 toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
 
-                for (int i = 0; i < records.Count; i++)
+                foreach (var record in records)
                 {
-                    toWrite += records[i].Id;
-                    if (i != records.Count - 1)
-                    {
-                        toWrite += ", ";
-                    }
+                    toWrite += record.Id;
+                    toWrite += " ";
                 }
+
+                toWrite += "\n";
             }
             else
             {
@@ -139,26 +139,25 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">First name to find by.</param>
         /// <returns>List of found records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with FirstName'" + firstName + "'" + "\n";
 
             this.writer.Write(toWrite);
 
-            ReadOnlyCollection<FileCabinetRecord> records = this.service.FindByFirstName(firstName);
+            var records = this.service.FindByFirstName(firstName);
 
             if (records != null)
             {
                 toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
 
-                for (int i = 0; i < records.Count; i++)
+                foreach (var record in records)
                 {
-                    toWrite += records[i].Id;
-                    if (i != records.Count - 1)
-                    {
-                        toWrite += ", ";
-                    }
+                    toWrite += record.Id;
+                    toWrite += " ";
                 }
+
+                toWrite += "\n";
             }
             else
             {
@@ -177,25 +176,24 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Last name to find by.</param>
         /// <returns>List of found records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with LastName'" + lastName + "'" + "\n";
             this.writer.Write(toWrite);
 
-            ReadOnlyCollection<FileCabinetRecord> records = this.service.FindByLastName(lastName);
+            var records = this.service.FindByLastName(lastName);
 
-            if (records != null || records.Count != 0)
+            if (records != null)
             {
                 toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
 
-                for (int i = 0; i < records.Count; i++)
+                foreach (var record in records)
                 {
-                    toWrite += records[i].Id;
-                    if (i != records.Count - 1)
-                    {
-                        toWrite += ", ";
-                    }
+                    toWrite += record.Id;
+                    toWrite += " ";
                 }
+
+                toWrite += "\n";
             }
             else
             {

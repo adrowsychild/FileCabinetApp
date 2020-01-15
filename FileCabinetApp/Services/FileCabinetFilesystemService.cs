@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -15,7 +16,7 @@ namespace FileCabinetApp
     /// </summary>
     public class FileCabinetFilesystemService : IFileCabinetService
     {
-        private const int RecordSize = 400;
+        public const int RecordSize = 400;
         private const int StringSize = 120;
 
         private const int IdOffset = 2;
@@ -25,7 +26,7 @@ namespace FileCabinetApp
         private const int MonthOffset = 250;
         private const int DayOffset = 254;
         private const int FavNumOffset = 258;
-        private const int FavCarOffset = 262;
+        private const int FavCharOffset = 262;
         private const int FavGameOffset = 382;
         private const int DonationsOffset = 398;
 
@@ -33,10 +34,20 @@ namespace FileCabinetApp
 
         private readonly IRecordValidator validator;
 
+        // field -> record's offset of field in the file
+        private SortedList<int, int> recordIdOffset = new SortedList<int, int>();
+        private SortedList<string, List<int>> recordFirstNameOffset = new SortedList<string, List<int>>();
+        private SortedList<string, List<int>> recordLastNameOffset = new SortedList<string, List<int>>();
+        private SortedList<DateTime, List<int>> recordDateOfBirthOffset = new SortedList<DateTime, List<int>>();
+        private SortedList<short, List<int>> recordFavNumberOffset = new SortedList<short, List<int>>();
+        private SortedList<char, List<int>> recordFavCharacterOffset = new SortedList<char, List<int>>();
+        private SortedList<string, List<int>> recordFavGameOffset = new SortedList<string, List<int>>();
+        private SortedList<decimal, List<int>> recordDonationsOffset = new SortedList<decimal, List<int>>();
+
         private int count;
         private int deleted;
 
-        private List<int> ids = new List<int>() { 0 };
+        private List<int> ids = new List<int>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -76,12 +87,19 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            record.Id = this.ids.Max() + 1;
+            if (this.ids.Count == 0)
+            {
+                record.Id = 1;
+            }
+            else
+            {
+                record.Id = this.ids.Max() + 1;
+            }
 
             this.count++;
             this.ids.Add(record.Id);
-
             this.WriteRecord(record, (this.count - 1) * RecordSize);
+            this.UpdateOffsets(record, (this.count - 1) * RecordSize);
 
             return record.Id;
         }
@@ -108,6 +126,7 @@ namespace FileCabinetApp
             this.ids.Add(record.Id);
 
             this.WriteRecord(record, (this.count - 1) * RecordSize);
+            this.UpdateOffsets(record, (this.count - 1) * RecordSize);
 
             return record.Id;
         }
@@ -129,7 +148,11 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            this.WriteRecord(record, this.FindOffsetById(record.Id));
+            int recordOffset = this.recordIdOffset[record.Id];
+            FileCabinetRecord prevRecord = this.ReadRecord(recordOffset);
+            this.WriteRecord(record, recordOffset);
+            this.DeleteOffsets(prevRecord, recordOffset);
+            this.UpdateOffsets(record, recordOffset);
 
             return record.Id;
         }
@@ -142,11 +165,14 @@ namespace FileCabinetApp
         /// </returns>
         public int RemoveRecord(int id)
         {
-            int offset = this.FindOffsetById(id);
+            int offset = this.recordIdOffset[id];
             if (offset == -1)
             {
                 return -1;
             }
+
+            FileCabinetRecord prevRecord = this.ReadRecord(offset);
+            this.DeleteOffsets(prevRecord, offset);
 
             // 0x0100
             ushort numToAdd = 4;
@@ -161,8 +187,6 @@ namespace FileCabinetApp
 
             return id;
         }
-
-        // removed: 31 33 35 125 127
 
         /// <summary>
         /// Purges the list of records.
@@ -232,29 +256,26 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
-            for (int i = 0; i < this.count; i++)
+            if (this.recordFirstNameOffset.ContainsKey(firstName))
             {
-                if (this.IsDeleted(RecordSize * i))
-                {
-                    continue;
-                }
+                List<int> offsets = this.recordFirstNameOffset[firstName];
 
-                this.fileStream.Seek(FirstNameOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[StringSize];
-                this.fileStream.Read(bytes, 0, StringSize);
-                string tmpFirstName = Encoding.ASCII.GetString(bytes);
-                tmpFirstName = WorkWithBytesHelper.RemoveOffset(tmpFirstName);
-                if (tmpFirstName.ToLower() == firstName.ToLower())
+                foreach (int offset in offsets)
                 {
-                    storedRecords.Add(this.ReadRecord(RecordSize * i));
+                    if (this.IsDeleted(offset))
+                    {
+                        continue;
+                    }
+
+                    storedRecords.Add(this.ReadRecord(offset));
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -262,29 +283,26 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
-            for (int i = 0; i < this.count; i++)
+            if (this.recordLastNameOffset.ContainsKey(lastName))
             {
-                if (this.IsDeleted(RecordSize * i))
-                {
-                    continue;
-                }
+                List<int> offsets = this.recordLastNameOffset[lastName];
 
-                this.fileStream.Seek(LastNameOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[StringSize];
-                this.fileStream.Read(bytes, 0, StringSize);
-                string tmpLastName = Encoding.ASCII.GetString(bytes);
-                tmpLastName = WorkWithBytesHelper.RemoveOffset(tmpLastName);
-                if (tmpLastName.ToLower() == lastName.ToLower())
+                foreach (int offset in offsets)
                 {
-                    storedRecords.Add(this.ReadRecord(RecordSize * i));
+                    if (this.IsDeleted(offset))
+                    {
+                        continue;
+                    }
+
+                    storedRecords.Add(this.ReadRecord(offset));
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -292,33 +310,28 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public ReadOnlyCollection<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
-            for (int i = 0; i < this.count; i++)
-            {
-                if (this.IsDeleted(RecordSize * i))
-                {
-                    continue;
-                }
+            DateTime parsedDateOfBirth = DateTime.ParseExact(dateOfBirth, "yyyy-MMM-d", CultureInfo.InvariantCulture);
 
-                this.fileStream.Seek(YearOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[4];
-                this.fileStream.Read(bytes, 0, sizeof(int));
-                int tmpYear = BitConverter.ToInt32(bytes);
-                this.fileStream.Read(bytes, 0, sizeof(int));
-                int tmpMonth = BitConverter.ToInt32(bytes);
-                this.fileStream.Read(bytes, 0, sizeof(int));
-                int tmpDay = BitConverter.ToInt32(bytes);
-                DateTime tmpDateOfBirth = new DateTime(tmpYear, tmpMonth, tmpDay);
-                if (tmpDateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower() == dateOfBirth.ToLower())
+            if (this.recordDateOfBirthOffset.ContainsKey(parsedDateOfBirth))
+            {
+                List<int> offsets = this.recordDateOfBirthOffset[parsedDateOfBirth];
+
+                foreach (int offset in offsets)
                 {
-                    storedRecords.Add(this.ReadRecord(RecordSize * i));
+                    if (this.IsDeleted(offset))
+                    {
+                        continue;
+                    }
+
+                    storedRecords.Add(this.ReadRecord(offset));
                 }
             }
 
-            return new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -342,6 +355,18 @@ namespace FileCabinetApp
             ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
 
             return records;
+        }
+
+        public FileCabinetRecord GetRecord(int id)
+        {
+            if (this.IsDeleted(recordIdOffset[id]))
+            {
+                return null;
+            }
+            else
+            {
+                return this.ReadRecord(recordIdOffset[id]);
+            }
         }
 
         /// <summary>
@@ -431,63 +456,10 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Removes duplicates from the ids list.
-        /// </summary>
-        private void PurgeIds()
-        {
-            this.ids = this.ids.Distinct().ToList();
-        }
-
-        /// <summary>
-        /// Searches for the record by id.
-        /// </summary>
-        /// <param name="id">Id to search by.</param>
-        /// <returns>Offset of the record.</returns>
-        private int FindOffsetById(int id)
-        {
-            int offset = -1;
-
-            for (int i = 0; i < this.count; i++)
-            {
-                this.fileStream.Seek(IdOffset + (RecordSize * i), SeekOrigin.Begin);
-                byte[] bytes = new byte[4];
-                this.fileStream.Read(bytes, 0, sizeof(int));
-                int tmpId = BitConverter.ToInt32(bytes);
-                if (tmpId == id)
-                {
-                    offset = RecordSize * i;
-                }
-            }
-
-            return offset;
-        }
-
-        /// <summary>
-        /// Writes a record to the file.
-        /// </summary>
-        /// <param name="record">A record to write.</param>
-        /// <param name="offset">Offset to start from.</param>
-        private void WriteRecord(FileCabinetRecord record, int offset)
-        {
-            this.fileStream.Seek(offset, SeekOrigin.Begin);
-            this.fileStream.Write(new byte[2], 0, sizeof(short));
-            this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.LastName, StringSize), 0, StringSize);
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
-            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
-            this.fileStream.Write(WorkWithBytesHelper.DecimalToBytes(record.Donations), 0, sizeof(decimal));
-        }
-
-        /// <summary>
         /// Reads the record from the file.
         /// </summary>
         /// <param name="offset">Offset to read from.</param>
-        private FileCabinetRecord ReadRecord(int offset)
+        public FileCabinetRecord ReadRecord(int offset)
         {
             this.fileStream.Seek(offset, SeekOrigin.Begin);
             byte[] reservedBytes = new byte[2];
@@ -523,6 +495,35 @@ namespace FileCabinetApp
             return new FileCabinetRecord(id, firstName, lastName, new DateTime(year, month, day), favNumber, favCharacter, favGame, donations);
         }
 
+        /// <summary>
+        /// Writes a record to the file.
+        /// </summary>
+        /// <param name="record">A record to write.</param>
+        /// <param name="offset">Offset to start from.</param>
+        private void WriteRecord(FileCabinetRecord record, int offset)
+        {
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            this.fileStream.Write(new byte[2], 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.LastName, StringSize), 0, StringSize);
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.DecimalToBytes(record.Donations), 0, sizeof(decimal));
+        }
+
+        /// <summary>
+        /// Removes duplicates from the ids list.
+        /// </summary>
+        private void PurgeIds()
+        {
+            this.ids = this.ids.Distinct().ToList();
+        }
+
         private bool IsDeleted(int offset)
         {
             // 0x0100
@@ -537,6 +538,106 @@ namespace FileCabinetApp
             else
             {
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Updates a single dictionary containing offset.
+        /// </summary>
+        /// <typeparam name="T">Specifies the type of property.</typeparam>
+        /// <param name="dictionary">Dictionary to update.</param>
+        /// <param name="value">Key to add or find by.</param>
+        /// <param name="offset">Offset to add.</param>
+        private void UpdateDictionary<T>(SortedList<T, List<int>> dictionary, T value, int offset)
+        {
+            if (!dictionary.ContainsKey(value))
+            {
+                List<int> listOfOffsets = new List<int>
+                {
+                    offset,
+                };
+
+                dictionary.Add(value, listOfOffsets);
+            }
+            else
+            {
+                dictionary[value].Add(offset);
+            }
+        }
+
+        /// <summary>
+        /// Updates all the dictionaries containing offsets.
+        /// </summary>
+        /// <param name="record">Record to add properties from.</param>
+        /// <param name="recordOffset">Record's offset in the file.</param>
+        private void UpdateOffsets(FileCabinetRecord record, int recordOffset)
+        {
+            this.recordIdOffset.Add(record.Id, recordOffset);
+            this.UpdateDictionary(this.recordFirstNameOffset, record.FirstName, recordOffset);
+            this.UpdateDictionary(this.recordLastNameOffset, record.LastName, recordOffset);
+            this.UpdateDictionary(this.recordDateOfBirthOffset, record.DateOfBirth, recordOffset);
+            /*
+            this.UpdateDictionary(this.recordFavNumberOffset, record.FavouriteNumber, recordOffset);
+            this.UpdateDictionary(this.recordFavCharacterOffset, record.FavouriteCharacter, recordOffset);
+            this.UpdateDictionary(this.recordFavGameOffset, record.FavouriteGame, recordOffset);
+            this.UpdateDictionary(this.recordDonationsOffset, record.Donations, recordOffset);
+            */
+        }
+
+        /// <summary>
+        /// Deletes from all the dictionaries containing offsets.
+        /// </summary>
+        /// <param name="record">Record to delelte properties from.</param>
+        /// <param name="recordOffset">Record's offset in the file.</param>
+        private void DeleteOffsets(FileCabinetRecord record, int recordOffset)
+        {
+            this.recordIdOffset.Remove(record.Id);
+            this.recordFirstNameOffset[record.FirstName].Remove(recordOffset);
+            this.recordLastNameOffset[record.LastName].Remove(recordOffset);
+            this.recordDateOfBirthOffset[record.DateOfBirth].Remove(recordOffset);
+            /*
+            this.recordFavNumberOffset[record.FavouriteNumber].Remove(recordOffset);
+            this.recordFavCharacterOffset[record.FavouriteCharacter].Remove(recordOffset);
+            this.recordFavGameOffset[record.FavouriteGame].Remove(recordOffset);
+            this.recordDonationsOffset[record.Donations].Remove(recordOffset);
+            */
+        }
+
+        /// <summary>
+        /// Enumerator for iterating through records.
+        /// </summary>
+        public class FileSystemRecordEnumerator : IEnumerable<FileCabinetRecord>
+        {
+            private int current = -1;
+            private FileCabinetFilesystemService service;
+            private ReadOnlyCollection<FileCabinetRecord> records;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="FileSystemRecordEnumerator"/> class.
+            /// </summary>
+            /// <param name="service">Service whose records to iterate through.</param>
+            /// <param name="records">Records to iterate through.</param>
+            public FileSystemRecordEnumerator(FileCabinetFilesystemService service, ReadOnlyCollection<FileCabinetRecord> records)
+            {
+                this.service = service;
+                this.records = records;
+            }
+
+            public IEnumerator<FileCabinetRecord> GetEnumerator()
+            {
+                foreach (var record in this.records)
+                {
+                    //yield return this.service.GetRecord(id);
+                    yield return record;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                foreach (var id in this.service.GetIds())
+                {
+                    yield return this.service.GetRecord(id);
+                }
             }
         }
     }

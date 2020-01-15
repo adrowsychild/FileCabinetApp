@@ -882,23 +882,6 @@
             </summary>
             <returns>List of records.</returns>
         </member>
-        <member name="T:FileCabinetApp.Interfaces.IRecordIterator">
-            <summary>
-            Iterator for iterating over records.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IRecordIterator.GetNext">
-            <summary>
-            Gets the next record from the list.
-            </summary>
-            <returns>A single record.</returns>
-        </member>
-        <member name="M:FileCabinetApp.Interfaces.IRecordIterator.HasMore">
-            <summary>
-            Whether collection has more records.
-            </summary>
-            <returns>Bool whether collection has more records.</returns>
-        </member>
         <member name="T:FileCabinetApp.Interfaces.IRecordPrinter">
             <summary>
             Printer for the records.
@@ -1033,12 +1016,6 @@
             </summary>
             <param name="record">Record to print.</param>
         </member>
-        <member name="M:FileCabinetApp.Printers.DefaultRecordPrinter.Print(FileCabinetApp.Interfaces.IRecordIterator)">
-            <summary>
-            Prints the list of records to the user.
-            </summary>
-            <param name="records">Records to print.</param>
-        </member>
         <member name="T:FileCabinetApp.ServiceLogger">
             <summary>
             Class for adding loggs of service's methods to the file.
@@ -1143,6 +1120,18 @@
             <param name="snapshot">Snapshot to restore by.</param>
             <returns>Number of imported records.</returns>
         </member>
+        <member name="M:FileCabinetApp.ServiceLogger.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
         <member name="T:FileCabinetApp.ServiceMeter">
             <summary>
             Class for measuring timings of service's methods.
@@ -1245,6 +1234,18 @@
             </summary>
             <param name="snapshot">A snapshot of records to restore.</param>
             <returns>Number of imported records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetFilesystemService">
             <summary>
@@ -1365,10 +1366,11 @@
             <param name="snapshot">A snapshot to restore.</param>
             <returns>Number of imported records.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.PurgeIds">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.ReadRecord(System.Int32)">
             <summary>
-            Removes duplicates from the ids list.
+            Reads the record from the file.
             </summary>
+            <param name="offset">Offset to read from.</param>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
             <summary>
@@ -1377,11 +1379,10 @@
             <param name="record">A record to write.</param>
             <param name="offset">Offset to start from.</param>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.ReadRecord(System.Int32)">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.PurgeIds">
             <summary>
-            Reads the record from the file.
+            Removes duplicates from the ids list.
             </summary>
-            <param name="offset">Offset to read from.</param>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.UpdateDictionary``1(System.Collections.Generic.SortedList{``0,System.Collections.Generic.List{System.Int32}},``0,System.Int32)">
             <summary>
@@ -1405,6 +1406,58 @@
             </summary>
             <param name="record">Record to delelte properties from.</param>
             <param name="recordOffset">Record's offset in the file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator">
+            <summary>
+            Enumerator for iterating through records.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator"/> class.
+            </summary>
+            <param name="service">Service whose records to iterate through.</param>
+            <param name="records">Records to iterate through.</param>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Current">
+            <summary>
+            Gets the current record.
+            </summary>
+            <value>The current record.</value>
+        </member>
+        <member name="P:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.System#Collections#IEnumerator#Current">
+            <summary>
+            Gets the current record.
+            </summary>
+            <value>The current object.</value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.MoveNext">
+            <summary>
+            Advances the enumerator to the next element of the collection.
+            </summary>
+            <returns>Whether the enumerator was successfully advanced.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Reset">
+            <summary>
+            Resets the current position.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Dispose">
+            <summary>
+            Logic after deleting the enumerator.
+            </summary>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>
@@ -1531,6 +1584,18 @@
             Updates all the dictionaries.
             </summary>
             <param name="record">Record to get values from.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Gets the enumerator.
+            </summary>
+            <returns>The instance of IEnumerator.</returns>
         </member>
         <member name="T:FileCabinetApp.Program">
             <summary>

@@ -57,7 +57,7 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            IRecordIterator foundRecords;
+            IEnumerable<FileCabinetRecord> foundRecords;
 
             try
             {

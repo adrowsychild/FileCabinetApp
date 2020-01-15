@@ -8,7 +8,7 @@ namespace FileCabinetApp
     /// <summary>
     /// Interface for class for working with list of users.
     /// </summary>
-    public interface IFileCabinetService
+    public interface IFileCabinetService : IEnumerable<FileCabinetRecord>
     {
         /// <summary>
         /// Creates a new record.
@@ -44,21 +44,21 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByFirstName(string firstName);
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName);
 
         /// <summary>
         /// Searches the records by last name.
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByLastName(string lastName);
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName);
 
         /// <summary>
         /// Searches the records by date of birth.
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByDateOfBirth(string dateOfBirth);
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth);
 
         /// <summary>
         /// Makes a snapshot of records in the concrete moment.

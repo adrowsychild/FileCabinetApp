@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -74,7 +75,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
             this.watch = Stopwatch.StartNew();
             var foundRecords = this.service.FindByDateOfBirth(dateOfBirth);
@@ -89,7 +90,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             this.watch = Stopwatch.StartNew();
             var foundRecords = this.service.FindByFirstName(firstName);
@@ -104,7 +105,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             this.watch = Stopwatch.StartNew();
             var foundRecords = this.service.FindByLastName(lastName);
@@ -227,6 +228,24 @@ namespace FileCabinetApp
             Console.WriteLine($"Restore method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 
             return imported;
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.service.GetRecords().GetEnumerator();
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        public IEnumerator<FileCabinetRecord> GetEnumerator()
+        {
+            return this.GetRecords().GetEnumerator();
         }
     }
 }

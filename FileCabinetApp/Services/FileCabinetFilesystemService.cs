@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -248,7 +249,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -267,7 +268,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
+            return storedRecords;
         }
 
         /// <summary>
@@ -275,7 +276,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -294,7 +295,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
+            return storedRecords;
         }
 
         /// <summary>
@@ -302,7 +303,7 @@ namespace FileCabinetApp
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 
@@ -323,7 +324,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return new FilesystemIterator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
+            return storedRecords;
         }
 
         /// <summary>
@@ -436,35 +437,6 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Removes duplicates from the ids list.
-        /// </summary>
-        private void PurgeIds()
-        {
-            this.ids = this.ids.Distinct().ToList();
-        }
-
-        /// <summary>
-        /// Writes a record to the file.
-        /// </summary>
-        /// <param name="record">A record to write.</param>
-        /// <param name="offset">Offset to start from.</param>
-        private void WriteRecord(FileCabinetRecord record, int offset)
-        {
-            this.fileStream.Seek(offset, SeekOrigin.Begin);
-            this.fileStream.Write(new byte[2], 0, sizeof(short));
-            this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.LastName, StringSize), 0, StringSize);
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
-            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
-            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
-            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
-            this.fileStream.Write(WorkWithBytesHelper.DecimalToBytes(record.Donations), 0, sizeof(decimal));
-        }
-
-        /// <summary>
         /// Reads the record from the file.
         /// </summary>
         /// <param name="offset">Offset to read from.</param>
@@ -502,6 +474,35 @@ namespace FileCabinetApp
             decimal donations = WorkWithBytesHelper.BytesToDecimal(bytes);
 
             return new FileCabinetRecord(id, firstName, lastName, new DateTime(year, month, day), favNumber, favCharacter, favGame, donations);
+        }
+
+        /// <summary>
+        /// Writes a record to the file.
+        /// </summary>
+        /// <param name="record">A record to write.</param>
+        /// <param name="offset">Offset to start from.</param>
+        private void WriteRecord(FileCabinetRecord record, int offset)
+        {
+            this.fileStream.Seek(offset, SeekOrigin.Begin);
+            this.fileStream.Write(new byte[2], 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.Id), 0, sizeof(int));
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FirstName, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.LastName, StringSize), 0, StringSize);
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Year), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Month), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.DateOfBirth.Day), 0, sizeof(int));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteNumber), 0, sizeof(short));
+            this.fileStream.Write(BitConverter.GetBytes(record.FavouriteCharacter), 0, sizeof(char));
+            this.fileStream.Write(WorkWithBytesHelper.MakeStringOffset(record.FavouriteGame, StringSize), 0, StringSize);
+            this.fileStream.Write(WorkWithBytesHelper.DecimalToBytes(record.Donations), 0, sizeof(decimal));
+        }
+
+        /// <summary>
+        /// Removes duplicates from the ids list.
+        /// </summary>
+        private void PurgeIds()
+        {
+            this.ids = this.ids.Distinct().ToList();
         }
 
         private bool IsDeleted(int offset)
@@ -581,6 +582,95 @@ namespace FileCabinetApp
             this.recordFavGameOffset[record.FavouriteGame].Remove(recordOffset);
             this.recordDonationsOffset[record.Donations].Remove(recordOffset);
             */
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        public IEnumerator<FileCabinetRecord> GetEnumerator()
+        {
+            return new RecordEnumerator(this, this.GetRecords());
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return new RecordEnumerator(this, this.GetRecords());
+        }
+
+        /// <summary>
+        /// Enumerator for iterating through records.
+        /// </summary>
+        public class RecordEnumerator : IEnumerator<FileCabinetRecord>
+        {
+            private int current = -1;
+            private FileCabinetFilesystemService service;
+            private ReadOnlyCollection<FileCabinetRecord> records;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="RecordEnumerator"/> class.
+            /// </summary>
+            /// <param name="service">Service whose records to iterate through.</param>
+            /// <param name="records">Records to iterate through.</param>
+            public RecordEnumerator(FileCabinetFilesystemService service, ReadOnlyCollection<FileCabinetRecord> records)
+            {
+                this.service = service;
+                this.records = records;
+            }
+
+            /// <summary>
+            /// Gets the current record.
+            /// </summary>
+            /// <value>The current record.</value>
+            public FileCabinetRecord Current
+            {
+                get
+                {
+                    return this.records[this.current];
+                }
+            }
+
+            /// <summary>
+            /// Gets the current record.
+            /// </summary>
+            /// <value>The current object.</value>
+            object IEnumerator.Current => this.Current;
+
+            /// <summary>
+            /// Advances the enumerator to the next element of the collection.
+            /// </summary>
+            /// <returns>Whether the enumerator was successfully advanced.</returns>
+            public bool MoveNext()
+            {
+                if (this.current + 1 < this.records.Count)
+                {
+                    this.current++;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            /// <summary>
+            /// Resets the current position.
+            /// </summary>
+            public void Reset()
+            {
+                this.current = 0;
+            }
+
+            /// <summary>
+            /// Logic after deleting the enumerator.
+            /// </summary>
+            public void Dispose()
+            {
+            }
         }
     }
 }

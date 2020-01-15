@@ -1,6 +1,7 @@
 ﻿namespace FileCabinetApp
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Globalization;
@@ -137,9 +138,9 @@
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByFirstName(string firstName)
+        public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            IRecordIterator foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
             return foundRecords;
         }
 
@@ -148,9 +149,9 @@
         /// </summary>
         /// <param name="lastName">Given last name.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByLastName(string lastName)
+        public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            IRecordIterator foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
             return foundRecords;
         }
 
@@ -159,9 +160,9 @@
         /// </summary>
         /// <param name="dateOfBirth">Given date of birth.</param>
         /// <returns>The array of records.</returns>
-        public IRecordIterator FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            IRecordIterator foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
             return foundRecords;
         }
 
@@ -290,7 +291,7 @@
         /// <param name="key">The key to search by.</param>
         /// <param name="dictionary">The dictionary to search in.</param>
         /// <returns>The array of records.</returns>
-        private static IRecordIterator FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
+        private static IEnumerable<FileCabinetRecord> FindByKey(string key, Dictionary<string, List<FileCabinetRecord>> dictionary)
         {
             if (string.IsNullOrEmpty(key))
             {
@@ -299,8 +300,8 @@
 
             if (dictionary.ContainsKey(key.ToLower()))
             {
-                IRecordIterator iterator = new MemoryIterator(new ReadOnlyCollection<FileCabinetRecord>(dictionary[key.ToLower()]));
-                return iterator;
+                IEnumerable<FileCabinetRecord> foundRecords = dictionary[key.ToLower()];
+                return foundRecords;
             }
             else
             {
@@ -323,7 +324,24 @@
 
         public void Close()
         {
-            //
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        public IEnumerator<FileCabinetRecord> GetEnumerator()
+        {
+            return this.GetRecords().GetEnumerator();
+        }
+
+        /// <summary>
+        /// Gets the enumerator.
+        /// </summary>
+        /// <returns>The instance of IEnumerator.</returns>
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetRecords().GetEnumerator();
         }
     }
 }

@@ -1120,18 +1120,6 @@
             <param name="snapshot">Snapshot to restore by.</param>
             <returns>Number of imported records.</returns>
         </member>
-        <member name="M:FileCabinetApp.ServiceLogger.System#Collections#IEnumerable#GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
         <member name="T:FileCabinetApp.ServiceMeter">
             <summary>
             Class for measuring timings of service's methods.
@@ -1234,18 +1222,6 @@
             </summary>
             <param name="snapshot">A snapshot of records to restore.</param>
             <returns>Number of imported records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.System#Collections#IEnumerable#GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetFilesystemService">
             <summary>
@@ -1407,57 +1383,17 @@
             <param name="record">Record to delelte properties from.</param>
             <param name="recordOffset">Record's offset in the file.</param>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.System#Collections#IEnumerable#GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator">
+        <member name="T:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator">
             <summary>
             Enumerator for iterating through records.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator"/> class.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator"/> class.
             </summary>
             <param name="service">Service whose records to iterate through.</param>
             <param name="records">Records to iterate through.</param>
-        </member>
-        <member name="P:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Current">
-            <summary>
-            Gets the current record.
-            </summary>
-            <value>The current record.</value>
-        </member>
-        <member name="P:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.System#Collections#IEnumerator#Current">
-            <summary>
-            Gets the current record.
-            </summary>
-            <value>The current object.</value>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.MoveNext">
-            <summary>
-            Advances the enumerator to the next element of the collection.
-            </summary>
-            <returns>Whether the enumerator was successfully advanced.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Reset">
-            <summary>
-            Resets the current position.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.RecordEnumerator.Dispose">
-            <summary>
-            Logic after deleting the enumerator.
-            </summary>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>
@@ -1584,18 +1520,6 @@
             Updates all the dictionaries.
             </summary>
             <param name="record">Record to get values from.</param>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetMemoryService.System#Collections#IEnumerable#GetEnumerator">
-            <summary>
-            Gets the enumerator.
-            </summary>
-            <returns>The instance of IEnumerator.</returns>
         </member>
         <member name="T:FileCabinetApp.Program">
             <summary>

@@ -47,7 +47,7 @@ namespace FileCabinetApp
         private int count;
         private int deleted;
 
-        private List<int> ids = new List<int>() { 0 };
+        private List<int> ids = new List<int>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetFilesystemService"/> class.
@@ -87,7 +87,14 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            record.Id = this.ids.Max() + 1;
+            if (this.ids.Count == 0)
+            {
+                record.Id = 1;
+            }
+            else
+            {
+                record.Id = this.ids.Max() + 1;
+            }
 
             this.count++;
             this.ids.Add(record.Id);
@@ -268,7 +275,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return storedRecords;
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -295,7 +302,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return storedRecords;
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -324,7 +331,7 @@ namespace FileCabinetApp
                 }
             }
 
-            return storedRecords;
+            return new FileSystemRecordEnumerator(this, new ReadOnlyCollection<FileCabinetRecord>(storedRecords));
         }
 
         /// <summary>
@@ -348,6 +355,18 @@ namespace FileCabinetApp
             ReadOnlyCollection<FileCabinetRecord> records = new ReadOnlyCollection<FileCabinetRecord>(storedRecords);
 
             return records;
+        }
+
+        public FileCabinetRecord GetRecord(int id)
+        {
+            if (this.IsDeleted(recordIdOffset[id]))
+            {
+                return null;
+            }
+            else
+            {
+                return this.ReadRecord(recordIdOffset[id]);
+            }
         }
 
         /// <summary>
@@ -585,91 +604,40 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>The instance of IEnumerator.</returns>
-        public IEnumerator<FileCabinetRecord> GetEnumerator()
-        {
-            return new RecordEnumerator(this, this.GetRecords());
-        }
-
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>The instance of IEnumerator.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new RecordEnumerator(this, this.GetRecords());
-        }
-
-        /// <summary>
         /// Enumerator for iterating through records.
         /// </summary>
-        public class RecordEnumerator : IEnumerator<FileCabinetRecord>
+        public class FileSystemRecordEnumerator : IEnumerable<FileCabinetRecord>
         {
             private int current = -1;
             private FileCabinetFilesystemService service;
             private ReadOnlyCollection<FileCabinetRecord> records;
 
             /// <summary>
-            /// Initializes a new instance of the <see cref="RecordEnumerator"/> class.
+            /// Initializes a new instance of the <see cref="FileSystemRecordEnumerator"/> class.
             /// </summary>
             /// <param name="service">Service whose records to iterate through.</param>
             /// <param name="records">Records to iterate through.</param>
-            public RecordEnumerator(FileCabinetFilesystemService service, ReadOnlyCollection<FileCabinetRecord> records)
+            public FileSystemRecordEnumerator(FileCabinetFilesystemService service, ReadOnlyCollection<FileCabinetRecord> records)
             {
                 this.service = service;
                 this.records = records;
             }
 
-            /// <summary>
-            /// Gets the current record.
-            /// </summary>
-            /// <value>The current record.</value>
-            public FileCabinetRecord Current
+            public IEnumerator<FileCabinetRecord> GetEnumerator()
             {
-                get
+                foreach (var record in this.records)
                 {
-                    return this.records[this.current];
+                    //yield return this.service.GetRecord(id);
+                    yield return record;
                 }
             }
 
-            /// <summary>
-            /// Gets the current record.
-            /// </summary>
-            /// <value>The current object.</value>
-            object IEnumerator.Current => this.Current;
-
-            /// <summary>
-            /// Advances the enumerator to the next element of the collection.
-            /// </summary>
-            /// <returns>Whether the enumerator was successfully advanced.</returns>
-            public bool MoveNext()
+            IEnumerator IEnumerable.GetEnumerator()
             {
-                if (this.current + 1 < this.records.Count)
+                foreach (var id in this.service.GetIds())
                 {
-                    this.current++;
-                    return true;
+                    yield return this.service.GetRecord(id);
                 }
-                else
-                {
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// Resets the current position.
-            /// </summary>
-            public void Reset()
-            {
-                this.current = 0;
-            }
-
-            /// <summary>
-            /// Logic after deleting the enumerator.
-            /// </summary>
-            public void Dispose()
-            {
             }
         }
     }

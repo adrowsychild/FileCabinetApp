@@ -8,7 +8,7 @@ namespace FileCabinetApp
     /// <summary>
     /// Interface for class for working with list of users.
     /// </summary>
-    public interface IFileCabinetService : IEnumerable<FileCabinetRecord>
+    public interface IFileCabinetService
     {
         /// <summary>
         /// Creates a new record.

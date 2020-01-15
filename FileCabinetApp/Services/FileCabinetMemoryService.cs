@@ -325,23 +325,5 @@
         public void Close()
         {
         }
-
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>The instance of IEnumerator.</returns>
-        public IEnumerator<FileCabinetRecord> GetEnumerator()
-        {
-            return this.GetRecords().GetEnumerator();
-        }
-
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>The instance of IEnumerator.</returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetRecords().GetEnumerator();
-        }
     }
 }

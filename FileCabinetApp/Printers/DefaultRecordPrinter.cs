@@ -64,6 +64,7 @@ namespace FileCabinetApp.Printers
             }
 
             Console.WriteLine(output);
+
         }
     }
 }

@@ -18,6 +18,11 @@ namespace FileCabinetApp.Printers
         /// <param name="records">Records to print.</param>
         public void Print(IEnumerable<FileCabinetRecord> records)
         {
+            if (records == null)
+            {
+                return;
+            }
+
             IEnumerable<FileCabinetRecord> orderedRecords = records.OrderBy(record => record.Id);
             foreach (var record in orderedRecords)
             {
@@ -64,6 +69,7 @@ namespace FileCabinetApp.Printers
             }
 
             Console.WriteLine(output);
+
         }
     }
 }

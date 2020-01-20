@@ -152,29 +152,23 @@
             Creates a new record.
             </summary>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.EditCommandHandler">
+        <member name="T:FileCabinetApp.CommandHandlers.DeleteCommandHandler">
             <summary>
-            Handler for the user's 'edit' command.
+            Handler for the user's 'delete' command.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+        <member name="M:FileCabinetApp.CommandHandlers.DeleteCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.EditCommandHandler"/> class.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.DeleteCommandHandler"/> class.
             </summary>
-            <param name="fileCabinetService">Service to edit record in.</param>
+            <param name="fileCabinetService">Service to create record in.</param>
         </member>
-        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+        <member name="M:FileCabinetApp.CommandHandlers.DeleteCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
             <summary>
             Handles the request.
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.EditCommandHandler.Edit(System.String)">
-            <summary>
-            Edits the existing record.
-            </summary>
-            <param name="parameters">Parameters.</param>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.ExitCommandHandler">
             <summary>
@@ -290,6 +284,24 @@
             </summary>
             <param name="parameters">Format to write in and path to write to.</param>
         </member>
+        <member name="T:FileCabinetApp.CommandHandlers.InsertCommandHandler">
+            <summary>
+            Handler for the user's 'insert' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.InsertCommandHandler"/> class.
+            </summary>
+            <param name="fileCabinetService">Service to get stats from.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
         <member name="T:FileCabinetApp.CommandHandlers.ListCommandHandler">
             <summary>
             Handler for the user's 'list' command.
@@ -337,30 +349,6 @@
             Purges the list of records, if fileSystemService.
             </summary>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.RemoveCommandHandler">
-            <summary>
-            Handler for the user's 'remove' command.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.RemoveCommandHandler"/> class.
-            </summary>
-            <param name="fileCabinetService">Service to remove record from.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <summary>
-            Handles the request.
-            </summary>
-            <param name="request">Request to handle.</param>
-            <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.RemoveCommandHandler.Remove(System.String)">
-            <summary>
-            Removes the existing record.
-            </summary>
-            <param name="parameters">Parameters.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.StatCommandHandler">
             <summary>
             Handler for the user's 'stat' command.
@@ -383,6 +371,24 @@
             <summary>
             Shows the number of records to the user.
             </summary>
+        </member>
+        <member name="T:FileCabinetApp.CommandHandlers.UpdateCommandHandler">
+            <summary>
+            Handler for the user's 'update' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.UpdateCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.UpdateCommandHandler"/> class.
+            </summary>
+            <param name="fileCabinetService">Service to create record in.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.UpdateCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>
@@ -676,6 +682,30 @@
             </summary>
             <param name="reader">Xml reader.</param>
             <returns>List of imported records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.FileSystemRecordEnumerator">
+            <summary>
+            Enumerator for iterating through records.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileSystemRecordEnumerator"/> class.
+            </summary>
+            <param name="service">Service whose records to iterate through.</param>
+            <param name="records">Records to iterate through.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.GetEnumerator">
+            <summary>
+            Iterator to iterate through the records.
+            </summary>
+            <returns>Single record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            Iterator to iterate through the records.
+            </summary>
+            <returns>Single record.</returns>
         </member>
         <member name="T:FileCabinetApp.Helpers.WorkWithBytesHelper">
             <summary>
@@ -1382,18 +1412,6 @@
             </summary>
             <param name="record">Record to delelte properties from.</param>
             <param name="recordOffset">Record's offset in the file.</param>
-        </member>
-        <member name="T:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator">
-            <summary>
-            Enumerator for iterating through records.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileCabinetFilesystemService.FileSystemRecordEnumerator"/> class.
-            </summary>
-            <param name="service">Service whose records to iterate through.</param>
-            <param name="records">Records to iterate through.</param>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>

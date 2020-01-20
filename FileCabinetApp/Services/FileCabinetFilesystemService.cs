@@ -122,11 +122,21 @@ namespace FileCabinetApp
                 return -1;
             }
 
-            this.count++;
-            this.ids.Add(record.Id);
-
-            this.WriteRecord(record, (this.count - 1) * RecordSize);
-            this.UpdateOffsets(record, (this.count - 1) * RecordSize);
+            if (this.ids.Contains(record.Id))
+            {
+                int recordOffset = this.recordIdOffset[record.Id];
+                FileCabinetRecord prevRecord = this.ReadRecord(recordOffset);
+                this.DeleteOffsets(prevRecord, recordOffset);
+                this.WriteRecord(record, recordOffset);
+                this.UpdateOffsets(record, recordOffset);
+            }
+            else
+            {
+                this.ids.Add(record.Id);
+                this.count++;
+                this.WriteRecord(record, (this.count - 1) * RecordSize);
+                this.UpdateOffsets(record, (this.count - 1) * RecordSize);
+            }
 
             return record.Id;
         }
@@ -359,13 +369,13 @@ namespace FileCabinetApp
 
         public FileCabinetRecord GetRecord(int id)
         {
-            if (this.IsDeleted(recordIdOffset[id]))
+            if (this.IsDeleted(this.recordIdOffset[id]))
             {
                 return null;
             }
             else
             {
-                return this.ReadRecord(recordIdOffset[id]);
+                return this.ReadRecord(this.recordIdOffset[id]);
             }
         }
 
@@ -601,44 +611,6 @@ namespace FileCabinetApp
             this.recordFavGameOffset[record.FavouriteGame].Remove(recordOffset);
             this.recordDonationsOffset[record.Donations].Remove(recordOffset);
             */
-        }
-
-        /// <summary>
-        /// Enumerator for iterating through records.
-        /// </summary>
-        public class FileSystemRecordEnumerator : IEnumerable<FileCabinetRecord>
-        {
-            private int current = -1;
-            private FileCabinetFilesystemService service;
-            private ReadOnlyCollection<FileCabinetRecord> records;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="FileSystemRecordEnumerator"/> class.
-            /// </summary>
-            /// <param name="service">Service whose records to iterate through.</param>
-            /// <param name="records">Records to iterate through.</param>
-            public FileSystemRecordEnumerator(FileCabinetFilesystemService service, ReadOnlyCollection<FileCabinetRecord> records)
-            {
-                this.service = service;
-                this.records = records;
-            }
-
-            public IEnumerator<FileCabinetRecord> GetEnumerator()
-            {
-                foreach (var record in this.records)
-                {
-                    //yield return this.service.GetRecord(id);
-                    yield return record;
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                foreach (var id in this.service.GetIds())
-                {
-                    yield return this.service.GetRecord(id);
-                }
-            }
         }
     }
 }

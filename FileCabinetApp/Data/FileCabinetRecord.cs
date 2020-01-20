@@ -7,7 +7,7 @@
     /// Class representing a record with user's info.
     /// </summary>
     [Serializable]
-    public class FileCabinetRecord
+    public class FileCabinetRecord : ICloneable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileCabinetRecord"/> class.
@@ -95,5 +95,20 @@
         /// <value> Given donations. </value>
         [XmlElement]
         public decimal Donations { get; set; }
+
+        public object Clone()
+        {
+            return new FileCabinetRecord
+            {
+                Id = this.Id,
+                FirstName = this.FirstName,
+                LastName = this.LastName,
+                DateOfBirth = this.DateOfBirth,
+                FavouriteNumber = this.FavouriteNumber,
+                FavouriteCharacter = this.FavouriteCharacter,
+                FavouriteGame = this.FavouriteGame,
+                Donations = this.Donations,
+            };
+        }
     }
 }

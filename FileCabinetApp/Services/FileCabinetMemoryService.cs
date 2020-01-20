@@ -72,9 +72,22 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
-            this.list.Add(record);
+            if (this.ids.Contains(record.Id))
+            {
+                int indexOfPrev = this.list.FindIndex(rec => rec.Id.Equals(record.Id));
+
+                this.firstNameDictionary[this.list[indexOfPrev].FirstName.ToLower()].Remove(this.list[indexOfPrev]);
+                this.lastNameDictionary[this.list[indexOfPrev].LastName.ToLower()].Remove(this.list[indexOfPrev]);
+                this.dateOfBirthDictionary[this.list[indexOfPrev].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexOfPrev]);
+                this.list[indexOfPrev] = record;
+            }
+            else
+            {
+                this.list.Add(record);
+                this.ids.Add(record.Id);
+            }
+
             this.UpdateDictionaries(record);
-            this.ids.Add(record.Id);
 
             return record.Id;
         }

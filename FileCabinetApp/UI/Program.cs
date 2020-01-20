@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using FileCabinetApp.CommandHandlers;
 using FileCabinetApp.Extensions.ValidatorExtensions;
 using FileCabinetApp.Printers;
@@ -13,6 +15,8 @@ namespace FileCabinetApp
     /// </summary>
     public static class Program
     {
+        private static List<string> commandNames = new List<string>();
+
         /// <summary>
         /// Developer's name.
         /// </summary>
@@ -67,6 +71,16 @@ namespace FileCabinetApp
         /// <param name="args">Additional rule-changing arguments.</param>
         public static void Main(string[] args)
         {
+            var assemblyName = "FileCabinetApp";
+            var nameSpace = "FileCabinetApp.CommandHandlers";
+            var asm = Assembly.Load(assemblyName);
+            var handlers = asm.GetTypes().Where(p => p.Namespace == nameSpace && p.Name.EndsWith("CommandHandler") && !p.IsInterface).ToList();
+            foreach (var handler in handlers)
+            {
+                int indexOfCommandWord = handler.Name.IndexOf("CommandHandler");
+                commandNames.Add(handler.Name.Substring(0, indexOfCommandWord).ToLower());
+            }
+
             string[] tempArgs = new string[2];
 
             SetDefaultSettings();
@@ -148,7 +162,25 @@ namespace FileCabinetApp
 
                 const int parametersIndex = 1;
                 var parameters = inputs.Length > 1 ? inputs[parametersIndex] : string.Empty;
-                commandHandler.Handle(new AppCommandRequest(command, parameters));
+                var wasSucceed = commandHandler.Handle(new AppCommandRequest(command, parameters));
+                if (wasSucceed == null)
+                {
+                    Console.WriteLine("\'" + command + "\' is not a valid command. See 'help'." );
+                    List<string> similarCommands = CommandHints(command);
+                    if (similarCommands.Count == 1)
+                    {
+                        Console.WriteLine("The most similar command is ");
+                        Console.WriteLine("\t\t" + similarCommands[0]);
+                    }
+                    else if (similarCommands.Count > 1)
+                    {
+                        Console.WriteLine("The most similar commands are ");
+                        foreach (var com in similarCommands)
+                        {
+                            Console.WriteLine("\t\t" + com);
+                        }
+                    }
+                }
             }
             while (isRunning);
 
@@ -156,6 +188,83 @@ namespace FileCabinetApp
             {
                 logWriter.Close();
             }
+        }
+
+        private static List<string> CommandHints(string command)
+        {
+            List<string> similarCommands = new List<string>();
+            int averageLength = 5;
+
+            // if command.length = 2 
+            // startswith = command.Length
+            // matchedChars => command.Length
+            // if command.length = 6
+            // startwith = command.Length / 2
+            // matchedChars => command.Length / 2
+
+            int toMatch = command.Length <= averageLength ? command.Length : command.Length / 2;
+
+            List<char> letters = new List<char>();
+            char[] startsWith = new char[toMatch];
+            for (int i = 0; i < toMatch; i++)
+            {
+                startsWith[i] = command[i];
+            }
+
+            for (int i = 0; i < commandNames.Count; i++)
+            {
+                int toCheck = toMatch < commandNames[i].Length ? toMatch : commandNames[i].Length;
+                if (new string(startsWith) == commandNames[i].Substring(0, toCheck))
+                {
+                    if (!similarCommands.Contains(commandNames[i]))
+                    {
+                        similarCommands.Add(commandNames[i]);
+                    }
+                }
+            }
+
+            foreach (char c in command)
+            {
+                if (!letters.Contains(c))
+                {
+                    letters.Add(c);
+                }
+            }
+
+            int matchedChars = 0;
+            List<char> tempLetters = new List<char>();
+            foreach (var com in commandNames)
+            {
+                foreach (char c in letters)
+                {
+                    tempLetters.Add(c);
+                }
+
+                foreach (char c in com)
+                {
+                    if (tempLetters.Contains(c))
+                    {
+                        matchedChars++;
+                        if (tempLetters.Contains(c))
+                        {
+                            tempLetters.Remove(c);
+                        }
+                    }
+                }
+
+                if (matchedChars >= toMatch)
+                {
+                    if (!similarCommands.Contains(com))
+                    {
+                        similarCommands.Add(com);
+                    }
+                }
+
+                matchedChars = 0;
+                tempLetters.Clear();
+            }
+
+            return similarCommands;
         }
 
         private static void ChangeServiceState(bool toSet)

@@ -53,7 +53,6 @@ namespace FileCabinetApp.CommandHandlers
                 return;
             }
 
-            // make safe / +4
             parameters = parameters.Substring(indexOfSet + 3);
 
             int numOfProps = typeof(FileCabinetRecord).GetProperties().Length;

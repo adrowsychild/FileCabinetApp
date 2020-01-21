@@ -280,6 +280,7 @@ namespace FileCabinetApp
         {
             var recordPrinter = new DefaultRecordPrinter();
             var createHandler = new CreateCommandHandler(fileCabinetService);
+            var selectHandler = new SelectCommandHandler(fileCabinetService);
             var updateHandler = new UpdateCommandHandler(fileCabinetService);
             var insertHandler = new InsertCommandHandler(fileCabinetService);
             var deleteHandler = new DeleteCommandHandler(fileCabinetService);
@@ -292,7 +293,7 @@ namespace FileCabinetApp
             var helpHandler = new HelpCommandHandler();
             var exitHandler = new ExitCommandHandler(ChangeServiceState);
 
-            createHandler.SetNext(updateHandler).SetNext(insertHandler).SetNext(deleteHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler).SetNext(exitHandler);
+            createHandler.SetNext(selectHandler).SetNext(updateHandler).SetNext(insertHandler).SetNext(deleteHandler).SetNext(purgeHandler).SetNext(importHandler).SetNext(exportHandler).SetNext(findHandler).SetNext(listHandler).SetNext(statHandler).SetNext(helpHandler).SetNext(exitHandler);
 
             return createHandler;
         }

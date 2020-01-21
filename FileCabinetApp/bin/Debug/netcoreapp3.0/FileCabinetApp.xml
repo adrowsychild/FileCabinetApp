@@ -349,6 +349,24 @@
             Purges the list of records, if fileSystemService.
             </summary>
         </member>
+        <member name="T:FileCabinetApp.CommandHandlers.SelectCommandHandler">
+            <summary>
+            Handler for the user's 'select' command.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.#ctor(FileCabinetApp.IFileCabinetService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.SelectCommandHandler"/> class.
+            </summary>
+            <param name="fileCabinetService">Service to create record in.</param>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
+            <summary>
+            Handles the request.
+            </summary>
+            <param name="request">Request to handle.</param>
+            <returns>The object back, or null otherwise.</returns>
+        </member>
         <member name="T:FileCabinetApp.CommandHandlers.StatCommandHandler">
             <summary>
             Handler for the user's 'stat' command.
@@ -1330,6 +1348,12 @@
             <returns>The array of records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecords">
+            <summary>
+            Gets all the records.
+            </summary>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetUnsafeRecords">
             <summary>
             Gets all the records.
             </summary>

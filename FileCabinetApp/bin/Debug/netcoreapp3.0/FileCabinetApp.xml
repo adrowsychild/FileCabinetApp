@@ -217,31 +217,6 @@
             </summary>
             <param name="parameters">Format to write in and path to write to.</param>
         </member>
-        <member name="T:FileCabinetApp.CommandHandlers.FindCommandHandler">
-            <summary>
-            Handler for the user's 'find' command.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,FileCabinetApp.Interfaces.IRecordPrinter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.FindCommandHandler"/> class.
-            </summary>
-            <param name="fileCabinetService">Service to find record in.</param>
-            <param name="printer">Printer for records.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <summary>
-            Handles the request.
-            </summary>
-            <param name="request">Request to handle.</param>
-            <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.FindCommandHandler.Find(System.String)">
-            <summary>
-            Searches for the record by key.
-            </summary>
-            <param name="parameters">Parameters to search by.</param>
-        </member>
         <member name="T:FileCabinetApp.CommandHandlers.HelpCommandHandler">
             <summary>
             Handler for the user's 'help' command.
@@ -301,30 +276,6 @@
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="T:FileCabinetApp.CommandHandlers.ListCommandHandler">
-            <summary>
-            Handler for the user's 'list' command.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.#ctor(FileCabinetApp.IFileCabinetService,FileCabinetApp.Interfaces.IRecordPrinter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.CommandHandlers.ListCommandHandler"/> class.
-            </summary>
-            <param name="fileCabinetService">Service to show records from.</param>
-            <param name="printer">Printer for records.</param>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.Handle(FileCabinetApp.CommandHandlers.AppCommandRequest)">
-            <summary>
-            Handles the request.
-            </summary>
-            <param name="request">Request to handle.</param>
-            <returns>The object back, or null otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.CommandHandlers.ListCommandHandler.List">
-            <summary>
-            Shows all the records to the user.
-            </summary>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.PurgeCommandHandler">
             <summary>

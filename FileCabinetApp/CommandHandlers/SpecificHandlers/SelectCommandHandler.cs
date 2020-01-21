@@ -67,7 +67,8 @@ namespace FileCabinetApp.CommandHandlers
                 }
             }
 
-            List<FileCabinetRecord> foundListRecords = this.WhereParser(parameters.Substring(indexOfWhere + 5).Split());
+            // подправить
+            List<FileCabinetRecord> foundListRecords = this.WhereParser(parameters.Substring(indexOfWhere + 6).Split());
             ReadOnlyCollection<FileCabinetRecord> foundRecords;
             if (foundListRecords == null || foundListRecords.Count == 0)
             {

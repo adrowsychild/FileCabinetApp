@@ -22,6 +22,10 @@
         private Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> firstNameCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> lastNameCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> dateOfBirthCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+
         private List<int> ids = new List<int>() { 0 };
 
         /// <summary>
@@ -55,6 +59,7 @@
 
             this.list.Add(record);
             this.UpdateDictionaries(record);
+            this.PurgeCache(record);
             this.ids.Add(record.Id);
 
             return record.Id;
@@ -88,6 +93,7 @@
             }
 
             this.UpdateDictionaries(record);
+            this.PurgeCache(record);
 
             return record.Id;
         }
@@ -118,6 +124,7 @@
 
             this.list[indexOfPrev] = record;
             this.UpdateDictionaries(record);
+            this.PurgeCache(record);
 
             return 0;
         }
@@ -136,6 +143,7 @@
                 return -1;
             }
 
+            this.PurgeCache(this.list[indexToRemove]);
             this.firstNameDictionary[this.list[indexToRemove].FirstName.ToLower()].Remove(this.list[indexToRemove]);
             this.lastNameDictionary[this.list[indexToRemove].LastName.ToLower()].Remove(this.list[indexToRemove]);
             this.dateOfBirthDictionary[this.list[indexToRemove].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
@@ -153,7 +161,18 @@
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(firstName, this.firstNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords;
+
+            if (this.firstNameCache.ContainsKey(firstName))
+            {
+                foundRecords = this.firstNameCache[firstName];
+            }
+            else
+            {
+                foundRecords = FindByKey(firstName, this.firstNameDictionary);
+                this.firstNameCache.Add(firstName, foundRecords);
+            }
+
             return foundRecords;
         }
 
@@ -164,7 +183,18 @@
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(lastName, this.lastNameDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords;
+
+            if (this.lastNameCache.ContainsKey(lastName))
+            {
+                foundRecords = this.lastNameCache[lastName];
+            }
+            else
+            {
+                foundRecords = FindByKey(lastName, this.lastNameDictionary);
+                this.lastNameCache.Add(lastName, foundRecords);
+            }
+
             return foundRecords;
         }
 
@@ -175,7 +205,18 @@
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            IEnumerable<FileCabinetRecord> foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+            IEnumerable<FileCabinetRecord> foundRecords;
+
+            if (this.dateOfBirthCache.ContainsKey(dateOfBirth))
+            {
+                foundRecords = this.dateOfBirthCache[dateOfBirth];
+            }
+            else
+            {
+                foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
+                this.dateOfBirthCache.Add(dateOfBirth, foundRecords);
+            }
+
             return foundRecords;
         }
 
@@ -333,6 +374,21 @@
             UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+        }
+
+        private void PurgeCache(Dictionary<string, IEnumerable<FileCabinetRecord>> cache, string key)
+        {
+            if (cache.ContainsKey(key))
+            {
+                cache.Remove(key);
+            }
+        }
+
+        private void PurgeCache(FileCabinetRecord record)
+        {
+            this.PurgeCache(this.firstNameCache, record.FirstName);
+            this.PurgeCache(this.lastNameCache, record.LastName);
+            this.PurgeCache(this.dateOfBirthCache, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
 
         public void Close()

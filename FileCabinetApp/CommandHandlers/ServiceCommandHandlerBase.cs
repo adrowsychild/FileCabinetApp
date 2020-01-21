@@ -315,8 +315,15 @@ namespace FileCabinetApp.CommandHandlers
                                 {
                                     try
                                     {
-                                        FileSystemRecordEnumerator enumeratedrecords = (FileSystemRecordEnumerator)findMethod.Invoke(this.service, new object[] { sets[x + y] });
-                                        tempRecords = FileSystemRecordEnumerator.ToList(enumeratedrecords);
+                                        if (this.service is FileCabinetFilesystemService)
+                                        {
+                                            FileSystemRecordEnumerator enumeratedrecords = (FileSystemRecordEnumerator)findMethod.Invoke(this.service, new object[] { sets[x + y] });
+                                            tempRecords = FileSystemRecordEnumerator.ToList(enumeratedrecords);
+                                        }
+                                        else
+                                        {
+                                            tempRecords = (List<FileCabinetRecord>)findMethod.Invoke(this.service, new object[] { sets[x + y] });
+                                        }
 
                                         if (tempRecords.Count != 0)
                                         {
@@ -492,6 +499,65 @@ namespace FileCabinetApp.CommandHandlers
                 }
 
                 return sets;
+            }
+        }
+
+        protected List<PropertyInfo> ParseProperties(string parameters)
+        {
+            List<PropertyInfo> propsToShow = new List<PropertyInfo>();
+            Tuple<string, string, int> propValue;
+
+            // if there is only one property
+            if (!parameters.Contains(','))
+            {
+                if (parameters.StartsWith(' '))
+                {
+                    parameters = parameters.Substring(1);
+                }
+
+                PropertyInfo property = typeof(FileCabinetRecord).GetProperty(parameters, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                
+                // check if such property exists
+                if (property == null)
+                {
+                    // incorrect property
+                    return null;
+                }
+                else
+                {
+                    propsToShow.Add(property);
+                }
+
+                return propsToShow;
+            }
+            else
+            {
+                string[] args = parameters.Split(',');
+                int numOfConditions = args.Length;
+
+                for (int i = 0; i < numOfConditions; i++)
+                {
+                    if (args[i].StartsWith(' '))
+                    {
+                        args[i] = args[i].Substring(1);
+                    }
+
+                    // add case invariant
+                    PropertyInfo property = typeof(FileCabinetRecord).GetProperty(args[i], BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+
+                    // check if such property exists
+                    if (property == null)
+                    {
+                        // incorrect property
+                        return null;
+                    }
+                    else
+                    {
+                        propsToShow.Add(property);
+                    }
+                }
+
+                return propsToShow;
             }
         }
     }

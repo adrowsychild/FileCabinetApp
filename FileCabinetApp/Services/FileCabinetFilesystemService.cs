@@ -367,6 +367,27 @@ namespace FileCabinetApp
             return records;
         }
 
+        /// <summary>
+        /// Gets all the records.
+        /// </summary>
+        /// <returns>The array of records.</returns>
+        public List<FileCabinetRecord> GetUnsafeRecords()
+        {
+            List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
+
+            for (int i = 0; i < this.count; i++)
+            {
+                if (this.IsDeleted(RecordSize * i))
+                {
+                    continue;
+                }
+
+                storedRecords.Add(this.ReadRecord(i * RecordSize));
+            }
+
+            return storedRecords;
+        }
+
         public FileCabinetRecord GetRecord(int id)
         {
             if (this.IsDeleted(this.recordIdOffset[id]))

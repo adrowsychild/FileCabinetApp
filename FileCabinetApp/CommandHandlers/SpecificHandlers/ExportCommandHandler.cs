@@ -16,7 +16,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to export records from.</param>
         public ExportCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace FileCabinetApp.CommandHandlers
 
             using (StreamWriter writer = new StreamWriter(path))
             {
-                IFileCabinetServiceSnapshot snapshot = this.service.MakeSnapshot();
+                IFileCabinetServiceSnapshot snapshot = this.Service.MakeSnapshot();
                 bool isSucceed = false;
                 switch (format)
                 {

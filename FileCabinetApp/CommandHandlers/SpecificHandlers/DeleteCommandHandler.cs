@@ -15,7 +15,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to create record in.</param>
         public DeleteCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -41,6 +41,10 @@ namespace FileCabinetApp.CommandHandlers
             }
         }
 
+        /// <summary>
+        /// Deletes the records by the given criterion.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private void Delete(string parameters)
         {
             string[] args = parameters.Split(' ');
@@ -54,7 +58,7 @@ namespace FileCabinetApp.CommandHandlers
             int equalsIndex = -1;
             for (int i = 0; i < args.Length; i++)
             {
-                if (args[i].Contains('='))
+                if (args[i].Contains('=', StringComparison.InvariantCulture))
                 {
                     equalsIndex = i;
                 }
@@ -64,14 +68,6 @@ namespace FileCabinetApp.CommandHandlers
             {
                 return;
             }
-
-            // equalsIndex 2
-            // where id = '1'
-            // where id ='1'
-
-            // equalsIndex 1
-            // where id= '1'
-            // where id='1'
 
             if (equalsIndex == 2)
             {
@@ -98,13 +94,12 @@ namespace FileCabinetApp.CommandHandlers
             }
             else
             {
-                // where id= '1'
                 if (args[1].EndsWith('='))
                 {
                     property = args[1].Substring(0, args[1].Length - 1);
                     value = args[2];
                 }
-                else // where id='1'
+                else
                 {
                     string[] subArgs = args[1].Split('=');
                     value = subArgs[1];
@@ -112,26 +107,29 @@ namespace FileCabinetApp.CommandHandlers
                 }
             }
 
-            if (!value.Contains('\'') || (value.IndexOf('\'', StringComparison.InvariantCulture) == value.LastIndexOf('\'')))
+            if (!value.Contains('\'', StringComparison.InvariantCulture) || (value.IndexOf('\'', StringComparison.InvariantCulture) == value.LastIndexOf('\'')))
             {
                 return;
             }
             else
             {
-                value = value[(value.IndexOf('\'', StringComparison.InvariantCulture) + 1)..value.LastIndexOf('\'')];
+                value = value[(value.IndexOf('\'', StringComparison.InvariantCulture) + 1) ..value.LastIndexOf('\'')];
             }
 
-            // PARSED.
-
-            // delete where FirstName='ray'
-            MethodInfo findMethod = this.service.GetType().GetMethod("findby" + property, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            MethodInfo findMethod = this.Service.GetType().GetMethod("findby" + property, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
             if (findMethod == null)
             {
                 // incorrect property
                 return;
             }
 
-            List<FileCabinetRecord> foundRecords = (List<FileCabinetRecord>)findMethod.Invoke(this.service, new object[] { value });
+            List<FileCabinetRecord> foundRecords = (List<FileCabinetRecord>)findMethod.Invoke(this.Service, new object[] { value });
+
+            if (foundRecords == null)
+            {
+                Console.WriteLine("No such records found.");
+                return;
+            }
 
             List<int> deletedRecords = new List<int>();
 
@@ -142,7 +140,7 @@ namespace FileCabinetApp.CommandHandlers
 
             foreach (var id in deletedRecords)
             {
-                this.service.RemoveRecord(id);
+                this.Service.RemoveRecord(id);
             }
 
             Console.Write("Records ");

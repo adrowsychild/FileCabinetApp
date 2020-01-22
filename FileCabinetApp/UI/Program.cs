@@ -15,8 +15,6 @@ namespace FileCabinetApp
     /// </summary>
     public static class Program
     {
-        private static List<string> commandNames = new List<string>();
-
         /// <summary>
         /// Developer's name.
         /// </summary>
@@ -48,7 +46,13 @@ namespace FileCabinetApp
             ["--validation-rules"] = new Settings(SetValidationRules),
             ["-s"] = new Settings(SetStorageRules),
             ["--storage"] = new Settings(SetStorageRules),
+            ["-uw"] = new Settings(AddStopwatch),
+            ["--use-stopwatch"] = new Settings(AddStopwatch),
+            ["-ul"] = new Settings(AddLogger),
+            ["--use-logger"] = new Settings(AddLogger),
         };
+
+        private static List<string> commandNames = new List<string>();
 
         private static bool isRunning = true;
 
@@ -74,10 +78,10 @@ namespace FileCabinetApp
             var assemblyName = "FileCabinetApp";
             var nameSpace = "FileCabinetApp.CommandHandlers";
             var asm = Assembly.Load(assemblyName);
-            var handlers = asm.GetTypes().Where(p => p.Namespace == nameSpace && p.Name.EndsWith("CommandHandler") && !p.IsInterface).ToList();
+            var handlers = asm.GetTypes().Where(p => p.Namespace == nameSpace && p.Name.EndsWith("CommandHandler", StringComparison.InvariantCulture) && !p.IsInterface).ToList();
             foreach (var handler in handlers)
             {
-                int indexOfCommandWord = handler.Name.IndexOf("CommandHandler");
+                int indexOfCommandWord = handler.Name.IndexOf("CommandHandler", StringComparison.InvariantCulture);
                 commandNames.Add(handler.Name.Substring(0, indexOfCommandWord).ToLower());
             }
 
@@ -93,19 +97,6 @@ namespace FileCabinetApp
                     if (i != args.Length)
                     {
                         tempArgs[1] = args[i];
-                    }
-
-                    if (tempArgs[0] == "--use-stopwatch")
-                    {
-                        stopwatchAdded = true;
-                        i++;
-                        continue;
-                    }
-                    else if (tempArgs[0] == "--use-logger")
-                    {
-                        loggerAdded = true;
-                        i++;
-                        continue;
                     }
 
                     int parsedSetting = SettingsParser(tempArgs);
@@ -128,6 +119,16 @@ namespace FileCabinetApp
 
             Console.WriteLine("Using " + validatorType + " validation rules.");
             Console.WriteLine("Using " + serviceType + " service type.");
+
+            if (stopwatchAdded)
+            {
+                Console.WriteLine("Stopwatch added.");
+            }
+
+            if (loggerAdded)
+            {
+                Console.WriteLine("Logger added.");
+            }
 
             Console.WriteLine(Program.HINTMESSAGE);
             Console.WriteLine();
@@ -165,7 +166,7 @@ namespace FileCabinetApp
                 var wasSucceed = commandHandler.Handle(new AppCommandRequest(command, parameters));
                 if (wasSucceed == null)
                 {
-                    Console.WriteLine("\'" + command + "\' is not a valid command. See 'help'." );
+                    Console.WriteLine("\'" + command + "\' is not a valid command. See 'help'.");
                     List<string> similarCommands = CommandHints(command);
                     if (similarCommands.Count == 1)
                     {
@@ -194,13 +195,6 @@ namespace FileCabinetApp
         {
             List<string> similarCommands = new List<string>();
             int averageLength = 5;
-
-            // if command.length = 2 
-            // startswith = command.Length
-            // matchedChars => command.Length
-            // if command.length = 6
-            // startwith = command.Length / 2
-            // matchedChars => command.Length / 2
 
             int toMatch = command.Length <= averageLength ? command.Length : command.Length / 2;
 
@@ -416,7 +410,18 @@ namespace FileCabinetApp
 
         private static void AddStopwatch(string args)
         {
-            stopwatchAdded = true;
+            if (args.ToLower().Contains("true", StringComparison.OrdinalIgnoreCase) || args.ToLower().Contains("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                stopwatchAdded = true;
+            }
+        }
+
+        private static void AddLogger(string args)
+        {
+            if (args.ToLower().Contains("true", StringComparison.OrdinalIgnoreCase) || args.ToLower().Contains("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                loggerAdded = true;
+            }
         }
     }
 }

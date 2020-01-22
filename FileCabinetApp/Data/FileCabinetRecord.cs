@@ -96,6 +96,10 @@
         [XmlElement]
         public decimal Donations { get; set; }
 
+        /// <summary>
+        /// Implements ICloneable interface.
+        /// </summary>
+        /// <returns>The copy of the record.</returns>
         public object Clone()
         {
             return new FileCabinetRecord

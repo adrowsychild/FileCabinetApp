@@ -14,7 +14,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to create record in.</param>
         public CreateCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Create()
         {
-            int id = this.service.CreateRecord(this.CheckRecordInput());
+            int id = this.Service.CreateRecord(this.CheckRecordInput());
             Console.WriteLine($"Record #{id} is created.");
         }
     }

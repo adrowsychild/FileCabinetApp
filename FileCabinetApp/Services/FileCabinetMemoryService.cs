@@ -18,13 +18,23 @@
 
         private List<FileCabinetRecord> list = new List<FileCabinetRecord>();
 
+        private Dictionary<string, List<FileCabinetRecord>> idsDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private Dictionary<string, List<FileCabinetRecord>> firstNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private Dictionary<string, List<FileCabinetRecord>> lastNameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
         private Dictionary<string, List<FileCabinetRecord>> dateOfBirthDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> favNumberDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> favCharacterDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> favGameDictionary = new Dictionary<string, List<FileCabinetRecord>>();
+        private Dictionary<string, List<FileCabinetRecord>> donationsDictionary = new Dictionary<string, List<FileCabinetRecord>>();
 
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> idsCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
         private Dictionary<string, IEnumerable<FileCabinetRecord>> firstNameCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
         private Dictionary<string, IEnumerable<FileCabinetRecord>> lastNameCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
         private Dictionary<string, IEnumerable<FileCabinetRecord>> dateOfBirthCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> favNumberCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> favCharCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> favGameCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
+        private Dictionary<string, IEnumerable<FileCabinetRecord>> donationsCache = new Dictionary<string, IEnumerable<FileCabinetRecord>>();
 
         private List<int> ids = new List<int>() { 0 };
 
@@ -77,6 +87,12 @@
                 throw new ArgumentNullException($"Record object is invalid.");
             }
 
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
+            {
+                return -1;
+            }
+
             if (this.ids.Contains(record.Id))
             {
                 int indexOfPrev = this.list.FindIndex(rec => rec.Id.Equals(record.Id));
@@ -111,6 +127,12 @@
             }
 
             if (record.Id < 0 || !this.ids.Contains(record.Id))
+            {
+                return -1;
+            }
+
+            string exceptionMessage = this.validator.Validate(record);
+            if (exceptionMessage != null)
             {
                 return -1;
             }
@@ -155,25 +177,23 @@
         }
 
         /// <summary>
+        /// Searches the records by id.
+        /// </summary>
+        /// <param name="id">Given id.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindById(string id)
+        {
+            return FindInCache(this.idsDictionary, this.idsCache, id);
+        }
+
+        /// <summary>
         /// Searches the records by first name.
         /// </summary>
         /// <param name="firstName">Given first name.</param>
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByFirstName(string firstName)
         {
-            IEnumerable<FileCabinetRecord> foundRecords;
-
-            if (this.firstNameCache.ContainsKey(firstName))
-            {
-                foundRecords = this.firstNameCache[firstName];
-            }
-            else
-            {
-                foundRecords = FindByKey(firstName, this.firstNameDictionary);
-                this.firstNameCache.Add(firstName, foundRecords);
-            }
-
-            return foundRecords;
+            return FindInCache(this.firstNameDictionary, this.firstNameCache, firstName);
         }
 
         /// <summary>
@@ -183,19 +203,7 @@
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByLastName(string lastName)
         {
-            IEnumerable<FileCabinetRecord> foundRecords;
-
-            if (this.lastNameCache.ContainsKey(lastName))
-            {
-                foundRecords = this.lastNameCache[lastName];
-            }
-            else
-            {
-                foundRecords = FindByKey(lastName, this.lastNameDictionary);
-                this.lastNameCache.Add(lastName, foundRecords);
-            }
-
-            return foundRecords;
+            return FindInCache(this.lastNameDictionary, this.lastNameCache, lastName);
         }
 
         /// <summary>
@@ -205,19 +213,47 @@
         /// <returns>The array of records.</returns>
         public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
         {
-            IEnumerable<FileCabinetRecord> foundRecords;
+            return FindInCache(this.dateOfBirthDictionary, this.dateOfBirthCache, dateOfBirth);
+        }
 
-            if (this.dateOfBirthCache.ContainsKey(dateOfBirth))
-            {
-                foundRecords = this.dateOfBirthCache[dateOfBirth];
-            }
-            else
-            {
-                foundRecords = FindByKey(dateOfBirth, this.dateOfBirthDictionary);
-                this.dateOfBirthCache.Add(dateOfBirth, foundRecords);
-            }
+        /// <summary>
+        /// Searches the records by favourite number.
+        /// </summary>
+        /// <param name="favNumber">Given favourite number.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteNumber(string favNumber)
+        {
+            return FindInCache(this.favNumberDictionary, this.favNumberCache, favNumber);
+        }
 
-            return foundRecords;
+        /// <summary>
+        /// Searches the records by favourite character.
+        /// </summary>
+        /// <param name="favChar">Given favourite character.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteCharacter(string favChar)
+        {
+            return FindInCache(this.favCharacterDictionary, this.favCharCache, favChar);
+        }
+
+        /// <summary>
+        /// Searches the records by favourite game.
+        /// </summary>
+        /// <param name="favGame">Given favourite game.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteGame(string favGame)
+        {
+            return FindInCache(this.favGameDictionary, this.favGameCache, favGame);
+        }
+
+        /// <summary>
+        /// Searches the records by donations.
+        /// </summary>
+        /// <param name="donations">Given donations.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByDonations(string donations)
+        {
+            return FindInCache(this.donationsDictionary, this.donationsCache, donations);
         }
 
         /// <summary>
@@ -339,6 +375,23 @@
             }
         }
 
+        private static IEnumerable<FileCabinetRecord> FindInCache(Dictionary<string, List<FileCabinetRecord>> dictionary, Dictionary<string, IEnumerable<FileCabinetRecord>> cache, string key)
+        {
+            IEnumerable<FileCabinetRecord> foundRecords;
+
+            if (cache.ContainsKey(key))
+            {
+                foundRecords = cache[key];
+            }
+            else
+            {
+                foundRecords = FindByKey(key, dictionary);
+                cache.Add(key, foundRecords);
+            }
+
+            return foundRecords;
+        }
+
         /// <summary>
         /// Searches for the records in the dictionary by given key.
         /// </summary>
@@ -359,7 +412,15 @@
             }
             else
             {
-                throw new ArgumentException("No records found.");
+                return null;
+            }
+        }
+
+        private static void PurgeCache(Dictionary<string, IEnumerable<FileCabinetRecord>> cache, string key)
+        {
+            if (cache.ContainsKey(key))
+            {
+                cache.Remove(key);
             }
         }
 
@@ -376,23 +437,11 @@
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
 
-        private void PurgeCache(Dictionary<string, IEnumerable<FileCabinetRecord>> cache, string key)
-        {
-            if (cache.ContainsKey(key))
-            {
-                cache.Remove(key);
-            }
-        }
-
         private void PurgeCache(FileCabinetRecord record)
         {
-            this.PurgeCache(this.firstNameCache, record.FirstName);
-            this.PurgeCache(this.lastNameCache, record.LastName);
-            this.PurgeCache(this.dateOfBirthCache, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
-        }
-
-        public void Close()
-        {
+            PurgeCache(this.firstNameCache, record.FirstName);
+            PurgeCache(this.lastNameCache, record.LastName);
+            PurgeCache(this.dateOfBirthCache, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
         }
     }
 }

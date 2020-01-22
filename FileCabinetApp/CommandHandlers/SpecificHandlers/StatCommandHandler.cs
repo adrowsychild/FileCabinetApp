@@ -14,7 +14,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to get stats from.</param>
         public StatCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -45,9 +45,9 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Stat()
         {
-            var recordsCount = this.service.GetStat();
+            var recordsCount = this.Service.GetStat();
             Console.WriteLine($"{recordsCount} record(s).");
-            Console.WriteLine($"{this.service.GetDeleted()} records are ready to be purged.");
+            Console.WriteLine($"{this.Service.GetDeleted()} records are ready to be purged.");
         }
     }
 }

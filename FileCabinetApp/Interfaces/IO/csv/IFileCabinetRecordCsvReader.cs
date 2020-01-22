@@ -13,6 +13,6 @@ namespace FileCabinetApp.Interfaces
         /// Reads records from csv file.
         /// </summary>
         /// <returns>List of records.</returns>
-        public IList<FileCabinetRecord> ReadAll();
+        IList<FileCabinetRecord> ReadAll();
     }
 }

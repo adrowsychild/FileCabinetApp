@@ -16,7 +16,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to import records to.</param>
         public ImportCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -74,13 +74,13 @@ namespace FileCabinetApp.CommandHandlers
                     case "csv":
                         records = snapshot.LoadFromCsv(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = this.service.Restore(snapshot);
+                        importedRecords = this.Service.Restore(snapshot);
                         break;
 
                     case "xml":
                         records = snapshot.LoadFromXml(reader);
                         snapshot = new FileCabinetServiceSnapshot(records);
-                        importedRecords = this.service.Restore(snapshot);
+                        importedRecords = this.Service.Restore(snapshot);
                         break;
 
                     default:

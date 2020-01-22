@@ -71,16 +71,16 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Adds timing count for FindByDateOfBirth method.
+        /// Adds timing count for FindById method.
         /// </summary>
-        /// <param name="dateOfBirth">Given date of birth.</param>
+        /// <param name="id">Given id.</param>
         /// <returns>The array of records.</returns>
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindById(string id)
         {
             this.watch = Stopwatch.StartNew();
-            var foundRecords = this.service.FindByDateOfBirth(dateOfBirth);
+            var foundRecords = this.service.FindById(id);
             this.watch.Stop();
-            Console.WriteLine($"FindByDateOfBirth method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+            Console.WriteLine($"FindById method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 
             return foundRecords;
         }
@@ -111,6 +111,81 @@ namespace FileCabinetApp
             var foundRecords = this.service.FindByLastName(lastName);
             this.watch.Stop();
             Console.WriteLine($"FindByLastName method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+
+            return foundRecords;
+        }
+
+        /// <summary>
+        /// Adds timing count for FindByDateOfBirth method.
+        /// </summary>
+        /// <param name="dateOfBirth">Given date of birth.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        {
+            this.watch = Stopwatch.StartNew();
+            var foundRecords = this.service.FindByDateOfBirth(dateOfBirth);
+            this.watch.Stop();
+            Console.WriteLine($"FindByDateOfBirth method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+
+            return foundRecords;
+        }
+
+        /// <summary>
+        /// Adds timing count for FindByFavouriteNumber method.
+        /// </summary>
+        /// <param name="favNumber">Given favourite number.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteNumber(string favNumber)
+        {
+            this.watch = Stopwatch.StartNew();
+            var foundRecords = this.service.FindByFavouriteNumber(favNumber);
+            this.watch.Stop();
+            Console.WriteLine($"FindByFavouriteNumber method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+
+            return foundRecords;
+        }
+
+        /// <summary>
+        /// Adds timing count for FindByFavouriteCharacter method.
+        /// </summary>
+        /// <param name="favChar">Given favourite character.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteCharacter(string favChar)
+        {
+            this.watch = Stopwatch.StartNew();
+            var foundRecords = this.service.FindByFavouriteCharacter(favChar);
+            this.watch.Stop();
+            Console.WriteLine($"FindByFavouriteCharacter method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+
+            return foundRecords;
+        }
+
+        /// <summary>
+        /// Adds timing count for FindByFavouriteGame method.
+        /// </summary>
+        /// <param name="favGame">Given favourite game.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteGame(string favGame)
+        {
+            this.watch = Stopwatch.StartNew();
+            var foundRecords = this.service.FindByFavouriteGame(favGame);
+            this.watch.Stop();
+            Console.WriteLine($"FindByFavouriteGame method execution duration is " + this.watch.ElapsedTicks + " ticks.");
+
+            return foundRecords;
+        }
+
+        /// <summary>
+        /// Adds timing count for FindByDonations method.
+        /// </summary>
+        /// <param name="donations">Given donations.</param>
+        /// <returns>The array of records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByDonations(string donations)
+        {
+            this.watch = Stopwatch.StartNew();
+            var foundRecords = this.service.FindByDonations(donations);
+            this.watch.Stop();
+            Console.WriteLine($"FindByDonations method execution duration is " + this.watch.ElapsedTicks + " ticks.");
 
             return foundRecords;
         }

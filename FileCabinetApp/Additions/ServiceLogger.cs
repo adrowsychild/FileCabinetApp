@@ -99,16 +99,17 @@ namespace FileCabinetApp
         }
 
         /// <summary>
-        /// Adds logs about FindByDateOfBirth method in the textfile.
+        /// Adds logs about FindById method in the textfile.
         /// </summary>
-        /// <param name="dateOfBirth">Date of birth to find by.</param>
+        /// <param name="id">Id to find by.</param>
         /// <returns>List of found records.</returns>
-        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        public IEnumerable<FileCabinetRecord> FindById(string id)
         {
-            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + dateOfBirth + "'" + "\n";
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with FirstName'" + id + "'" + "\n";
+
             this.writer.Write(toWrite);
 
-            var records = this.service.FindByDateOfBirth(dateOfBirth);
+            var records = this.service.FindById(id);
 
             if (records != null)
             {
@@ -182,6 +183,186 @@ namespace FileCabinetApp
             this.writer.Write(toWrite);
 
             var records = this.service.FindByLastName(lastName);
+
+            if (records != null)
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
+
+                foreach (var record in records)
+                {
+                    toWrite += record.Id;
+                    toWrite += " ";
+                }
+
+                toWrite += "\n";
+            }
+            else
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() found no records.";
+            }
+
+            toWrite += "\n";
+
+            this.writer.Write(toWrite);
+
+            return records;
+        }
+
+        /// <summary>
+        /// Adds logs about FindByDateOfBirth method in the textfile.
+        /// </summary>
+        /// <param name="dateOfBirth">Date of birth to find by.</param>
+        /// <returns>List of found records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByDateOfBirth(string dateOfBirth)
+        {
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + dateOfBirth + "'" + "\n";
+            this.writer.Write(toWrite);
+
+            var records = this.service.FindByDateOfBirth(dateOfBirth);
+
+            if (records != null)
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
+
+                foreach (var record in records)
+                {
+                    toWrite += record.Id;
+                    toWrite += " ";
+                }
+
+                toWrite += "\n";
+            }
+            else
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() found no records.";
+            }
+
+            toWrite += "\n";
+
+            this.writer.Write(toWrite);
+
+            return records;
+        }
+
+        /// <summary>
+        /// Adds logs about FindByFavouriteNumber method in the textfile.
+        /// </summary>
+        /// <param name="favNumber">FavouriteNumber to find by.</param>
+        /// <returns>List of found records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteNumber(string favNumber)
+        {
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + favNumber + "'" + "\n";
+            this.writer.Write(toWrite);
+
+            var records = this.service.FindByFavouriteNumber(favNumber);
+
+            if (records != null)
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
+
+                foreach (var record in records)
+                {
+                    toWrite += record.Id;
+                    toWrite += " ";
+                }
+
+                toWrite += "\n";
+            }
+            else
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() found no records.";
+            }
+
+            toWrite += "\n";
+
+            this.writer.Write(toWrite);
+
+            return records;
+        }
+
+        /// <summary>
+        /// Adds logs about FindByFavouriteCharacter method in the textfile.
+        /// </summary>
+        /// <param name="favChar">Favourite character to find by.</param>
+        /// <returns>List of found records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteCharacter(string favChar)
+        {
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + favChar + "'" + "\n";
+            this.writer.Write(toWrite);
+
+            var records = this.service.FindByFavouriteCharacter(favChar);
+
+            if (records != null)
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
+
+                foreach (var record in records)
+                {
+                    toWrite += record.Id;
+                    toWrite += " ";
+                }
+
+                toWrite += "\n";
+            }
+            else
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() found no records.";
+            }
+
+            toWrite += "\n";
+
+            this.writer.Write(toWrite);
+
+            return records;
+        }
+
+        /// <summary>
+        /// Adds logs about FindByFavouriteGame method in the textfile.
+        /// </summary>
+        /// <param name="favGame">Date of birth to find by.</param>
+        /// <returns>List of found records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByFavouriteGame(string favGame)
+        {
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + favGame + "'" + "\n";
+            this.writer.Write(toWrite);
+
+            var records = this.service.FindByFavouriteGame(favGame);
+
+            if (records != null)
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() returned records with ids ";
+
+                foreach (var record in records)
+                {
+                    toWrite += record.Id;
+                    toWrite += " ";
+                }
+
+                toWrite += "\n";
+            }
+            else
+            {
+                toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Find() found no records.";
+            }
+
+            toWrite += "\n";
+
+            this.writer.Write(toWrite);
+
+            return records;
+        }
+
+        /// <summary>
+        /// Adds logs about FindByDonations method in the textfile.
+        /// </summary>
+        /// <param name="donations">Date of birth to find by.</param>
+        /// <returns>List of found records.</returns>
+        public IEnumerable<FileCabinetRecord> FindByDonations(string donations)
+        {
+            string toWrite = DateTime.Now.ToString("MM/dd/yyyy hh:mm", CultureInfo.InvariantCulture) + " Calling Find() with DateOfBirth'" + donations + "'" + "\n";
+            this.writer.Write(toWrite);
+
+            var records = this.service.FindByDonations(donations);
 
             if (records != null)
             {

@@ -13,6 +13,6 @@ namespace FileCabinetApp.Interfaces
         /// </summary>
         /// <param name="record">Record to write about.</param>
         /// <returns>Whether operation succeeded.</returns>
-        public bool Write(FileCabinetRecord record);
+        bool Write(FileCabinetRecord record);
     }
 }

@@ -17,7 +17,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to get stats from.</param>
         public InsertCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -43,6 +43,10 @@ namespace FileCabinetApp.CommandHandlers
             }
         }
 
+        /// <summary>
+        /// Inserts the records in the service.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private void Insert(string parameters)
         {
             if (string.IsNullOrEmpty(parameters))
@@ -170,7 +174,7 @@ namespace FileCabinetApp.CommandHandlers
                 props[i].SetValue(record, value);
             }
 
-            int id = this.service.AddRecord(record);
+            int id = this.Service.AddRecord(record);
 
             if (id == -1)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -19,7 +20,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to create record in.</param>
         public UpdateCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -45,9 +46,13 @@ namespace FileCabinetApp.CommandHandlers
             }
         }
 
+        /// <summary>
+        /// Updates the needed fields of records.
+        /// </summary>
+        /// <param name="parameters">Parameters.</param>
         private void Update(string parameters)
         {
-            int indexOfSet = parameters.IndexOf("set");
+            int indexOfSet = parameters.IndexOf("set", StringComparison.InvariantCulture);
             if (indexOfSet == -1)
             {
                 return;
@@ -68,19 +73,18 @@ namespace FileCabinetApp.CommandHandlers
                 propIndex.Add(properties[i].Name.ToLower(), i);
             }
 
-            string[] set = this.MakeSet(parameters);
+            string[] set = MakeSet(parameters);
             if (set == null)
             {
                 Console.WriteLine("Incorrect to-set conditions.");
                 return;
             }
 
-            List<FileCabinetRecord> foundRecords = this.WhereParser(parameters.Substring(parameters.IndexOf("where") + 6).Split());
+            ReadOnlyCollection<FileCabinetRecord> foundRecords = this.WhereParser(parameters.Substring(parameters.IndexOf("where", StringComparison.InvariantCulture) + 6).Split());
             List<FileCabinetRecord> copyOfRecords = new List<FileCabinetRecord>();
 
             if (foundRecords == null)
             {
-                Console.WriteLine("No records found and changed.");
                 return;
             }
 
@@ -140,11 +144,8 @@ namespace FileCabinetApp.CommandHandlers
 
             foreach (var record in copyOfRecords)
             {
-                this.service.AddRecord(record);
+                this.Service.AddRecord(record);
             }
-
-             DefaultRecordPrinter printer = new DefaultRecordPrinter();
-             printer.Print(this.service.GetRecords());
         }
     }
 }

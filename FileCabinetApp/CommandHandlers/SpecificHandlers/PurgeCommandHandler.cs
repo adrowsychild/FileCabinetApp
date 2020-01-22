@@ -14,7 +14,7 @@ namespace FileCabinetApp.CommandHandlers
         /// <param name="fileCabinetService">Service to purge.</param>
         public PurgeCommandHandler(IFileCabinetService fileCabinetService)
         {
-            this.service = fileCabinetService;
+            this.Service = fileCabinetService;
         }
 
         /// <summary>
@@ -45,12 +45,12 @@ namespace FileCabinetApp.CommandHandlers
         /// </summary>
         private void Purge()
         {
-            if (this.service.GetType() == typeof(FileCabinetFilesystemService))
+            if (this.Service.GetType() == typeof(FileCabinetFilesystemService))
             {
-                int initialNumOfRecords = this.service.GetStat();
+                int initialNumOfRecords = this.Service.GetStat();
 
                 MethodInfo method = typeof(FileCabinetFilesystemService).GetMethod("Purge");
-                int recordsPurged = (int)method.Invoke(this.service, null);
+                int recordsPurged = (int)method.Invoke(this.Service, null);
                 Console.WriteLine("Data file processing is completed: " + recordsPurged + " of " + initialNumOfRecords + " records were purged.");
             }
         }

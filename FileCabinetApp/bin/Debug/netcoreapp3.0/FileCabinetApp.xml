@@ -4,6 +4,283 @@
         <name>FileCabinetApp</name>
     </assembly>
     <members>
+        <member name="T:FileCabinetApp.ServiceLogger">
+            <summary>
+            Class for adding loggs of service's methods to the file.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.#ctor(FileCabinetApp.IFileCabinetService,System.IO.StreamWriter)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.ServiceLogger"/> class.
+            </summary>
+            <param name="service">Service to decorate.</param>
+            <param name="writer">Writer to write to.</param>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.AddRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about AddRecord method in the textfile.
+            </summary>
+            <param name="record">Record to add.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.CreateRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about CreateRecord method in the textfile.
+            </summary>
+            <param name="record">Record to create.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.EditRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds logs about EditRecord method in the textfile.
+            </summary>
+            <param name="record">Record to edit.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindById(System.String)">
+            <summary>
+            Adds logs about FindById method in the textfile.
+            </summary>
+            <param name="id">Id to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByFirstName(System.String)">
+            <summary>
+            Adds logs about FindByFirstName method in the textfile.
+            </summary>
+            <param name="firstName">First name to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByLastName(System.String)">
+            <summary>
+            Adds logs about FindByLastName method in the textfile.
+            </summary>
+            <param name="lastName">Last name to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByDateOfBirth(System.String)">
+            <summary>
+            Adds logs about FindByDateOfBirth method in the textfile.
+            </summary>
+            <param name="dateOfBirth">Date of birth to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByFavouriteNumber(System.String)">
+            <summary>
+            Adds logs about FindByFavouriteNumber method in the textfile.
+            </summary>
+            <param name="favNumber">FavouriteNumber to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByFavouriteCharacter(System.String)">
+            <summary>
+            Adds logs about FindByFavouriteCharacter method in the textfile.
+            </summary>
+            <param name="favChar">Favourite character to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByFavouriteGame(System.String)">
+            <summary>
+            Adds logs about FindByFavouriteGame method in the textfile.
+            </summary>
+            <param name="favGame">Date of birth to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.FindByDonations(System.String)">
+            <summary>
+            Adds logs about FindByDonations method in the textfile.
+            </summary>
+            <param name="donations">Date of birth to find by.</param>
+            <returns>List of found records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetDeleted">
+            <summary>
+            Returns the number of deleted records in the list.
+            </summary>
+            <returns>The number of deleted records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetIds">
+            <summary>
+            Returns list of ids in the list.
+            </summary>
+            <returns>List of ids in the list.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetRecords">
+            <summary>
+            Adds logs about GetRecords method in the textfile.
+            </summary>
+            <returns>The list of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetStat">
+            <summary>
+            Adds logs about GetStat method in the textfile.
+            </summary>
+            <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.GetValidator">
+            <summary>
+            Gets the validator.
+            </summary>
+            <returns>Validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.MakeSnapshot">
+            <summary>
+            Adds logs about MakeSnapshot method in the textfile.
+            </summary>
+            <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.RemoveRecord(System.Int32)">
+            <summary>
+            Adds logs about Remove method in the textfile.
+            </summary>
+            <param name="id">Id to remove by.</param>
+            <returns>Id of removed record.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceLogger.Restore(FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot)">
+            <summary>
+            Adds logs about Restore method in the textfile.
+            </summary>
+            <param name="snapshot">Snapshot to restore by.</param>
+            <returns>Number of imported records.</returns>
+        </member>
+        <member name="T:FileCabinetApp.ServiceMeter">
+            <summary>
+            Class for measuring timings of service's methods.
+            </summary>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.#ctor(FileCabinetApp.IFileCabinetService)">
+            <summary>
+            Initializes a new instance of the <see cref="T:FileCabinetApp.ServiceMeter"/> class.
+            </summary>
+            <param name="service">Service for measuring.</param>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.AddRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds timing count for Add method.
+            </summary>
+            <param name="record">Record to add.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.CreateRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds timing count for create method.
+            </summary>
+            <param name="record">Record to create.</param>
+            <returns>Record's id.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.EditRecord(FileCabinetApp.FileCabinetRecord)">
+            <summary>
+            Adds timing count for edit method.
+            </summary>
+            <param name="record">Record to edit.</param>
+            <returns>Whether operation succeeded.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindById(System.String)">
+            <summary>
+            Adds timing count for FindById method.
+            </summary>
+            <param name="id">Given id.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByFirstName(System.String)">
+            <summary>
+            Adds timing count for FindByFirstName method.
+            </summary>
+            <param name="firstName">Given first name.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByLastName(System.String)">
+            <summary>
+            Adds timing count for FindByLastName method.
+            </summary>
+            <param name="lastName">Given last name.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByDateOfBirth(System.String)">
+            <summary>
+            Adds timing count for FindByDateOfBirth method.
+            </summary>
+            <param name="dateOfBirth">Given date of birth.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByFavouriteNumber(System.String)">
+            <summary>
+            Adds timing count for FindByFavouriteNumber method.
+            </summary>
+            <param name="favNumber">Given favourite number.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByFavouriteCharacter(System.String)">
+            <summary>
+            Adds timing count for FindByFavouriteCharacter method.
+            </summary>
+            <param name="favChar">Given favourite character.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByFavouriteGame(System.String)">
+            <summary>
+            Adds timing count for FindByFavouriteGame method.
+            </summary>
+            <param name="favGame">Given favourite game.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.FindByDonations(System.String)">
+            <summary>
+            Adds timing count for FindByDonations method.
+            </summary>
+            <param name="donations">Given donations.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetDeleted">
+            <summary>
+            Adds timing count for GetDeleted method.
+            </summary>
+            <returns>The number of deleted records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetIds">
+            <summary>
+            Adds timing count for GetIds method.
+            </summary>
+            <returns>List of ids in the list.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetRecords">
+            <summary>
+            Adds timing count for GetRecords method.
+            </summary>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetStat">
+            <summary>
+            Adds timing count for GetStat method.
+            </summary>
+            <returns>The number of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.GetValidator">
+            <summary>
+            Adds timing count for GetValidator method.
+            </summary>
+            <returns>The service's validator.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.MakeSnapshot">
+            <summary>
+            Adds timing count for MakeSnapshot method.
+            </summary>
+            <returns>>An instance of the IFileCabinetServiceSnapshot class.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.RemoveRecord(System.Int32)">
+            <summary>
+            Adds timing count for RemoveRecord method.
+            </summary>
+            <param name="id">Id of record to remove.</param>
+            <returns>Id of removed record if succeeded, -1 otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.ServiceMeter.Restore(FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot)">
+            <summary>
+            Adds timing count for Restore method.
+            </summary>
+            <param name="snapshot">A snapshot of records to restore.</param>
+            <returns>Number of imported records.</returns>
+        </member>
         <member name="T:FileCabinetApp.CommandHandlers.AppCommandRequest">
             <summary>
             User's request.
@@ -97,10 +374,11 @@
             Handler for the user's commands which relate to the service.
             </summary>
         </member>
-        <member name="F:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.service">
+        <member name="P:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.Service">
             <summary>
-            The service to get information and modify.
+            Gets or sets the service to get information from and modify.
             </summary>
+            <value>Service to get information from and modify.</value>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ReadInput``1(System.Func{System.String,System.Tuple{System.Boolean,System.String,``0}})">
             <summary>
@@ -121,6 +399,52 @@
             Type of conversion as string.
             Converted value itself.
             </returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ParsePropertyValuePair(System.String[])">
+            <summary>
+            Parses the string to tuple.
+            </summary>
+            <param name="args">String to parse.</param>
+            <returns>Tuple of string name of property,
+            string value to find by and size that the condition takes in string.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.SubArrString(System.String[],System.Int32)">
+            <summary>
+            Extracts part array of string from array of string.
+            </summary>
+            <param name="arr">Array to extract from.</param>
+            <param name="from">Index to start from.</param>
+            <returns>Extracted string.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.SubArrString(System.String[],System.Int32,System.Int32)">
+            <summary>
+            Extracts part array of string from array of string.
+            </summary>
+            <param name="arr">Array to extract from.</param>
+            <param name="from">Index to start from.</param>
+            <param name="to">Index to extract to.</param>
+            <returns>Extracted string.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.ParseProperties(System.String)">
+            <summary>
+            Parses the list of properties in string(possibly separated by comas).
+            </summary>
+            <param name="parameters">Parameters to parse by.</param>
+            <returns>The list of properties.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.MakeSet(System.String)">
+            <summary>
+            Makes set of property-value.
+            </summary>
+            <param name="parameters">Arrays of values.</param>
+            <returns>Arrays of values in special corresponding with properties cells.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.WhereParser(System.String[])">
+            <summary>
+            Parses the criterion after 'where'.
+            </summary>
+            <param name="args">Strings to parse.</param>
+            <returns>Collection of records.</returns>
         </member>
         <member name="M:FileCabinetApp.CommandHandlers.ServiceCommandHandlerBase.CheckRecordInput(System.Int32)">
             <summary>
@@ -169,6 +493,12 @@
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.DeleteCommandHandler.Delete(System.String)">
+            <summary>
+            Deletes the records by the given criterion.
+            </summary>
+            <param name="parameters">Parameters.</param>
         </member>
         <member name="T:FileCabinetApp.CommandHandlers.ExitCommandHandler">
             <summary>
@@ -277,6 +607,12 @@
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.InsertCommandHandler.Insert(System.String)">
+            <summary>
+            Inserts the records in the service.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
         <member name="T:FileCabinetApp.CommandHandlers.PurgeCommandHandler">
             <summary>
             Handler for the user's 'purge' command.
@@ -318,6 +654,60 @@
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
         </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.WriteValues(FileCabinetApp.FileCabinetRecord,System.Collections.Generic.List{System.Reflection.PropertyInfo},System.Collections.Generic.List{System.Int32},System.Int32)">
+            <summary>
+            Writes values to the table.
+            </summary>
+            <param name="record">Record to write values from.</param>
+            <param name="properties">Properties to write.</param>
+            <param name="maxLength">Max lengths of the cells.</param>
+            <param name="padding">Padding.</param>
+            <returns>Outout string.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.WriteProperty(System.Collections.Generic.List{System.Reflection.PropertyInfo},System.Collections.Generic.List{System.Int32},System.Int32)">
+            <summary>
+            Writes names of properties to the table.
+            </summary>
+            <param name="properties">Properties to write.</param>
+            <param name="maxLength">Max lengths of the cells.</param>
+            <param name="padding">Padding.</param>
+            <returns>Outout string.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.WriteSpaces(System.Int32)">
+            <summary>
+            Writes white spaces.
+            </summary>
+            <param name="count">Number of spaces.</param>
+            <returns>Output string in spaces.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.WriteDashedLine(System.Collections.Generic.List{System.Int32},System.Int32)">
+            <summary>
+            Writes dashed line for all the properties.
+            </summary>
+            <param name="maxLength">Max lengths of the cells.</param>
+            <param name="padding">Padding.</param>
+            <returns>Output dashed line.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.WriteDashedLine(System.Int32)">
+            <summary>
+            Writes only dashed part of line.
+            </summary>
+            <param name="length">Length of dashed line to write.</param>
+            <returns>Output dashed line.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.IsNumericType(System.Object)">
+            <summary>
+            Checks whether object is of numeric type.
+            </summary>
+            <param name="o">Object to check type of.</param>
+            <returns>Whether object is of numeric type.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.SelectCommandHandler.Select(System.String)">
+            <summary>
+            Selects the records and shows them to the user.
+            </summary>
+            <param name="parameters">Parameters.</param>
+        </member>
         <member name="T:FileCabinetApp.CommandHandlers.StatCommandHandler">
             <summary>
             Handler for the user's 'stat' command.
@@ -358,6 +748,12 @@
             </summary>
             <param name="request">Request to handle.</param>
             <returns>The object back, or null otherwise.</returns>
+        </member>
+        <member name="M:FileCabinetApp.CommandHandlers.UpdateCommandHandler.Update(System.String)">
+            <summary>
+            Updates the needed fields of records.
+            </summary>
+            <param name="parameters">Parameters.</param>
         </member>
         <member name="T:FileCabinetApp.FileCabinetRecord">
             <summary>
@@ -430,6 +826,12 @@
             Gets or sets user's id in the users' donations.
             </summary>
             <value> Given donations. </value>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetRecord.Clone">
+            <summary>
+            Implements ICloneable interface.
+            </summary>
+            <returns>The copy of the record.</returns>
         </member>
         <member name="T:FileCabinetApp.Extensions.ValidatorExtensions.AgeConstraints">
             <summary>
@@ -652,25 +1054,32 @@
             <param name="reader">Xml reader.</param>
             <returns>List of imported records.</returns>
         </member>
-        <member name="T:FileCabinetApp.FileSystemRecordEnumerator">
+        <member name="T:FileCabinetApp.FileSystemRecordCollection">
             <summary>
             Enumerator for iterating through records.
             </summary>
         </member>
-        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
+        <member name="M:FileCabinetApp.FileSystemRecordCollection.#ctor(FileCabinetApp.FileCabinetFilesystemService,System.Collections.ObjectModel.ReadOnlyCollection{FileCabinetApp.FileCabinetRecord})">
             <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.FileSystemRecordEnumerator"/> class.
+            Initializes a new instance of the <see cref="T:FileCabinetApp.FileSystemRecordCollection"/> class.
             </summary>
             <param name="service">Service whose records to iterate through.</param>
             <param name="records">Records to iterate through.</param>
         </member>
-        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.GetEnumerator">
+        <member name="M:FileCabinetApp.FileSystemRecordCollection.ToList(FileCabinetApp.FileSystemRecordCollection)">
+            <summary>
+            Converts the instance of enumerator to list.
+            </summary>
+            <param name="enumeratedRecords">Enumerator to convert.</param>
+            <returns>List.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileSystemRecordCollection.GetEnumerator">
             <summary>
             Iterator to iterate through the records.
             </summary>
             <returns>Single record.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileSystemRecordEnumerator.System#Collections#IEnumerable#GetEnumerator">
+        <member name="M:FileCabinetApp.FileSystemRecordCollection.System#Collections#IEnumerable#GetEnumerator">
             <summary>
             Iterator to iterate through the records.
             </summary>
@@ -744,6 +1153,13 @@
             <returns>Id of removed record if succeeded, -1 otherwise.
             </returns>
         </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindById(System.String)">
+            <summary>
+            Searches the records by id.
+            </summary>
+            <param name="id">Given id.</param>
+            <returns>The array of records.</returns>
+        </member>
         <member name="M:FileCabinetApp.IFileCabinetService.FindByFirstName(System.String)">
             <summary>
             Searches the records by first name.
@@ -763,6 +1179,34 @@
             Searches the records by date of birth.
             </summary>
             <param name="dateOfBirth">Given date of birth.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByFavouriteNumber(System.String)">
+            <summary>
+            Searches the records by favourite number.
+            </summary>
+            <param name="favNumber">Given favourite number.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByFavouriteCharacter(System.String)">
+            <summary>
+            Searches the records by favourite character.
+            </summary>
+            <param name="favCharacter">Given favourite character.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByFavouriteGame(System.String)">
+            <summary>
+            Searches the records by favourite game.
+            </summary>
+            <param name="favGame">Given favourite game.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.IFileCabinetService.FindByDonations(System.String)">
+            <summary>
+            Searches the records by donations.
+            </summary>
+            <param name="donations">Given donations.</param>
             <returns>The array of records.</returns>
         </member>
         <member name="M:FileCabinetApp.IFileCabinetService.MakeSnapshot">
@@ -1015,216 +1459,14 @@
             </summary>
             <param name="record">Record to print.</param>
         </member>
-        <member name="T:FileCabinetApp.ServiceLogger">
-            <summary>
-            Class for adding loggs of service's methods to the file.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.#ctor(FileCabinetApp.IFileCabinetService,System.IO.StreamWriter)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.ServiceLogger"/> class.
-            </summary>
-            <param name="service">Service to decorate.</param>
-            <param name="writer">Writer to write to.</param>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.AddRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds logs about AddRecord method in the textfile.
-            </summary>
-            <param name="record">Record to add.</param>
-            <returns>Record's id.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.CreateRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds logs about CreateRecord method in the textfile.
-            </summary>
-            <param name="record">Record to create.</param>
-            <returns>Record's id.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.EditRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds logs about EditRecord method in the textfile.
-            </summary>
-            <param name="record">Record to edit.</param>
-            <returns>Whether operation succeeded.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.FindByDateOfBirth(System.String)">
-            <summary>
-            Adds logs about FindByDateOfBirth method in the textfile.
-            </summary>
-            <param name="dateOfBirth">Date of birth to find by.</param>
-            <returns>List of found records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.FindByFirstName(System.String)">
-            <summary>
-            Adds logs about FindByFirstName method in the textfile.
-            </summary>
-            <param name="firstName">First name to find by.</param>
-            <returns>List of found records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.FindByLastName(System.String)">
-            <summary>
-            Adds logs about FindByLastName method in the textfile.
-            </summary>
-            <param name="lastName">Last name to find by.</param>
-            <returns>List of found records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetDeleted">
-            <summary>
-            Returns the number of deleted records in the list.
-            </summary>
-            <returns>The number of deleted records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetIds">
-            <summary>
-            Returns list of ids in the list.
-            </summary>
-            <returns>List of ids in the list.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetRecords">
-            <summary>
-            Adds logs about GetRecords method in the textfile.
-            </summary>
-            <returns>The list of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetStat">
-            <summary>
-            Adds logs about GetStat method in the textfile.
-            </summary>
-            <returns>The number of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.GetValidator">
-            <summary>
-            Gets the validator.
-            </summary>
-            <returns>Validator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.MakeSnapshot">
-            <summary>
-            Adds logs about MakeSnapshot method in the textfile.
-            </summary>
-            <returns>An instance of the IFileCabinetServiceSnapshot class.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.RemoveRecord(System.Int32)">
-            <summary>
-            Adds logs about Remove method in the textfile.
-            </summary>
-            <param name="id">Id to remove by.</param>
-            <returns>Id of removed record.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceLogger.Restore(FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot)">
-            <summary>
-            Adds logs about Restore method in the textfile.
-            </summary>
-            <param name="snapshot">Snapshot to restore by.</param>
-            <returns>Number of imported records.</returns>
-        </member>
-        <member name="T:FileCabinetApp.ServiceMeter">
-            <summary>
-            Class for measuring timings of service's methods.
-            </summary>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.#ctor(FileCabinetApp.IFileCabinetService)">
-            <summary>
-            Initializes a new instance of the <see cref="T:FileCabinetApp.ServiceMeter"/> class.
-            </summary>
-            <param name="service">Service for measuring.</param>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.AddRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds timing count for Add method.
-            </summary>
-            <param name="record">Record to add.</param>
-            <returns>Record's id.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.CreateRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds timing count for create method.
-            </summary>
-            <param name="record">Record to create.</param>
-            <returns>Record's id.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.EditRecord(FileCabinetApp.FileCabinetRecord)">
-            <summary>
-            Adds timing count for edit method.
-            </summary>
-            <param name="record">Record to edit.</param>
-            <returns>Whether operation succeeded.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.FindByDateOfBirth(System.String)">
-            <summary>
-            Adds timing count for FindByDateOfBirth method.
-            </summary>
-            <param name="dateOfBirth">Given date of birth.</param>
-            <returns>The array of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.FindByFirstName(System.String)">
-            <summary>
-            Adds timing count for FindByFirstName method.
-            </summary>
-            <param name="firstName">Given first name.</param>
-            <returns>The array of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.FindByLastName(System.String)">
-            <summary>
-            Adds timing count for FindByLastName method.
-            </summary>
-            <param name="lastName">Given last name.</param>
-            <returns>The array of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetDeleted">
-            <summary>
-            Adds timing count for GetDeleted method.
-            </summary>
-            <returns>The number of deleted records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetIds">
-            <summary>
-            Adds timing count for GetIds method.
-            </summary>
-            <returns>List of ids in the list.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetRecords">
-            <summary>
-            Adds timing count for GetRecords method.
-            </summary>
-            <returns>The array of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetStat">
-            <summary>
-            Adds timing count for GetStat method.
-            </summary>
-            <returns>The number of records.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.GetValidator">
-            <summary>
-            Adds timing count for GetValidator method.
-            </summary>
-            <returns>The service's validator.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.MakeSnapshot">
-            <summary>
-            Adds timing count for MakeSnapshot method.
-            </summary>
-            <returns>>An instance of the IFileCabinetServiceSnapshot class.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.RemoveRecord(System.Int32)">
-            <summary>
-            Adds timing count for RemoveRecord method.
-            </summary>
-            <param name="id">Id of record to remove.</param>
-            <returns>Id of removed record if succeeded, -1 otherwise.</returns>
-        </member>
-        <member name="M:FileCabinetApp.ServiceMeter.Restore(FileCabinetApp.Interfaces.IFileCabinetServiceSnapshot)">
-            <summary>
-            Adds timing count for Restore method.
-            </summary>
-            <param name="snapshot">A snapshot of records to restore.</param>
-            <returns>Number of imported records.</returns>
-        </member>
         <member name="T:FileCabinetApp.FileCabinetFilesystemService">
             <summary>
             Class for working with list of users.
+            </summary>
+        </member>
+        <member name="F:FileCabinetApp.FileCabinetFilesystemService.RecordSize">
+            <summary>
+            The size of the record in bytes.
             </summary>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.#ctor(System.IO.FileStream,FileCabinetApp.IRecordValidator)">
@@ -1277,6 +1519,13 @@
             -1 if not all the records were purged.
             </returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindById(System.String)">
+            <summary>
+            Searches the records by id.
+            </summary>
+            <param name="id">Given id.</param>
+            <returns>The array of records.</returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFirstName(System.String)">
             <summary>
             Searches the records by first name.
@@ -1298,13 +1547,35 @@
             <param name="dateOfBirth">Given date of birth.</param>
             <returns>The array of records.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecords">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFavouriteNumber(System.String)">
             <summary>
-            Gets all the records.
+            Searches the records by favourite number.
             </summary>
+            <param name="favNumber">Given favourite number.</param>
             <returns>The array of records.</returns>
         </member>
-        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetUnsafeRecords">
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFavouriteCharacter(System.String)">
+            <summary>
+            Searches the records by favourite character.
+            </summary>
+            <param name="favCharacter">Given favourite character.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByFavouriteGame(System.String)">
+            <summary>
+            Searches the records by favourite game.
+            </summary>
+            <param name="favGame">Given favourite game.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.FindByDonations(System.String)">
+            <summary>
+            Searches the records by donations.
+            </summary>
+            <param name="donations">Given donations.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecords">
             <summary>
             Gets all the records.
             </summary>
@@ -1352,6 +1623,7 @@
             Reads the record from the file.
             </summary>
             <param name="offset">Offset to read from.</param>
+            <returns>Record read.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetFilesystemService.WriteRecord(FileCabinetApp.FileCabinetRecord,System.Int32)">
             <summary>
@@ -1387,6 +1659,13 @@
             </summary>
             <param name="record">Record to delelte properties from.</param>
             <param name="recordOffset">Record's offset in the file.</param>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetFilesystemService.GetRecord(System.Int32)">
+            <summary>
+            Gets a single method from the list of records.
+            </summary>
+            <param name="id">Id to get record by.</param>
+            <returns>The record found, null otherwise.</returns>
         </member>
         <member name="T:FileCabinetApp.FileCabinetMemoryService">
             <summary>
@@ -1428,6 +1707,13 @@
             <returns>Id of removed record if succeeded, -1 otherwise.
             </returns>
         </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindById(System.String)">
+            <summary>
+            Searches the records by id.
+            </summary>
+            <param name="id">Given id.</param>
+            <returns>The array of records.</returns>
+        </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFirstName(System.String)">
             <summary>
             Searches the records by first name.
@@ -1447,6 +1733,34 @@
             Searches the records by date of birth.
             </summary>
             <param name="dateOfBirth">Given date of birth.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFavouriteNumber(System.String)">
+            <summary>
+            Searches the records by favourite number.
+            </summary>
+            <param name="favNumber">Given favourite number.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFavouriteCharacter(System.String)">
+            <summary>
+            Searches the records by favourite character.
+            </summary>
+            <param name="favChar">Given favourite character.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByFavouriteGame(System.String)">
+            <summary>
+            Searches the records by favourite game.
+            </summary>
+            <param name="favGame">Given favourite game.</param>
+            <returns>The array of records.</returns>
+        </member>
+        <member name="M:FileCabinetApp.FileCabinetMemoryService.FindByDonations(System.String)">
+            <summary>
+            Searches the records by donations.
+            </summary>
+            <param name="donations">Given donations.</param>
             <returns>The array of records.</returns>
         </member>
         <member name="M:FileCabinetApp.FileCabinetMemoryService.GetRecords">

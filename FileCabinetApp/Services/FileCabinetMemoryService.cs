@@ -97,9 +97,8 @@
             {
                 int indexOfPrev = this.list.FindIndex(rec => rec.Id.Equals(record.Id));
 
-                this.firstNameDictionary[this.list[indexOfPrev].FirstName.ToLower()].Remove(this.list[indexOfPrev]);
-                this.lastNameDictionary[this.list[indexOfPrev].LastName.ToLower()].Remove(this.list[indexOfPrev]);
-                this.dateOfBirthDictionary[this.list[indexOfPrev].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexOfPrev]);
+                this.RemoveFromDictionary(indexOfPrev);
+
                 this.list[indexOfPrev] = record;
             }
             else
@@ -139,9 +138,8 @@
 
             int indexOfPrev = this.list.FindIndex(rec => rec.Id.Equals(record.Id));
 
-            this.firstNameDictionary[this.list[indexOfPrev].FirstName.ToLower()].Remove(this.list[indexOfPrev]);
-            this.lastNameDictionary[this.list[indexOfPrev].LastName.ToLower()].Remove(this.list[indexOfPrev]);
-            this.dateOfBirthDictionary[this.list[indexOfPrev].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexOfPrev]);
+            this.RemoveFromDictionary(indexOfPrev);
+
             this.ids.Remove(this.list[indexOfPrev].Id);
 
             this.list[indexOfPrev] = record;
@@ -166,9 +164,8 @@
             }
 
             this.PurgeCache(this.list[indexToRemove]);
-            this.firstNameDictionary[this.list[indexToRemove].FirstName.ToLower()].Remove(this.list[indexToRemove]);
-            this.lastNameDictionary[this.list[indexToRemove].LastName.ToLower()].Remove(this.list[indexToRemove]);
-            this.dateOfBirthDictionary[this.list[indexToRemove].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.RemoveFromDictionary(indexToRemove);
+
             this.ids.Remove(this.list[indexToRemove].Id);
 
             this.list.Remove(this.list[indexToRemove]);
@@ -435,6 +432,14 @@
             UpdateDictionary(record, this.lastNameDictionary, record.LastName);
 
             UpdateDictionary(record, this.dateOfBirthDictionary, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+
+            UpdateDictionary(record, this.favNumberDictionary, record.FavouriteNumber.ToString(CultureInfo.InvariantCulture));
+
+            UpdateDictionary(record, this.favCharacterDictionary, record.FavouriteCharacter.ToString(CultureInfo.InvariantCulture));
+
+            UpdateDictionary(record, this.favGameDictionary, record.FavouriteGame);
+
+            UpdateDictionary(record, this.donationsDictionary, record.Donations.ToString(CultureInfo.InvariantCulture));
         }
 
         private void PurgeCache(FileCabinetRecord record)
@@ -442,6 +447,17 @@
             PurgeCache(this.firstNameCache, record.FirstName);
             PurgeCache(this.lastNameCache, record.LastName);
             PurgeCache(this.dateOfBirthCache, record.DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture));
+        }
+
+        private void RemoveFromDictionary(int indexToRemove)
+        {
+            this.firstNameDictionary[this.list[indexToRemove].FirstName.ToLower()].Remove(this.list[indexToRemove]);
+            this.lastNameDictionary[this.list[indexToRemove].LastName.ToLower()].Remove(this.list[indexToRemove]);
+            this.dateOfBirthDictionary[this.list[indexToRemove].DateOfBirth.ToString("yyyy-MMM-d", CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.favNumberDictionary[this.list[indexToRemove].FavouriteNumber.ToString(CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.favCharacterDictionary[this.list[indexToRemove].FavouriteCharacter.ToString(CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.favGameDictionary[this.list[indexToRemove].FavouriteGame.ToString(CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
+            this.donationsDictionary[this.list[indexToRemove].Donations.ToString(CultureInfo.InvariantCulture).ToLower()].Remove(this.list[indexToRemove]);
         }
     }
 }

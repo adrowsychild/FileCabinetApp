@@ -108,12 +108,14 @@ namespace FileCabinetApp.CommandHandlers
             // if they don't correspond
             if (properties.Length - propEmptyValues != values.Length - valEmptyValues)
             {
+                Console.WriteLine("Fields don't correspond to the properties.");
                 return;
             }
 
             if (properties.Length - propEmptyValues != typeof(FileCabinetRecord).GetProperties().Length)
             {
                 Console.WriteLine("Please, enter all the properties needed.");
+                return;
             }
 
             PropertyInfo[] props = new PropertyInfo[properties.Length - propEmptyValues];

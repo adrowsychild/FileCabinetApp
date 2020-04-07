@@ -361,7 +361,7 @@ namespace FileCabinetApp
                 return null;
             }
 
-            return this.FindByKey(this.recordFavCharacterOffset, favCharacter);
+            return this.FindByKey(this.recordFavCharacterOffset, favCharacter[0]);
         }
 
         /// <summary>
@@ -653,7 +653,7 @@ namespace FileCabinetApp
             this.recordDonationsOffset[record.Donations].Remove(recordOffset);
         }
 
-        private FileSystemRecordCollection FindByKey<T>(SortedList<T, List<int>> offsetDictionary, dynamic key)
+        private FileSystemRecordCollection FindByKey<T>(SortedList<T, List<int>> offsetDictionary, T key)
         {
             List<FileCabinetRecord> storedRecords = new List<FileCabinetRecord>();
 

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using FileCabinetApp.Helpers;
-using FileCabinetApp.Printers;
 
 namespace FileCabinetApp.CommandHandlers
 {
